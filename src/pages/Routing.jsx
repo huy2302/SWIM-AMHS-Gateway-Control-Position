@@ -5,7 +5,7 @@ import { Save, ArrowRightLeft, Send, Download } from 'lucide-react';
 const RoutingView = () => {
   return (
     <DashboardLayout>
-        <div className="flex flex-col h-full bg-slate-950 text-slate-200 p-6 overflow-y-auto custom-scrollbar">
+        <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-6 overflow-y-auto custom-scrollbar">
         {/* Top Toolbar */}
         <div className="flex justify-between items-center mb-6 bg-slate-900 p-3 rounded-lg border border-slate-800 shadow-lg">
             <div className="flex items-center gap-3">
@@ -13,7 +13,7 @@ const RoutingView = () => {
                 <ArrowRightLeft size={20} />
             </div>
             <div>
-                <h2 className="text-sm font-bold uppercase tracking-wider">Routing Configuration</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider" style={{color: '#000'}}>Routing Configuration</h2>
                 <p className="text-[10px] text-slate-500">Define message flow between AMHS and SWIM protocols</p>
             </div>
             </div>

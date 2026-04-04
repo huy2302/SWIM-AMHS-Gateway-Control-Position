@@ -17,7 +17,7 @@ const FullLogView = () => {
 
   return (
     <DashboardLayout>
-        <div className="flex flex-col h-full bg-slate-950 text-slate-200 font-sans">
+        <div className="flex flex-col h-full bg-slate-100 text-slate-900 font-sans">
         
         {/* 1. FUNCTION BUTTONS (Toolbar chính) */}
         <div className="bg-slate-900 p-2 border-b border-slate-800 flex items-center justify-between shadow-md">
@@ -70,9 +70,9 @@ const FullLogView = () => {
         </div>
 
         {/* 2. LOG TABLE (Có tính năng click chọn) */}
-        <div className="flex-1 overflow-auto custom-scrollbar relative bg-[#0a0f18]">
+        <div className="flex-1 overflow-auto custom-scrollbar relative bg-slate-100">
             <table className="w-full text-left text-[11px] border-collapse font-mono">
-            <thead className="sticky top-0 bg-slate-900 z-20 shadow-sm">
+            <thead className="sticky top-0 bg-slate-100 z-20 shadow-sm">
                 <tr className="text-slate-500 border-b border-slate-800">
                 <th className="px-4 py-2 w-8"></th> {/* Cột icon chỉ thị */}
                 <th className="px-4 py-2 w-32">Date / Time</th>

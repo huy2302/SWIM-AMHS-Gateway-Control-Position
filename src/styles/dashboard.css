@@ -1,8 +1,8 @@
 body {
   margin: 0;
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
+  font-family: Arial, sans-serif;
+  background: #f8fafc;
+  color: #111827;
 }
 
 .app {
@@ -12,20 +12,26 @@ body {
 
 .sidebar {
   width: 450px;
-  background: #111827;
+  background: #ffffff;
   padding: 20px;
+  border-right: 1px solid #e5e7eb;
 }
 .sidebar a {
   display: flex;
   gap: 10px;
   padding: 12px;
   margin: 6px 0;
-  color: #cbd5e1;
+  color: #334155;
   align-items: center;
+  border-radius: 8px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.sidebar a:hover {
+  background: #f1f5f9;
 }
 .sidebar .active {
-  background: #1f2937;
-  border-radius: 6px;
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 .main {
@@ -35,7 +41,8 @@ body {
 }
 .topbar {
   height: 60px;
-  background: #111827;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -47,22 +54,23 @@ body {
 }
 
 .systemHealth {
-  background: #1f2937;
+  background: #eef2ff;
   padding: 10px;
   margin-bottom: 16px;
+  color: #0f172a;
 }
 
 .acp {
-  color: var(--acp-color);
+  color: rgb(39, 174, 96);
 }
 .wrn {
-  color: var(--wrn-color);
+  color: rgb(241, 196, 15);
 }
 .err {
-  color: var(--err-color);
+  color: rgb(231, 76, 60);
 }
 .def {
-  color: var(--def-color);
+  color: #64748b;
 }
 
 .statGrid {
@@ -73,24 +81,27 @@ body {
 }
 
 .statCard {
-  background: #1f2937;
+  background: #ffffff;
   padding: 16px;
   border-radius: 8px;
+  border: 1px solid #e5e7eb;
   text-align: center;
   display: flex;
-      flex-direction: column;
-    justify-content: space-between;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .statTitle {
   font-size: 18px;
   text-transform: uppercase;
+  color: #475569;
 }
 
 .statValue {
   font-size: 32px;
   font-weight: 600;
   margin-bottom: 1em;
+  color: #0f172a;
 }
 
 .bottomGrid,
@@ -101,9 +112,10 @@ body {
 }
 
 .panel {
-  background: #1f2937;
+  background: #ffffff;
   padding: 16px;
   border-radius: 8px;
+  border: 1px solid #e5e7eb;
 }
 
 table {
@@ -113,5 +125,73 @@ table {
 th,
 td {
   padding: 8px;
-  border-bottom: 1px solid #374151;
+  border-bottom: 1px solid #e2e8f0;
+  color: #334155;
+}
+th {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Light theme overrides for existing Tailwind dark utility classes */
+[class*="bg-slate-950"] {
+  background-color: #f8fafc !important;
+}
+[class*="bg-slate-900"] {
+  background-color: #ffffff !important;
+}
+[class*="bg-slate-800"] {
+  background-color: rgba(241, 245, 249, 0.9) !important;
+}
+[class*="bg-slate-700"] {
+  background-color: #e2e8f0 !important;
+}
+[class*="bg-black"] {
+  background-color: #ffffff !important;
+}
+[class*="border-slate-900"],
+[class*="border-slate-800"] {
+  border-color: #cbd5e1 !important;
+}
+[class*="border-slate-700"] {
+  border-color: #e2e8f0 !important;
+}
+.text-slate-200,
+.text-slate-300,
+.text-slate-400,
+.text-slate-500,
+.text-slate-600 {
+  color: #334155 !important;
+}
+.text-slate-300 {
+  color: #475569 !important;
+}
+.text-slate-400,
+.text-slate-500 {
+  color: #64748b !important;
+}
+.hover\:bg-slate-800:hover,
+.hover\:bg-slate-800\/40:hover,
+.hover\:bg-slate-900:hover,
+.hover\:bg-black\/40:hover {
+  background-color: #e2e8f0 !important;
+}
+.group-hover\:bg-slate-800:hover,
+.group-hover\:bg-black\/40:hover {
+  background-color: #e2e8f0 !important;
 }

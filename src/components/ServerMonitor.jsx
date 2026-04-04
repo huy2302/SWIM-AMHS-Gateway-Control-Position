@@ -26,8 +26,8 @@ const ServerMonitor = () => {
   const cpuPoints = metrics.cpu.map((val, i) => `${i * 25},${30 - (val / 100) * 30}`).join(' ');
 
   return (
-    <div className="bg-[#1e293b]/90 border border-slate-700 rounded-lg flex flex-col shadow-inner">
-      <div className="flex justify-between items-center border-b border-slate-700/50 px-3 py-1">
+    <div className="bg-slate-100 border border-slate-300 rounded-lg flex flex-col shadow-inner">
+      <div className="flex justify-between items-center border-b border-slate-300/50 px-3 py-1">
         <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Resource Infrastructure</span>
         <span className="text-[9px] text-green-500 font-mono">UPTIME: 12d 04h</span>
       </div>

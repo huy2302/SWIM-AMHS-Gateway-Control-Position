@@ -43,7 +43,7 @@ export default function Sidebar() {
   return (
     <div className="sidebar flex flex-col justify-between">
       <div>
-        <h2 className="logo">Gateway AMHS-SWIM</h2>
+        <h2 className="logo" style={{color: '#000'}}>Gateway AMHS-SWIM</h2>
 
         <nav>
           <NavLink 

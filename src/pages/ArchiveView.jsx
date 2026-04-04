@@ -56,7 +56,7 @@ const ArchiveView = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full bg-slate-950 text-slate-200 p-4 relative overflow-hidden">
+      <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-4 relative overflow-hidden">
         {/* Search Header */}
         <div className="bg-slate-900 p-4 rounded-t-xl border border-slate-800 flex flex-wrap gap-4 items-center">
           {/* Select Type */}

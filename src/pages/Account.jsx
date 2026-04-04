@@ -19,7 +19,7 @@ export default function Account() {
   const [selectedId, setSelectedId] = useState(2);
   return (
     <DashboardLayout>
-      <div className="flex h-full bg-slate-950 text-slate-200 p-4 gap-4">
+      <div className="flex h-full bg-slate-100 text-slate-900 p-4 gap-4">
         {/* CỘT TRÁI: BẢNG DANH SÁCH */}
         <div className="flex-1 flex flex-col bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow-xl">
           <div className="overflow-x-auto">

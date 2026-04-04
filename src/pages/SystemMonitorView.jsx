@@ -35,35 +35,35 @@ const SystemMonitorView = () => {
 
   return (
     <DashboardLayout>
-        <div className="flex flex-col h-full bg-slate-950 text-slate-200 p-4 gap-4 overflow-y-auto">
+        <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-4 gap-4 overflow-y-auto">
         
         {/* Top Toolbar */}
-        <div className="bg-slate-900 p-3 rounded-lg border border-slate-800 flex items-center justify-between shadow-lg">
+        <div className="bg-white p-3 rounded-lg border border-slate-300 flex items-center justify-between shadow-lg">
             <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-500 font-bold uppercase">Refresh every</span>
+                <span className="text-[10px] text-slate-600 font-bold uppercase">Refresh every</span>
                 <input 
                 type="number" 
                 value={refreshInterval}
                 onChange={(e) => setRefreshInterval(e.target.value)}
-                className="bg-black border border-slate-700 rounded px-2 py-1 text-xs w-16 text-blue-400 outline-none focus:border-blue-500"
+                className="bg-white border border-slate-300 rounded px-2 py-1 text-xs w-16 text-slate-900 outline-none focus:border-blue-500"
                 />
-                <span className="text-[10px] text-slate-500 font-medium">seconds</span>
+                <span className="text-[10px] text-slate-600 font-medium">seconds</span>
             </div>
-            <button className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded text-[11px] font-bold transition-all active:scale-95">
+            <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded text-[11px] font-bold text-slate-900 transition-all active:scale-95">
                 <Save size={14} /> WRITE TO LOG
             </button>
             </div>
 
             <div className="flex items-center gap-4">
-            <div className="bg-black/50 px-3 py-1.5 rounded border border-slate-800 flex items-center gap-3">
-                <span className="text-[10px] text-slate-500 uppercase font-bold">Heap Manager:</span>
-                <div className="h-2 w-32 bg-slate-800 rounded-full overflow-hidden">
+            <div className="bg-slate-100 px-3 py-1.5 rounded border border-slate-300 flex items-center gap-3">
+                <span className="text-[10px] text-slate-600 uppercase font-bold">Heap Manager:</span>
+                <div className="h-2 w-32 bg-slate-300 rounded-full overflow-hidden">
                 <div className="h-full bg-blue-500 w-[45%]" />
                 </div>
-                <span className="text-[10px] font-mono text-blue-400">41.14MB / 1024MB</span>
+                <span className="text-[10px] font-mono text-blue-600">41.14MB / 1024MB</span>
             </div>
-            <button className="p-1.5 text-slate-500 hover:text-red-400 transition-colors"><RefreshCw size={16}/></button>
+            <button className="p-1.5 text-slate-600 hover:text-red-500 transition-colors"><RefreshCw size={16}/></button>
             </div>
         </div>
 
@@ -81,17 +81,17 @@ const SystemMonitorView = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
                 <XAxis dataKey="time" hide />
                 <YAxis stroke="#475569" fontSize={10} unit="%" />
-                <Tooltip contentStyle={{backgroundColor: '#0f172a', border: '1px solid #1e293b', fontSize: '10px'}} />
+                <Tooltip contentStyle={{backgroundColor: '#ffffff', border: '1px solid #d1d5db', color: '#0f172a', fontSize: '10px'}} />
                 <Area type="monotone" dataKey="cpu" stroke="#ef4444" fillOpacity={1} fill="url(#colorCpu)" isAnimationActive={false} />
             </AreaChart>
             </ChartCard>
 
             <ChartCard title="Console Heap Memory Usage (MB)" color="#eab308" unit="MB">
             <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
                 <XAxis dataKey="time" hide />
-                <YAxis stroke="#475569" fontSize={10} />
-                <Tooltip contentStyle={{backgroundColor: '#0f172a', border: '1px solid #1e293b', fontSize: '10px'}} />
+                <YAxis stroke="#64748b" fontSize={10} />
+                <Tooltip contentStyle={{backgroundColor: '#ffffff', border: '1px solid #d1d5db', color: '#0f172a', fontSize: '10px'}} />
                 <Line type="stepAfter" dataKey="heap" stroke="#eab308" dot={false} isAnimationActive={false} strokeWidth={2} />
             </LineChart>
             </ChartCard>

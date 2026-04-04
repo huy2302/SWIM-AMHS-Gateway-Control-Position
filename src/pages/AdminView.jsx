@@ -9,10 +9,10 @@ import DashboardLayout from '../layout/DashboardLayout';
 const AdminView = () => {
   return (
     <DashboardLayout>
-        <div className="flex flex-col h-full bg-slate-950 text-slate-200 p-6 overflow-y-auto custom-scrollbar">
+        <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-6 overflow-y-auto custom-scrollbar">
         
         {/* Header cảnh báo đặc thù của màn Admin */}
-        <div className="mb-6 flex items-center gap-3 bg-red-950/20 border border-red-900/50 p-3 rounded-lg text-red-400">
+        <div className="mb-6 flex items-center gap-3 bg-red-100/80 border border-red-200/80 p-3 rounded-lg text-red-700">
             <AlertTriangle size={18} />
             <span className="text-xs font-bold uppercase tracking-tight">
             Caution: Some administrative actions are irreversible. Proceed with care.
