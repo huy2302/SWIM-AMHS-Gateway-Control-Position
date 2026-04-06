@@ -1,19 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, 
-  Tooltip, ResponsiveContainer, AreaChart, Area 
-} from 'recharts';
-import { LayoutGrid, Database, Cpu, Activity, RefreshCw, Save } from 'lucide-react';
-import DashboardLayout from '../layout/DashboardLayout';
+import React, { useState, useEffect } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+} from "recharts";
+import {
+  LayoutGrid,
+  Database,
+  Cpu,
+  Activity,
+  RefreshCw,
+  Save,
+} from "lucide-react";
+import DashboardLayout from "../layout/DashboardLayout";
 
 // Giả lập dữ liệu thời gian thực
-const generateData = () => [...Array(20)].map((_, i) => ({
-  time: i,
-  cpu: Math.floor(Math.random() * 30) + 10,
-  heap: Math.floor(Math.random() * 200) + 400,
-  amqp: Math.floor(Math.random() * 50),
-  amhs: Math.floor(Math.random() * 40),
-}));
+const generateData = () =>
+  [...Array(20)].map((_, i) => ({
+    time: i,
+    cpu: Math.floor(Math.random() * 30) + 10,
+    heap: Math.floor(Math.random() * 200) + 400,
+    amqp: Math.floor(Math.random() * 50),
+    amhs: Math.floor(Math.random() * 40),
+  }));
 
 const SystemMonitorView = () => {
   const [data, setData] = useState(generateData());
@@ -22,90 +37,148 @@ const SystemMonitorView = () => {
   // Hiệu ứng cập nhật dữ liệu giả lập mỗi 3 giây
   useEffect(() => {
     const interval = setInterval(() => {
-      setData(prev => [...prev.slice(1), {
-        time: prev[prev.length - 1].time + 1,
-        cpu: Math.floor(Math.random() * 40),
-        heap: Math.floor(Math.random() * 100) + 500,
-        amqp: Math.floor(Math.random() * 60),
-        amhs: Math.floor(Math.random() * 50),
-      }]);
+      setData((prev) => [
+        ...prev.slice(1),
+        {
+          time: prev[prev.length - 1].time + 1,
+          cpu: Math.floor(Math.random() * 40),
+          heap: Math.floor(Math.random() * 100) + 500,
+          amqp: Math.floor(Math.random() * 60),
+          amhs: Math.floor(Math.random() * 50),
+        },
+      ]);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
     <DashboardLayout>
-        <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-4 gap-4 overflow-y-auto">
-        
+      <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-4 gap-4 overflow-y-auto">
         {/* Top Toolbar */}
         <div className="bg-white p-3 rounded-lg border border-slate-300 flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-600 font-bold uppercase">Refresh every</span>
-                <input 
-                type="number" 
+              <span className="text-[10px] text-slate-600 font-bold uppercase">
+                Refresh every
+              </span>
+              <input
+                type="number"
                 value={refreshInterval}
                 onChange={(e) => setRefreshInterval(e.target.value)}
                 className="bg-white border border-slate-300 rounded px-2 py-1 text-xs w-16 text-slate-900 outline-none focus:border-blue-500"
-                />
-                <span className="text-[10px] text-slate-600 font-medium">seconds</span>
+              />
+              <span className="text-[10px] text-slate-600 font-medium">
+                seconds
+              </span>
             </div>
             <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded text-[11px] font-bold text-slate-900 transition-all active:scale-95">
-                <Save size={14} /> WRITE TO LOG
+              <Save size={14} /> WRITE TO LOG
             </button>
-            </div>
+          </div>
 
-            <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4">
             <div className="bg-slate-100 px-3 py-1.5 rounded border border-slate-300 flex items-center gap-3">
-                <span className="text-[10px] text-slate-600 uppercase font-bold">Heap Manager:</span>
-                <div className="h-2 w-32 bg-slate-300 rounded-full overflow-hidden">
+              <span className="text-[10px] text-slate-600 uppercase font-bold">
+                Heap Manager:
+              </span>
+              <div className="h-2 w-32 bg-slate-300 rounded-full overflow-hidden">
                 <div className="h-full bg-blue-500 w-[45%]" />
-                </div>
-                <span className="text-[10px] font-mono text-blue-600">41.14MB / 1024MB</span>
+              </div>
+              <span className="text-[10px] font-mono text-blue-600">
+                41.14MB / 1024MB
+              </span>
             </div>
-            <button className="p-1.5 text-slate-600 hover:text-red-500 transition-colors"><RefreshCw size={16}/></button>
-            </div>
+            <button className="p-1.5 text-slate-600 hover:text-red-500 transition-colors">
+              <RefreshCw size={16} />
+            </button>
+          </div>
         </div>
 
         {/* Grid Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1">
-            
-            <ChartCard title="CPU Usage (%)" color="#ef4444" unit="%">
+          <ChartCard title="CPU Usage (%)" color="#ef4444" unit="%">
             <AreaChart data={data}>
-                <defs>
+              <defs>
                 <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                 </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                <XAxis dataKey="time" hide />
-                <YAxis stroke="#475569" fontSize={10} unit="%" />
-                <Tooltip contentStyle={{backgroundColor: '#ffffff', border: '1px solid #d1d5db', color: '#0f172a', fontSize: '10px'}} />
-                <Area type="monotone" dataKey="cpu" stroke="#ef4444" fillOpacity={1} fill="url(#colorCpu)" isAnimationActive={false} />
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#1e293b"
+                vertical={false}
+              />
+              <XAxis dataKey="time" hide />
+              <YAxis stroke="#475569" fontSize={10} unit="%" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #d1d5db",
+                  color: "#0f172a",
+                  fontSize: "10px",
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="cpu"
+                stroke="#ef4444"
+                fillOpacity={1}
+                fill="url(#colorCpu)"
+                isAnimationActive={false}
+              />
             </AreaChart>
-            </ChartCard>
+          </ChartCard>
 
-            <ChartCard title="Console Heap Memory Usage (MB)" color="#eab308" unit="MB">
+          <ChartCard
+            title="Console Heap Memory Usage (MB)"
+            color="#eab308"
+            unit="MB"
+          >
             <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" vertical={false} />
-                <XAxis dataKey="time" hide />
-                <YAxis stroke="#64748b" fontSize={10} />
-                <Tooltip contentStyle={{backgroundColor: '#ffffff', border: '1px solid #d1d5db', color: '#0f172a', fontSize: '10px'}} />
-                <Line type="stepAfter" dataKey="heap" stroke="#eab308" dot={false} isAnimationActive={false} strokeWidth={2} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="#cbd5e1"
+                vertical={false}
+              />
+              <XAxis dataKey="time" hide />
+              <YAxis stroke="#64748b" fontSize={10} />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#ffffff",
+                  border: "1px solid #d1d5db",
+                  color: "#0f172a",
+                  fontSize: "10px",
+                }}
+              />
+              <Line
+                type="stepAfter"
+                dataKey="heap"
+                stroke="#eab308"
+                dot={false}
+                isAnimationActive={false}
+                strokeWidth={2}
+              />
             </LineChart>
-            </ChartCard>
+          </ChartCard>
 
-            <ChartCard title="AMQP Incoming Messages (msg/period)" color="#3b82f6" unit="">
+          <ChartCard
+            title="AMQP Incoming Messages (msg/period)"
+            color="#3b82f6"
+            unit=""
+          >
             <BarChartCustom data={data} dataKey="amqp" color="#3b82f6" />
-            </ChartCard>
+          </ChartCard>
 
-            <ChartCard title="AMHS Incoming Messages (msg/period)" color="#10b981" unit="">
+          <ChartCard
+            title="AMHS Incoming Messages (msg/period)"
+            color="#10b981"
+            unit=""
+          >
             <BarChartCustom data={data} dataKey="amhs" color="#10b981" />
-            </ChartCard>
-
+          </ChartCard>
         </div>
-        </div>
+      </div>
     </DashboardLayout>
   );
 };
@@ -115,7 +188,10 @@ const ChartCard = ({ title, children, color }) => (
   <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col h-[280px] shadow-lg">
     <div className="flex items-center justify-between mb-4">
       <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full" style={{backgroundColor: color}} />
+        <div
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: color }}
+        />
         {title}
       </h3>
       <LayoutGrid size={14} className="text-slate-600" />
@@ -132,14 +208,14 @@ const ChartCard = ({ title, children, color }) => (
 const BarChartCustom = ({ data, dataKey, color }) => (
   <div className="h-full w-full flex items-end gap-1 px-2">
     {data.map((item, i) => (
-      <div 
-        key={i} 
-        className="flex-1 rounded-t-sm transition-all duration-500" 
-        style={{ 
-          height: `${(item[dataKey] / 100) * 100}%`, 
+      <div
+        key={i}
+        className="flex-1 rounded-t-sm transition-all duration-500"
+        style={{
+          height: `${(item[dataKey] / 100) * 100}%`,
           backgroundColor: color,
-          opacity: 0.6 + (i / 20) * 0.4 
-        }} 
+          opacity: 0.6 + (i / 20) * 0.4,
+        }}
       />
     ))}
   </div>

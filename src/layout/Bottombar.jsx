@@ -23,10 +23,7 @@ export default function Bottombar() {
       </div>
       <div>
         <h3>
-          Curent time:{" "}
-          <span className="time">
-            {currentTime}
-          </span>
+          Curent time: <span className="time">{currentTime}</span>
         </h3>
       </div>
     </div>

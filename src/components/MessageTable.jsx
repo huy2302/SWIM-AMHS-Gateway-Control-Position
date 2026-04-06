@@ -1,19 +1,29 @@
-import { useEffect } from 'react';
-import { useMessageStore } from '../store/useMessageStore';
+import { useEffect } from "react";
+import { useMessageStore } from "../store/useMessageStore";
 
+/**
+ * Formats a time value to HH:MM format.
+ * @param {string|Date} value - The time value to format.
+ * @returns {string} Formatted time string or original value if invalid.
+ */
 const formatTime = (value) => {
-  if (!value) return '-';
+  if (!value) return "-";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
+/**
+ * MessageTable component that displays a live feed of messages in a table format.
+ * Shows message time, flight, type, and status with loading and error states.
+ * @returns {JSX.Element} A table displaying message data.
+ */
 export default function MessageTable() {
   const { messages, loading, error, loadSampleData } = useMessageStore();
 
   useEffect(() => {
     loadSampleData();
-    // Nếu muốn sử dụng API thực tế, thay bằng fetchMessages() và có thể giữ interval
+    // If you want to use real API, replace with fetchMessages() and optionally keep interval
     // fetchMessages();
     // const interval = setInterval(() => fetchMessages(), 30000);
     // return () => clearInterval(interval);
@@ -22,8 +32,8 @@ export default function MessageTable() {
   return (
     <div className="panel">
       <h4>Message Live Feed</h4>
-      {loading && <p>Đang tải dữ liệu từ API...</p>}
-      {error && <p className="error">Lỗi API: {error}</p>}
+      {loading && <p>Loading data from API...</p>}
+      {error && <p className="error">API Error: {error}</p>}
       <table>
         <thead>
           <tr>
@@ -36,17 +46,19 @@ export default function MessageTable() {
         <tbody>
           {messages.length === 0 && (
             <tr>
-              <td colSpan={4} style={{ textAlign: 'center' }}>
-                Không có dữ liệu
+              <td colSpan={4} style={{ textAlign: "center" }}>
+                No data available
               </td>
             </tr>
           )}
           {messages.map((msg, index) => (
-            <tr key={msg.id || `${msg.flight || 'none'}-${index}`}>
+            <tr key={msg.id || `${msg.flight || "none"}-${index}`}>
               <td>{formatTime(msg.time)}</td>
-              <td>{msg.flight || '-'}</td>
-              <td>{msg.type || '-'}</td>
-              <td className={msg.status === 'FAILED' ? 'bad' : 'ok'}>{msg.status || '-'}</td>
+              <td>{msg.flight || "-"}</td>
+              <td>{msg.type || "-"}</td>
+              <td className={msg.status === "FAILED" ? "bad" : "ok"}>
+                {msg.status || "-"}
+              </td>
             </tr>
           ))}
         </tbody>

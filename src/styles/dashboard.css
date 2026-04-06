@@ -24,7 +24,9 @@ body {
   color: #334155;
   align-items: center;
   border-radius: 8px;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 .sidebar a:hover {
   background: #f1f5f9;

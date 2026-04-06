@@ -2,18 +2,23 @@ import React, { useState } from "react";
 import DashboardLayout from "../layout/DashboardLayout";
 import { Search, Database, Download, X, Copy, Check } from "lucide-react";
 
+/**
+ * ArchiveView component for browsing archived messages.
+ * Allows searching, filtering, and viewing detailed message information in a modal.
+ * @returns {JSX.Element} The archive view with search functionality and message table.
+ */
 const ArchiveView = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
 
-  // Dữ liệu mẫu (giả lập từ ảnh)
+  // Sample data (simulated from image)
   const rows = [...Array(20)].map((_, i) => ({
     id: 281 + i,
     time: "08/12/25 15:14:59",
     mtsId: `[/PRMD=URUGUAY/ADMD=ICAO/C=XX;/Nova.000${i + 1}-251208.151459.4]`,
     ipmId: `${281 + i}*/OU=EGLLAMHS/O=AFTN/PRMD=EG/ADMD=ICAO/C=XX/`,
-    content: "FPL-HVN123-IS-A321/M-SDFM1/S-VVTS0900-N0450F350 DCT PANTO DCT...", // Nội dung giả lập
+    content: "FPL-HVN123-IS-A321/M-SDFM1/S-VVTS0900-N0450F350 DCT PANTO DCT...", // Simulated content
   }));
 
   const handleCopy = (text) => {
@@ -22,26 +27,26 @@ const ArchiveView = () => {
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  // Giả sử rows là mảng dữ liệu gốc từ sampleData
+  // Assume rows is the original data array from sampleData
   const [searchType, setSearchType] = useState("AMQP");
   const [direction, setDirection] = useState("Received");
   const [searchTerm, setSearchTerm] = useState("");
 
-  // State lưu dữ liệu sau khi lọc để hiển thị lên bảng
+  // State to store filtered data for display on table
   const [filteredRows, setFilteredRows] = useState(rows);
 
   const handleSearch = () => {
     const results = rows.filter((row) => {
-      // 1. Lọc theo Type (Ví dụ: MTS-ID chứa thông tin X.400 hoặc AMQP)
+      // 1. Filter by Type (Example: MTS-ID contains X.400 or AMQP info)
       const matchesType =
         searchType === "AMQP"
           ? row.mtsId.includes("Nova")
           : row.mtsId.includes("PRMD");
 
-      // 2. Lọc theo Direction (Giả sử dữ liệu của bạn có field 'type' là 'sent' hoặc 'received')
+      // 2. Filter by Direction (Assume your data has 'type' field as 'sent' or 'received')
       const matchesDir = row.direction === direction.toLowerCase();
 
-      // 3. Lọc theo Keyword (ID, MTS-ID hoặc IPM-ID)
+      // 3. Filter by Keyword (ID, MTS-ID or IPM-ID)
       const query = searchTerm.toLowerCase();
       const matchesQuery =
         row.id.toString().includes(query) ||
@@ -115,7 +120,7 @@ const ArchiveView = () => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()} // Nhấn Enter để search
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()} // Press Enter to search
               placeholder="Matching AMQP Message ID / MTS-ID..."
               className="w-full bg-black/40 border border-slate-800 rounded-lg py-2 pl-10 pr-4 text-xs focus:border-blue-500 outline-none transition-all text-slate-200"
             />
@@ -145,8 +150,8 @@ const ArchiveView = () => {
               {rows.map((row) => (
                 <tr
                   key={row.id}
-                  onClick={() => setSelectedId(row.id)} // Click 1 lần để chọn
-                  onDoubleClick={() => setModalData(row)} // Click đúp để mở Modal
+                  onClick={() => setSelectedId(row.id)} // Single click to select
+                  onDoubleClick={() => setModalData(row)} // Double-click to open Modal
                   className={`transition-all duration-150 cursor-pointer select-none
                   ${selectedId === row.id ? "bg-blue-600/30 text-white shadow-inner" : "hover:bg-slate-800/60 text-slate-400"}
                 `}
@@ -169,7 +174,7 @@ const ArchiveView = () => {
           </table>
         </div>
 
-        {/* MODAL CHI TIẾT ĐIỆN VĂN */}
+        {/* MESSAGE DETAILS MODAL */}
         {modalData && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
             <div className="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
@@ -244,7 +249,7 @@ const ArchiveView = () => {
   );
 };
 
-// Component nhỏ hiển thị thông tin mã ID
+// Small component to display ID information
 const DetailBox = ({ label, value, onCopy }) => (
   <div className="flex flex-col gap-1">
     <div className="flex justify-between items-center">

@@ -1,4 +1,11 @@
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const data = [
   { time: "09:30", in: 120, out: 60 },
@@ -14,11 +21,11 @@ export default function TrafficChart() {
       <h4>Traffic Flow</h4>
       <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
-          <XAxis dataKey="time" stroke="#ccc"/>
-          <YAxis stroke="#ccc"/>
+          <XAxis dataKey="time" stroke="#ccc" />
+          <YAxis stroke="#ccc" />
           <Tooltip />
-          <Line type="monotone" dataKey="in" stroke="#2ecc71"/>
-          <Line type="monotone" dataKey="out" stroke="#bdc3c7"/>
+          <Line type="monotone" dataKey="in" stroke="#2ecc71" />
+          <Line type="monotone" dataKey="out" stroke="#bdc3c7" />
         </LineChart>
       </ResponsiveContainer>
     </div>

@@ -15,12 +15,17 @@ import {
 } from "lucide-react";
 import { ACCOUNT_DATA } from "../data/sampleData";
 
+/**
+ * Account page component for managing system accounts.
+ * Displays a table of accounts with their status and provides command buttons for account operations.
+ * @returns {JSX.Element} The account management interface.
+ */
 export default function Account() {
   const [selectedId, setSelectedId] = useState(2);
   return (
     <DashboardLayout>
       <div className="flex h-full bg-slate-100 text-slate-900 p-4 gap-4">
-        {/* CỘT TRÁI: BẢNG DANH SÁCH */}
+        {/* LEFT COLUMN: LIST TABLE */}
         <div className="flex-1 flex flex-col bg-slate-900 border border-slate-800 rounded-lg overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-[11px] border-collapse">
@@ -77,20 +82,20 @@ export default function Account() {
               </tbody>
             </table>
           </div>
-          {/* Footer trạng thái */}
+          {/* Status footer */}
           <div className="mt-auto p-2 bg-slate-800/30 border-t border-slate-800 text-[10px] text-slate-500 flex justify-between">
             <span>Connected to server Nova</span>
             <span>Last update: Thu Dec 11 2025</span>
           </div>
         </div>
 
-        {/* CỘT PHẢI: CÁC NÚT LỆNH (COMMANDS) */}
+        {/* RIGHT COLUMN: COMMAND BUTTONS */}
         <div className="w-48 flex flex-col gap-2">
           <h3 className="text-[10px] font-bold text-slate-500 uppercase px-2 mb-1">
             Commands
           </h3>
 
-          {/* Nhóm chức năng chính */}
+          {/* Main functions group */}
           <div className="flex flex-col gap-1 bg-slate-900 p-2 rounded-lg border border-slate-800">
             <CommandBtn
               icon={<Plus size={14} />}
@@ -106,7 +111,7 @@ export default function Account() {
             <CommandBtn icon={<Copy size={14} />} label="Copy" />
           </div>
 
-          {/* Nhóm trạng thái */}
+          {/* Status group */}
           <div className="flex flex-col gap-1 bg-slate-900 p-2 rounded-lg border border-slate-800 mt-2">
             <CommandBtn
               icon={<Play size={14} />}
@@ -116,7 +121,7 @@ export default function Account() {
             <CommandBtn icon={<Square size={14} />} label="Disable" />
           </div>
 
-          {/* Nhóm Import/Export */}
+          {/* Import/Export group */}
           <div className="flex flex-col gap-1 bg-slate-900 p-2 rounded-lg border border-slate-800 mt-2 text-blue-400">
             <CommandBtn icon={<Upload size={14} />} label="Import" />
             <CommandBtn icon={<Download size={14} />} label="Export" />
@@ -124,7 +129,7 @@ export default function Account() {
             <CommandBtn icon={<Save size={14} />} label="Save" />
           </div>
 
-          {/* Nhóm Connect */}
+          {/* Connect group */}
           <div className="flex flex-col gap-1 bg-slate-900 p-2 rounded-lg border border-slate-800 mt-auto">
             <CommandBtn
               icon={<Link size={14} />}
@@ -143,7 +148,7 @@ export default function Account() {
   );
 }
 
-// Component con cho các nút lệnh
+// Sub-component for command buttons
 const CommandBtn = ({
   icon,
   label,

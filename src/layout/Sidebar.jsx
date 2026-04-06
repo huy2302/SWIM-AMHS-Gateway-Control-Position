@@ -14,8 +14,13 @@ import {
 import { useState, useEffect } from "react";
 import LogConsole from "../components/LogConsole";
 import ServerMonitor from "../components/ServerMonitor";
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { LOG_TEMPLATES } from '../data/sampleData';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  NavLink,
+} from "react-router-dom";
+import { LOG_TEMPLATES } from "../data/sampleData";
 
 export default function Sidebar() {
   const [logs, setLogs] = useState([]);
@@ -43,43 +48,73 @@ export default function Sidebar() {
   return (
     <div className="sidebar flex flex-col justify-between">
       <div>
-        <h2 className="logo" style={{color: '#000'}}>Gateway AMHS-SWIM</h2>
+        <h2 className="logo" style={{ color: "#000" }}>
+          Gateway AMHS-SWIM
+        </h2>
 
         <nav>
-          <NavLink 
-            to="/monitor" 
-            className={({ isActive }) => (isActive ? 'menu-item active' : 'menu-item')}
-          ><Monitor size={18} /> Monitor</NavLink>
+          <NavLink
+            to="/monitor"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+          >
+            <Monitor size={18} /> Monitor
+          </NavLink>
 
-          <NavLink 
-            to="/accounts" 
-            className={({ isActive }) => (isActive ? 'menu-item active' : 'menu-item')}
-          ><Mail size={18} /> Accounts</NavLink>
+          <NavLink
+            to="/accounts"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+          >
+            <Mail size={18} /> Accounts
+          </NavLink>
 
-          <NavLink 
-            to="/routing" 
-            className={({ isActive }) => (isActive ? 'menu-item active' : 'menu-item')}
-          ><RouterIcon size={18} /> Routing</NavLink>
+          <NavLink
+            to="/routing"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+          >
+            <RouterIcon size={18} /> Routing
+          </NavLink>
 
-          <NavLink 
-            to="/log" 
-            className={({ isActive }) => (isActive ? 'menu-item active' : 'menu-item')}
-          ><Logs size={18} /> Log</NavLink>
+          <NavLink
+            to="/log"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+          >
+            <Logs size={18} /> Log
+          </NavLink>
 
-          <NavLink 
-            to="/archive" 
-            className={({ isActive }) => (isActive ? 'menu-item active' : 'menu-item')}
-          ><Archive size={18} /> Archive</NavLink>
-          
-          <NavLink 
-            to="/admin" 
-            className={({ isActive }) => (isActive ? 'menu-item active' : 'menu-item')}
-          ><SettingsIcon size={18} /> Admin</NavLink>
-          
-          <NavLink 
-            to="/system" 
-            className={({ isActive }) => (isActive ? 'menu-item active' : 'menu-item')}
-          ><MonitorCog size={18} /> System Monitor</NavLink>
+          <NavLink
+            to="/archive"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+          >
+            <Archive size={18} /> Archive
+          </NavLink>
+
+          <NavLink
+            to="/admin"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+          >
+            <SettingsIcon size={18} /> Admin
+          </NavLink>
+
+          <NavLink
+            to="/system"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+          >
+            <MonitorCog size={18} /> System Monitor
+          </NavLink>
         </nav>
       </div>
       <div>
