@@ -37,7 +37,7 @@ const LogConsole = ({ logs }) => {
 
         {/* Display notification if scrolling is paused */}
         {isPaused && (
-          <span className="text-yellow-500 animate-pulse font-bold">
+          <span className="text-red-500 animate-pulse font-bold">
             [ SCROLL PAUSED - VIEWING OLD LOGS ]
           </span>
         )}
