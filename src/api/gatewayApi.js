@@ -16,12 +16,44 @@ const gatewayApi = {
   },
 
   // --- 2. ROUTING CONFIGURATION (Cấu hình định tuyến) ---
-  getRoutings: () => {
-    return axiosClient.get('/routing');
+  getRoutingA2s: () => {
+    return axiosClient.get('/routing/a2s');
   },
 
-  createRouting: (data) => {
-    return axiosClient.post('/routing', data);
+  getRoutingS2a: () => {
+    return axiosClient.get('/routing/s2a');
+  },
+
+  getRoutings: () => {
+    return Promise.all([
+      axiosClient.get('/routing/a2s'),
+      axiosClient.get('/routing/s2a'),
+    ]).then(([a2s, s2a]) => ({ a2s, s2a }));
+  },
+
+  createRouting: async (data) => {
+    try {
+      const response = await axiosClient.post("/routing", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        timeout: 10000,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("API createRouting error:", error);
+
+      if (error.response) {
+        // server trả lỗi
+        throw new Error(error.response.data?.message || "Server error");
+      } else if (error.request) {
+        // không gọi được API
+        throw new Error("Cannot connect to Gateway API");
+      } else {
+        throw new Error(error.message);
+      }
+    }
   },
 
   deleteRouting: (uuid) => {

@@ -46,7 +46,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <div className="sidebar flex flex-col justify-between">
+    <div className="sidebar flex flex-col">
       <div>
         <h2 className="logo" style={{color: '#000000'}}>
           {/* <span style={{color: '#ff0000'}}>A</span>
