@@ -15,20 +15,13 @@ const gatewayApi = {
     return axiosClient.patch(`/accounts/${uuid}/bind-status`, { status });
   },
 
-  // --- 2. ROUTING CONFIGURATION (Cấu hình định tuyến) ---
-  getRoutingA2s: () => {
-    return axiosClient.get('/routing/a2s');
-  },
+  getRoutings: async () => {
+    const data = await axiosClient.get('/routing');
 
-  getRoutingS2a: () => {
-    return axiosClient.get('/routing/s2a');
-  },
-
-  getRoutings: () => {
-    return Promise.all([
-      axiosClient.get('/routing/a2s'),
-      axiosClient.get('/routing/s2a'),
-    ]).then(([a2s, s2a]) => ({ a2s, s2a }));
+    return {
+      a2s: data.filter(r => r.direction === "OUT"),
+      s2a: data.filter(r => r.direction === "IN"),
+    };
   },
 
   createRouting: async (data) => {
@@ -51,6 +44,32 @@ const gatewayApi = {
         // không gọi được API
         throw new Error("Cannot connect to Gateway API");
       } else {
+        throw new Error(error.message);
+      }
+    }
+  },
+
+  updateRouting: async (id, data) => {
+    try {
+      const response = await axiosClient.put(`/routing/${id}`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        timeout: 10000,
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("API updateRouting error:", error);
+
+      if (error.response) {
+        // Server trả về lỗi (ví dụ: 404 Not Found hoặc 400 Bad Request)
+        throw new Error(error.response.data?.message || "Server error occurred while updating");
+      } else if (error.request) {
+        // Request đã gửi nhưng không nhận được phản hồi (lỗi mạng/gateway)
+        throw new Error("Cannot connect to Gateway API");
+      } else {
+        // Lỗi thiết lập request
         throw new Error(error.message);
       }
     }
