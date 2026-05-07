@@ -24,15 +24,11 @@ const FullLogView = () => {
   const fetchLogs = useCallback(async () => {
     try {
       setLoading(true);
-      // Gọi API gateway-logs với phân trang và tìm kiếm (nếu backend hỗ trợ)
-      const response = await gatewayApi.getGatewayLogs({ 
-        page: page, 
-        size: 50,
-        sort: "createdAt,desc" 
-      });
+      // Gọi API message-log
+      const response = await gatewayApi.getMessageLog();
       
       // Giả sử response trả về dạng Page của Spring Boot có trường .content
-      setLogs(response.content || []); 
+      setLogs(response || []); 
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu log:", error);
     } finally {
@@ -40,6 +36,15 @@ const FullLogView = () => {
     }
   }, [page]);
 
+  useEffect(() => {
+    fetchLogs();
+
+    const interval = setInterval(() => {
+      fetchLogs();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
   // 2. Tự động lấy dữ liệu khi Component mount hoặc đổi trang
   useEffect(() => {
     fetchLogs();
@@ -66,6 +71,120 @@ const FullLogView = () => {
     }
   };
 
+  const getStatusColor = (status, isSelected = false) => {
+    if (isSelected) return "text-white";
+
+    switch (status) {
+      case "SUCCESS":
+      case "ACK_RECEIVED":
+        return "text-green-400";
+
+      case "WAITING_ACK":
+      case "SENDING":
+      case "VALIDATING":
+      case "ROUTING":
+      case "TRANSFORMING":
+        return "text-blue-400";
+
+      case "ROUTING_FAILED":
+        return "text-yellow-400";
+
+      case "VALIDATION_FAILED":
+      case "TRANSFORMATION_FAILED":
+      case "SEND_FAILED":
+      case "ACK_TIMEOUT":
+      case "FAILED":
+        return "text-red-400";
+
+      default:
+        return "text-gray-400";
+    }
+  };
+
+  const getPriorityColor = (priority) => {
+    if (!priority) return "text-gray-400";
+
+    if (priority.startsWith("SS")) {
+      return "text-red-500";
+    }
+
+    if (priority.startsWith("DD")) {
+      return "text-orange-400";
+    }
+
+    if (priority.startsWith("FF")) {
+      return "text-yellow-400";
+    }
+
+    if (priority.startsWith("GG")) {
+      return "text-cyan-400";
+    }
+
+    if (priority.startsWith("KK")) {
+      return "text-gray-400";
+    }
+
+    return "text-white";
+  };
+
+  const getDirectionColor = (dir) => {
+    switch (dir) {
+      case "OUT":
+        return "text-blue-400";
+
+      case "IN":
+        return "text-purple-400";
+
+      default:
+        return "text-gray-400";
+    }
+  };
+
+  const isErrorStatus = (status) => {
+    return [
+      "FAILED",
+      "VALIDATION_FAILED",
+      "ROUTING_FAILED",
+      "TRANSFORMATION_FAILED",
+      "SEND_FAILED",
+      "ACK_TIMEOUT"
+    ].includes(status);
+  };
+
+  const getRowStatusClass = (status, isSelected) => {
+    if (isSelected && isErrorStatus(status)) {
+      return `
+        bg-red-600/60
+        text-white
+
+        [&>td]:text-white
+        [&>td>span]:text-white
+      `;
+    } 
+
+    if (isSelected) {
+      return `
+        bg-blue-600/60
+        text-white
+
+        [&>td]:text-white
+        [&>td>span]:text-white
+      `;
+    }
+
+    if (isErrorStatus(status)) {
+      return `
+        bg-red-500/5
+        text-red-600
+
+        [&>td]:text-red-600
+        [&>td>span]:text-red-600
+      `;
+    }
+
+    return "hover:bg-slate-200";
+  };
+
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full bg-slate-100 text-slate-900 font-sans">
@@ -88,17 +207,16 @@ const FullLogView = () => {
               disabled={!selectedLog}
             />
 
+            <div className="w-[1px] h-6 bg-slate-800 mx-2" />
+
+            <ToolbarBtn icon={<Calendar size={14} />} label="Today's Log" />
             {/* Nút Update với hiệu ứng Loading */}
             <ToolbarBtn
               icon={loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCcw size={14} />}
-              label={loading ? "Updating..." : "Update"}
+              label={loading ? "Update" : "Update"}
               onClick={fetchLogs}
               active={loading}
             />
-
-            <div className="w-[1px] h-6 bg-slate-800 mx-2" />
-            <ToolbarBtn icon={<Calendar size={14} />} label="Today's Log" />
-            <ToolbarBtn icon={<Info size={14} />} label="Details" disabled={!selectedLog} />
           </div>
 
           {/* INPUT SEARCH ONCHANGE */}
@@ -119,11 +237,15 @@ const FullLogView = () => {
           <table className="w-full text-left text-[11px] border-collapse font-mono">
             <thead className="sticky top-0 bg-white z-20 shadow-sm">
               <tr className="text-slate-500 border-b border-slate-200">
-                <th className="px-4 py-2 w-8"></th>
-                <th className="px-4 py-2 w-48">Date / Time</th>
-                <th className="px-4 py-2 w-24">Status</th>
-                <th className="px-4 py-2 w-32">Direction</th>
-                <th className="px-4 py-2 font-semibold">Message ID / Payload</th>
+                <th className="px-4 py-2 w-8">#</th>
+                <th className="px-4 py-2 w-48">TIME</th>
+                <th className="px-4 py-2 w-24">DIR</th>
+                <th className="px-4 py-2 w-32">MSG ID</th>
+                <th className="px-4 py-2 font-semibold">TYPE</th>
+                <th className="px-4 py-2 font-semibold">PRIO</th>
+                <th className="px-4 py-2 font-semibold">MESSAGE</th>
+                <th className="px-4 py-2 font-semibold">TOPIC</th>
+                <th className="px-4 py-2 font-semibold">STATUS</th>
               </tr>
             </thead>
             <tbody>
@@ -131,31 +253,73 @@ const FullLogView = () => {
                 <tr
                   key={log.id}
                   onClick={() => setSelectedLog(log)}
-                  className={`group cursor-pointer border-b border-slate-200 transition-colors ${
-                    selectedLog?.id === log.id
-                      ? "bg-blue-600/40 text-white" 
-                      : "hover:bg-slate-200"
-                  }`}
+                  className={`
+                    group cursor-pointer border-b border-slate-200 transition-colors
+                    ${getRowStatusClass(
+                      log.processingStatus,
+                      selectedLog?.id === log.id
+                    )}
+                  `}
                 >
-                  <td className="px-2 py-1 text-center">
-                    {selectedLog?.id === log.id && <ChevronRight size={12} className="text-blue-400 inline" />}
-                  </td>
                   <td className="px-4 py-1">
-                    {new Date(log.createdAt).toLocaleString()}
+                    <span>{log.id}</span>
                   </td>
+
+                  <td className="px-4 py-1 whitespace-nowrap">
+                    <span>{new Date(log.createdAt).toLocaleString()}</span>
+                  </td>
+
+                  <td
+                    className={`px-4 py-1 font-semibold ${getDirectionColor(
+                      log.direction
+                    )}`}
+                  >
+                    <span>{log.direction}</span>
+                  </td>
+
+                  <td className="px-4 py-1 font-mono">
+                    <span>{log.messageId}</span>
+                  </td>
+
+                  <td className="px-4 py-1 font-medium">
+                    <span>{log.amhsMessageType}</span>
+                  </td>
+
+                  <td
+                    className={`px-4 py-1 font-bold ${getPriorityColor(
+                      log.amhsPriority
+                    )}`}
+                  >
+                    <span>{`${log.amhsPriority || "-"} (${log.swimPriority ?? "-"})`}</span>
+                  </td>
+
+                  <td
+                    className="px-4 py-1 truncate max-w-[250px]"
+                    title={log.errorMessage}
+                  >
+                    <span>{log.errorMessage}</span>
+                  </td>
+
+                  <td
+                    className="px-4 py-1 truncate max-w-[220px]"
+                    title={log.swimTopic}
+                  >
+                    <span>{log.swimTopic || "-"}</span>
+                  </td>
+
                   <td className="px-4 py-1">
-                    <span className={`font-bold ${
-                      log.status === 'ERROR' ? 'text-red-500' : 
-                      log.status === 'SENT' ? 'text-green-600' : 'text-blue-500'
-                    } ${selectedLog?.id === log.id ? "text-white" : ""}`}>
-                      {log.status}
+                    <span
+                      className={`
+                        px-2 py-0.5 rounded text-xs font-bold
+                        bg-white/5
+                        ${getStatusColor(
+                          log.processingStatus,
+                          selectedLog?.id === log.id
+                        )}
+                      `}
+                    >
+                      {log.processingStatus}
                     </span>
-                  </td>
-                  <td className="px-4 py-1 italic opacity-70">
-                    {log.direction}
-                  </td>
-                  <td className="px-4 py-1 truncate max-w-xs">
-                    {log.messageId} - {log.payload?.substring(0, 50)}...
                   </td>
                 </tr>
               ))}

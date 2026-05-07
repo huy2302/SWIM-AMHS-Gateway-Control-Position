@@ -16,19 +16,13 @@ const gatewayApi = {
   },
 
   // --- 2. ROUTING CONFIGURATION (Cấu hình định tuyến) ---
-  getRoutingA2s: () => {
-    return axiosClient.get('/routing/a2s');
-  },
+  getRoutings: async () => {
+    const data = await axiosClient.get('/routing');
 
-  getRoutingS2a: () => {
-    return axiosClient.get('/routing/s2a');
-  },
-
-  getRoutings: () => {
-    return Promise.all([
-      axiosClient.get('/routing/a2s'),
-      axiosClient.get('/routing/s2a'),
-    ]).then(([a2s, s2a]) => ({ a2s, s2a }));
+    return {
+      a2s: data.filter(r => r.direction === "OUT"),
+      s2a: data.filter(r => r.direction === "IN"),
+    };
   },
 
   createRouting: async (data) => {
@@ -58,6 +52,12 @@ const gatewayApi = {
 
   deleteRouting: (uuid) => {
     return axiosClient.delete(`/routing/${uuid}`);
+  },
+
+  getMessageLog: async () => {
+    const data = await axiosClient.get('/message-logs/latest');
+
+    return data;
   },
 
   // --- 3. MONITORING & PERFORMANCE (Giám sát hệ thống) ---
