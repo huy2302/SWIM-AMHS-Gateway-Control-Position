@@ -15,6 +15,7 @@ const gatewayApi = {
     return axiosClient.patch(`/accounts/${uuid}/bind-status`, { status });
   },
 
+  // --- 2. ROUTING CONFIGURATION (Cấu hình định tuyến) ---
   getRoutings: async () => {
     const data = await axiosClient.get('/routing');
 
@@ -77,6 +78,12 @@ const gatewayApi = {
 
   deleteRouting: (uuid) => {
     return axiosClient.delete(`/routing/${uuid}`);
+  },
+
+  getMessageLog: async () => {
+    const data = await axiosClient.get('/message-logs/latest');
+
+    return data;
   },
 
   // --- 3. MONITORING & PERFORMANCE (Giám sát hệ thống) ---
