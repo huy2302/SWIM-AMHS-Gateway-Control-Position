@@ -19,37 +19,65 @@ import {
   Save,
 } from "lucide-react";
 import DashboardLayout from "../layout/DashboardLayout";
+import gatewayApi from "../api/gatewayApi";
 
-// Giả lập dữ liệu thời gian thực
 const generateData = () =>
   [...Array(20)].map((_, i) => ({
     time: i,
-    cpu: Math.floor(Math.random() * 30) + 10,
-    heap: Math.floor(Math.random() * 200) + 400,
-    amqp: Math.floor(Math.random() * 50),
-    amhs: Math.floor(Math.random() * 40),
+    processCpu: 0,
+    systemCpu: 0,
+    heapUsedMb: 0,
+    totalRamMb: 0,
+    ramPercent: 0,
+    amqp: 0,
+    amhs: 0,
   }));
+
+const normalizePercent = (value) =>
+  typeof value === "number" && !Number.isNaN(value)
+    ? Number((value * 100).toFixed(1))
+    : 0;
+
+const toChartPoint = (health, prevTime) => {
+  const gatewayCp = health?.gatewayCp || {};
+
+  const dataSampe = {
+    time: prevTime + 1,
+    processCpu: normalizePercent(gatewayCp.processCpu),
+    systemCpu: normalizePercent(gatewayCp.systemCpu),
+    heapUsedMb: Number(gatewayCp.heapUsedMb ?? 0),
+    totalRamMb: Number(gatewayCp.totalRamMb ?? 0),
+    ramPercent: normalizePercent(gatewayCp.ramPercent),
+    amqp: Math.floor(Math.random() * 60),
+    amhs: Math.floor(Math.random() * 50),
+  };
+  
+  return dataSampe;
+};
 
 const SystemMonitorView = () => {
   const [data, setData] = useState(generateData());
-  const [refreshInterval, setRefreshInterval] = useState(5);
+  const [refreshInterval, setRefreshInterval] = useState(1);
 
-  // Hiệu ứng cập nhật dữ liệu giả lập mỗi 3 giây
-  useEffect(() => {
-    const interval = setInterval(() => {
+  const fetchSystemMonitor = async () => {
+    try {
+      const response = await gatewayApi.getSystemHealth();
+      console.log(data)
       setData((prev) => [
         ...prev.slice(1),
-        {
-          time: prev[prev.length - 1].time + 1,
-          cpu: Math.floor(Math.random() * 40),
-          heap: Math.floor(Math.random() * 100) + 500,
-          amqp: Math.floor(Math.random() * 60),
-          amhs: Math.floor(Math.random() * 50),
-        },
+        toChartPoint(response, prev[prev.length - 1]?.time ?? 0),
       ]);
-    }, 3000);
+      console.log(data)
+    } catch (error) {
+      console.error("Error fetching system health:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchSystemMonitor();
+    const interval = setInterval(fetchSystemMonitor, refreshInterval * 1000);
     return () => clearInterval(interval);
-  }, []);
+  }, [refreshInterval]);
 
   return (
     <DashboardLayout>
@@ -63,8 +91,11 @@ const SystemMonitorView = () => {
               </span>
               <input
                 type="number"
+                min="1"
                 value={refreshInterval}
-                onChange={(e) => setRefreshInterval(e.target.value)}
+                onChange={(e) =>
+                  setRefreshInterval(Math.max(1, Number(e.target.value) || 1))
+                }
                 className="bg-white border border-slate-300 rounded px-2 py-1 text-xs w-16 text-slate-900 outline-none focus:border-blue-500"
               />
               <span className="text-[10px] text-slate-600 font-medium">
@@ -121,7 +152,7 @@ const SystemMonitorView = () => {
               />
               <Area
                 type="monotone"
-                dataKey="cpu"
+                dataKey="processCpu"
                 stroke="#ef4444"
                 fillOpacity={1}
                 fill="url(#colorCpu)"
@@ -153,7 +184,7 @@ const SystemMonitorView = () => {
               />
               <Line
                 type="stepAfter"
-                dataKey="heap"
+                dataKey="heapUsedMb"
                 stroke="#eab308"
                 dot={false}
                 isAnimationActive={false}
