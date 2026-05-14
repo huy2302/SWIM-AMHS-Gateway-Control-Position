@@ -50,32 +50,6 @@ const gatewayApi = {
     }
   },
 
-  updateRouting: async (id, data) => {
-    try {
-      const response = await axiosClient.put(`/routing/${id}`, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        timeout: 10000,
-      });
-
-      return response.data;
-    } catch (error) {
-      console.error("API updateRouting error:", error);
-
-      if (error.response) {
-        // Server trả về lỗi (ví dụ: 404 Not Found hoặc 400 Bad Request)
-        throw new Error(error.response.data?.message || "Server error occurred while updating");
-      } else if (error.request) {
-        // Request đã gửi nhưng không nhận được phản hồi (lỗi mạng/gateway)
-        throw new Error("Cannot connect to Gateway API");
-      } else {
-        // Lỗi thiết lập request
-        throw new Error(error.message);
-      }
-    }
-  },
-
   deleteRouting: (uuid) => {
     return axiosClient.delete(`/routing/${uuid}`);
   },
@@ -95,6 +69,11 @@ const gatewayApi = {
   getSystemStatus: () => {
     // Trạng thái tổng quát của SWIM
     return axiosClient.get('/swim/status');
+  },
+
+  getSystemHealth: () => {
+    // Thông tin sức khỏe hệ thống (CPU, RAM, Disk, MySQL)
+    return axiosClient.get('/system/health');
   },
 
   // --- 4. MESSAGE ARCHIVE & LOGS (Tra cứu điện văn và Log) ---

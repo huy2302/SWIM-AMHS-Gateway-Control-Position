@@ -48,9 +48,9 @@ axiosClient.interceptors.request.use(
     const auth = authUtils.getAuth();
     if (auth?.token) {
       config.headers['Authorization'] = `Bearer ${auth.token}`;
-      console.log('🔐 Sending request with JWT token:', config.url);
+      // console.log('🔐 Sending request with JWT token:', config.url);
     } else {
-      console.log('🚫 Sending request without token:', config.url);
+      // console.log('🚫 Sending request without token:', config.url);
     }
     return config;
   },
@@ -63,7 +63,7 @@ axiosClient.interceptors.request.use(
 // Thêm interceptor để xử lý dữ liệu hoặc lỗi tập trung
 axiosClient.interceptors.response.use(
   (response) => {
-    console.log('✅ API Response:', response.config.url, response.status);
+    // console.log('✅ API Response:', response.config.url, response.status);
     return response.data;
   },
   async (error) => {
