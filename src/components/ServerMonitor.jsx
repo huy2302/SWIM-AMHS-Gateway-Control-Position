@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import gatewayApi from "../api/gatewayApi";
+import { useSelector } from "react-redux";
 
 const ServerMonitor = () => {
   const [metrics, setMetrics] = useState({
-    cpu: [45, 25, 19, 30, 55, 35, 32, 40],
+    cpu: [45, 25, 19, 30, 55, 35, 32, 40, 28, 22, 18, 30, 50, 60, 42, 38, 33, 29, 31, 27], // % CPU Load history
     ram: 0,
     rom: 0, // % Disk Usage
     net: { in: 124, out: 85 }, // KB/s
@@ -13,53 +13,40 @@ const ServerMonitor = () => {
     totalDiskGb: 1000,
     usedDiskGb: 72,
   });
+  const { CpuLoad, MemoryUsage } = useSelector((state) => state.system);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await gatewayApi.getSystemHealth();
-  //       const data = response;
-  //       setMetrics((prev) => ({
-  //         cpu: [...prev.cpu.slice(1), Math.round(data.cpuUsagePercent)],
-  //         ram: Math.round(data.ramUsagePercent),
-  //         rom: Math.round(data.diskUsagePercent),
-  //         net: prev.net, // Keep mock for now
-  //         mysqlStatus: data.mysqlStatus,
-  //         totalRamGb: data.totalRamGb,
-  //         usedRamGb: data.usedRamGb,
-  //         totalDiskGb: data.totalDiskGb,
-  //         usedDiskGb: data.usedDiskGb,
-  //       }));
-  //       console.log(`${data.ramUsagePercent} RAM used, ${data.diskUsagePercent} Disk used ${data.cpuUsagePercent} CPU used`);
-  //     } catch (error) {
-  //       console.error("Failed to fetch system health:", error);
-  //     }
-  //   };
+  const [cpuHistory, setCpuHistory] = useState(Array(20).fill(0));
 
-  //   fetchData();
-  //   const interval = setInterval(fetchData, 1000); // Fetch every 5 seconds
-  //   return () => clearInterval(interval);
-  // }, []);
+  useEffect(() => {
+    if (typeof CpuLoad !== "number") return;
 
-   const cpuPoints = metrics.cpu
-    .map((val, i) => `${i * 25},${30 - (val / 100) * 30}`)
-    .join(" "); 
+    setCpuHistory(prev => [
+      ...prev.slice(1),
+      Math.min(Math.max(CpuLoad * 100, 0), 100) // clamp 0–100
+    ]);
+
+    setMetrics(prev => ({
+      ...prev,
+      cpu: [
+        ...prev.cpu.slice(1),
+        Math.min(Math.max(CpuLoad*100, 0), 100) // clamp 0–100
+      ]
+    }));
+
+    console.log("CPU Load updated:", CpuLoad);
+    
+  }, [CpuLoad]);
+
+  const cpuPoints = cpuHistory
+    .map((val, i) => `${i * 9},${(30 - (val / 100) * 30)}`)
+    .join(" ");
+    
   return (
     <div className="bg-slate-100 border border-slate-300 rounded-lg flex flex-col shadow-inner">
       <div className="flex justify-between items-center border-b border-slate-300/50 px-3 py-1">
         <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
           Resource Infrastructure
         </span>
-        <div className="flex gap-2">
-          <span className="text-[9px] text-green-500 font-mono">
-            UPTIME: 12d 04h
-          </span>
-          <span className="text-[9px] font-mono">
-            MySQL: <span className={metrics.mysqlStatus === "UP" ? "text-green-500" : "text-red-500"}>
-              {metrics.mysqlStatus}
-            </span>
-          </span>
-        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3 px-3 py-1 bg-[#fff]">
@@ -68,7 +55,7 @@ const ServerMonitor = () => {
           <div className="flex justify-between text-[9px]">
             <span className="text-slate-300">CPU LOAD</span>
             <span className="text-green-400 font-mono">
-              {metrics.cpu[metrics.cpu.length - 1]}%
+              {(CpuLoad*100)?.toFixed(2) ?? 0}%
             </span>
           </div>
           <svg viewBox="0 0 180 30" className="w-full h-8 overflow-visible">
@@ -94,7 +81,7 @@ const ServerMonitor = () => {
             />
           </div>
           <p className="text-[8px] text-slate-400 text-right italic">
-            {/* {metrics.usedRamGb.toFixed(2)}GB / {metrics.totalRamGb.toFixed(2)}GB */}
+            {metrics.usedRamGb.toFixed(2)}GB / {metrics.totalRamGb.toFixed(2)}GB
           </p>
         </div>
 
@@ -114,7 +101,7 @@ const ServerMonitor = () => {
         </div>
 
         {/* Network - Throughput */}
-        {/* <div className="space-y-1 border-t border-slate-700/30 pt-2">
+        <div className="space-y-1 border-t border-slate-700/30 pt-2">
           <div className="flex justify-between text-[9px]">
             <span className="text-slate-300">NETWORK (IO)</span>
             <span className="text-purple-400 font-mono">LIVE</span>
@@ -129,7 +116,7 @@ const ServerMonitor = () => {
               <span className="text-slate-300">{metrics.net.out} KB/s</span>
             </div>
           </div>
-        </div> */}
+        </div>
       </div>
     </div>
   );

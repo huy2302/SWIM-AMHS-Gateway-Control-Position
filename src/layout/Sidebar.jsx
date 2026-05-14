@@ -120,9 +120,9 @@ export default function Sidebar() {
         </nav>
       </div>
       <div>
-        <div className="h-56 mt-4">
+        {/* <div className="h-56 mt-4">
           <LogConsole logs={logs} />
-        </div>
+        </div> */}
 
         <div className="mt-4">
           <ServerMonitor />

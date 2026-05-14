@@ -2,6 +2,7 @@ import Sidebar from "./Sidebar";
 import Topbar from "./Topbar";
 import "../styles/dashboard.css";
 import Bottombar from "./Bottombar";
+import GlobalSystemFetcher from "./GlobalSystemFetcher";
 
 /**
  * DashboardLayout component that provides the main layout structure for the application.
@@ -10,8 +11,10 @@ import Bottombar from "./Bottombar";
  * @returns {JSX.Element} The layout wrapper with sidebar, topbar, content, and bottombar.
  */
 export default function DashboardLayout({ children }) {
+
   return (
     <div className="app">
+      <GlobalSystemFetcher />
       <Sidebar />
       <div className="main">
         <Topbar />
