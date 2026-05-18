@@ -5,6 +5,7 @@ import FullLogView from "./pages/FullLogView";
 import ArchiveView from "./pages/ArchiveView";
 import AdminView from "./pages/AdminView";
 import SystemMonitorView from "./pages/SystemMonitorView";
+// import NewGatewayDashboard from "./pages/NewGatewayDashboard";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 /**

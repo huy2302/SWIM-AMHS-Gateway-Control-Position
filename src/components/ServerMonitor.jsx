@@ -32,8 +32,6 @@ const ServerMonitor = () => {
         Math.min(Math.max(CpuLoad*100, 0), 100) // clamp 0–100
       ]
     }));
-
-    console.log("CPU Load updated:", CpuLoad);
     
   }, [CpuLoad]);
 
