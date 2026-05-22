@@ -76,6 +76,11 @@ const gatewayApi = {
     return axiosClient.get('/system/health');
   },
 
+  // Lấy số liệu tổng hợp cho dashboard (các card thống kê)
+  getDashboardStats: () => {
+    return axiosClient.get('/monitor/stats');
+  },
+
   // --- 4. MESSAGE ARCHIVE & LOGS (Tra cứu điện văn và Log) ---
   getAllArchives: (params) => {
     // Lấy toàn bộ điện văn đã lưu trữ (có phân trang/lọc)

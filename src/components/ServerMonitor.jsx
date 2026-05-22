@@ -13,27 +13,28 @@ const ServerMonitor = () => {
     totalDiskGb: 1000,
     usedDiskGb: 72,
   });
-  const { CpuLoad, MemoryUsage } = useSelector((state) => state.system);
+  const { GatewayProcess } = useSelector((state) => state.system);
 
+  // console.log(GatewayProcess)
   const [cpuHistory, setCpuHistory] = useState(Array(20).fill(0));
 
   useEffect(() => {
-    if (typeof CpuLoad !== "number") return;
+    if (typeof GatewayProcess?.systemCpu !== "number") return;
 
     setCpuHistory(prev => [
       ...prev.slice(1),
-      Math.min(Math.max(CpuLoad * 100, 0), 100) // clamp 0–100
+      Math.min(Math.max(GatewayProcess?.systemCpu * 100, 0), 100) // clamp 0–100
     ]);
 
     setMetrics(prev => ({
       ...prev,
       cpu: [
         ...prev.cpu.slice(1),
-        Math.min(Math.max(CpuLoad*100, 0), 100) // clamp 0–100
+        Math.min(Math.max(GatewayProcess?.systemCpu*100, 0), 100) // clamp 0–100
       ]
     }));
     
-  }, [CpuLoad]);
+  }, [GatewayProcess?.systemCpu]);
 
   const cpuPoints = cpuHistory
     .map((val, i) => `${i * 9},${(30 - (val / 100) * 30)}`)
@@ -43,17 +44,17 @@ const ServerMonitor = () => {
     <div className="bg-slate-100 border border-slate-300 rounded-lg flex flex-col shadow-inner">
       <div className="flex justify-between items-center border-b border-slate-300/50 px-3 py-1">
         <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
-          Resource Infrastructure
+          System Status
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 px-3 py-1 bg-[#fff]">
+      <div className="grid grid-cols-1 gap-3 px-3 py-1 bg-[#fff]">
         {/* CPU - Sparkline */}
         <div className="space-y-1">
-          <div className="flex justify-between text-[9px]">
-            <span className="text-slate-300">CPU LOAD</span>
+          <div className="flex justify-between text-[10px]">
+            <span className="text-slate-300">CPU Usage</span>
             <span className="text-green-400 font-mono">
-              {(CpuLoad*100)?.toFixed(2) ?? 0}%
+              {(GatewayProcess?.systemCpu*100)?.toFixed(2) ?? 0}%
             </span>
           </div>
           <svg viewBox="0 0 180 30" className="w-full h-8 overflow-visible">
@@ -68,25 +69,25 @@ const ServerMonitor = () => {
 
         {/* RAM - Progress Bar */}
         <div className="space-y-1">
-          <div className="flex justify-between text-[9px]">
-            <span className="text-slate-300">RAM USAGE</span>
-            <span className="text-blue-400 font-mono">{metrics.ram}%</span>
+          <div className="flex justify-between text-[10px]">
+            <span className="text-slate-300">Memory Usage</span>
+            <span className="text-blue-400 font-mono">{GatewayProcess?.totalRamPercent?.toFixed(2) ?? 0}%</span>
           </div>
           <div className="h-1.5 w-full bg-slate-700 rounded-full mt-3 overflow-hidden">
             <div
               className="h-full bg-blue-500 transition-all duration-1000"
-              style={{ width: `${metrics.ram}%` }}
+              style={{ width: `${GatewayProcess?.totalRamPercent}%` }}
             />
           </div>
-          <p className="text-[8px] text-slate-400 text-right italic">
-            {metrics.usedRamGb.toFixed(2)}GB / {metrics.totalRamGb.toFixed(2)}GB
+          <p className="text-[10px] text-slate-400 text-right italic">
+            {GatewayProcess?.usedPhysicalMemoryMb ?? 0}GB / {GatewayProcess?.totalPhysicalMemoryMb ?? 0}GB
           </p>
         </div>
 
         {/* ROM (Storage) - Tuyến tính */}
         <div className="space-y-1 border-t border-slate-700/30 pt-2">
-          <div className="flex justify-between text-[9px]">
-            <span className="text-slate-300">ROM (NVMe)</span>
+          <div className="flex justify-between text-[10px]">
+            <span className="text-slate-300">Disk Usage</span>
             <span className="text-orange-400 font-mono">{metrics.rom}%</span>
           </div>
           <div className="h-1.5 w-full bg-slate-700 rounded-full overflow-hidden">
@@ -98,23 +99,6 @@ const ServerMonitor = () => {
           {/* <p className="text-[8px] text-slate-400 italic">Used: {metrics.usedDiskGb.toFixed(2)}GB / {metrics.totalDiskGb.toFixed(2)}GB</p> */}
         </div>
 
-        {/* Network - Throughput */}
-        <div className="space-y-1 border-t border-slate-700/30 pt-2">
-          <div className="flex justify-between text-[9px]">
-            <span className="text-slate-300">NETWORK (IO)</span>
-            <span className="text-purple-400 font-mono">LIVE</span>
-          </div>
-          <div className="flex flex-col gap-0.5 font-mono text-[9px]">
-            <div className="flex justify-between">
-              <span className="text-slate-400">IN:</span>
-              <span className="text-slate-300">{metrics.net.in} KB/s</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-slate-400">OUT:</span>
-              <span className="text-slate-300">{metrics.net.out} KB/s</span>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

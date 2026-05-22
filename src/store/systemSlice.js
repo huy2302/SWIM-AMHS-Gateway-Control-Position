@@ -4,8 +4,7 @@ const initialState = {
   uptime: 0,
   status: "connecting",   // idle | running | error
   error: null,
-  CpuLoad: 0,
-  MemoryUsage: 0,
+  GatewayProcess: null,
 };
 
 const systemSlice = createSlice({
@@ -22,9 +21,7 @@ const systemSlice = createSlice({
       state.error = action.payload;
     },
     setUsedProcess: (state, action) => {
-      state.usedProcess = action.payload;
-      state.CpuLoad = action.payload.cpu;
-      state.MemoryUsage = action.payload.memory;
+      state.GatewayProcess = action.payload.gatewayCp;
     }
   },
 });

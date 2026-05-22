@@ -16,14 +16,13 @@ export default function GlobalSystemFetcher() {
           signal: controller.signal, // truyền signal vào axios/fetch
           headers: { "Cache-Control": "no-store" }, // tránh cache
         });
-
+        
         clearTimeout(timeoutId);
-
+        
         const uptime = response?.gatewayCp?.serviceUptimeSec ?? 0;
         dispatch(setUptime(uptime));
         dispatch(setUsedProcess({
-          cpu: response.gatewayCp.systemCpu,
-          memory: response.gatewayCp.totalRamPercent
+          gatewayCp: response.gatewayCp,
         }));
       } catch (err) {
         clearTimeout(timeoutId);
