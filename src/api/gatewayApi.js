@@ -82,9 +82,14 @@ const gatewayApi = {
   },
 
   // --- 4. MESSAGE ARCHIVE & LOGS (Tra cứu điện văn và Log) ---
-  getAllArchives: (params) => {
+  getAllSwimMessages: (params) => {
     // Lấy toàn bộ điện văn đã lưu trữ (có phân trang/lọc)
-    return axiosClient.get('/archive/all', { params });
+    return axiosClient.get('/messages/inbound', { params });
+  },
+
+  getAllAmhsMessages: (params) => {
+    // Lấy toàn bộ điện văn đã lưu trữ (có phân trang/lọc)
+    return axiosClient.get('/messages/outbound', { params });
   },
 
   updateArchiveStatus: (uuid, status) => {

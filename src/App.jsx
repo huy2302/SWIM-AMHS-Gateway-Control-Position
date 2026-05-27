@@ -2,7 +2,7 @@ import Account from "./pages/Account";
 import Dashboard from "./pages/Dashboard";
 import RoutingView from "./pages/Routing";
 import FullLogView from "./pages/FullLogView";
-import ArchiveView from "./pages/ArchiveView";
+import MessageView from "./pages/MessageView";
 import AdminView from "./pages/AdminView";
 import SystemMonitorView from "./pages/SystemMonitorView";
 // import NewGatewayDashboard from "./pages/NewGatewayDashboard";
@@ -27,8 +27,8 @@ function App() {
         <Route path="routing" element={<RoutingView />} />
         {/* Full log view for detailed logging */}
         <Route path="log" element={<FullLogView />} />
-        {/* Archive view for historical data */}
-        <Route path="archive" element={<ArchiveView />} />
+        {/* Message view for historical data */}
+        <Route path="messages" element={<MessageView />} />
         {/* Admin panel for system administration */}
         <Route path="admin" element={<AdminView />} />
         {/* System monitor view for detailed system stats */}

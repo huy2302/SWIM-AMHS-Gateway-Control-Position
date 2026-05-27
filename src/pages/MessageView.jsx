@@ -3,7 +3,7 @@ import DashboardLayout from "../layout/DashboardLayout";
 import { Search, Database, X, Copy, Check, Loader2 } from "lucide-react";
 import gatewayApi from "../api/gatewayApi"; // Giả định file api đã tạo ở bước trước
 
-const ArchiveView = () => {
+const MessageView = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -11,7 +11,7 @@ const ArchiveView = () => {
   
   // States cho Filter và Search
   const [searchType, setSearchType] = useState("AMQP"); // AMQP hoặc X.400
-  const [direction, setDirection] = useState("Received");
+  const [direction, setDirection] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [rows, setRows] = useState([]);
 
@@ -22,20 +22,14 @@ const ArchiveView = () => {
       let response;
       if (searchType === "AMQP") {
         // Lấy dữ liệu từ bảng message_archive (Dữ liệu hệ thống SWIM/CP)
-        response = await gatewayApi.getAllArchives({
-          direction: direction.toLowerCase(),
-          query: searchTerm
-        });
+        response = await gatewayApi.getAllSwimMessages();
       } else {
         // Lấy dữ liệu từ bảng message_conversion_log (Dữ liệu Gateway re-use)
-        response = await gatewayApi.getConversionLogs({
-          page: 0,
-          size: 50,
-          query: searchTerm
-        });
+        response = await gatewayApi.getAllAmhsMessages();
         response = response.content; // Giả sử backend trả về Page object
       }
-      setRows(response || []);
+      console.log(response);
+      setRows(response.content || []);
     } catch (error) {
       console.error("Lỗi khi fetch dữ liệu archive:", error);
     } finally {
@@ -73,7 +67,7 @@ const ArchiveView = () => {
           </div>
 
           <div className="flex items-center gap-4 text-xs">
-            {["Received", "Sent"].map((dir) => (
+            {["All", "Received", "Sent"].map((dir) => (
               <label key={dir} className="flex items-center gap-2 cursor-pointer group">
                 <input
                   type="radio"
@@ -154,12 +148,12 @@ const ArchiveView = () => {
                     </>
                   ) : (
                     <>
-                      <td className="px-4 py-2.5 font-bold text-orange-400">{row.id}</td>
-                      <td className="px-4 py-2.5">{row.date}</td>
+                      <td className="px-4 py-2.5 font-bold text-orange-400">{row.msgid}</td>
+                      <td className="px-4 py-2.5">{row.time}</td>
                       <td className="px-4 py-2.5 text-blue-300 font-bold">{row.origin}</td>
-                      <td className="px-4 py-2.5">{row.filing_time}</td>
-                      <td className="px-4 py-2.5 break-all">{row.messageId}</td>
-                      <td className={`px-4 py-2.5 font-bold ${row.status === 'ERROR' ? 'text-red-500' : 'text-green-500'}`}>{row.status}</td>
+                      <td className="px-4 py-2.5">{row.filingTime}</td>
+                      <td className="px-4 py-2.5 break-all">{row.amhsid}</td>
+                      <td className={`px-4 py-2.5 font-bold ${row.errorType === 'ERROR' ? 'text-red-500' : 'text-green-500'}`}>{row.errorType}</td>
                     </>
                   )}
                 </tr>
@@ -233,4 +227,4 @@ const DetailBox = ({ label, value, onCopy }) => (
   </div>
 );
 
-export default ArchiveView;
+export default MessageView;
