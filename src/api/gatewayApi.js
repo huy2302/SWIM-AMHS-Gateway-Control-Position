@@ -10,6 +10,36 @@ const gatewayApi = {
     return axiosClient.post('/accounts', data);
   },
 
+  updateAccount: async (uuid, account) => {
+    console.log("Updating account with UUID:", uuid, "Data:", account);
+    try {
+      const response = await axiosClient.put(`/accounts/${uuid}`, account, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        timeout: 10000,
+      });
+
+      return response;
+    } catch (error) {
+      console.error("API updateAccount error:", error);
+
+      if (error.response) {
+        // server trả lỗi
+        throw new Error(error.response.data?.message || "Server error");
+      } else if (error.request) {
+        // không gọi được API
+        throw new Error("Cannot connect to Gateway API");
+      } else {
+        throw new Error(error.message);
+      }
+    }
+  },
+
+  deleteAccount: (uuid) => {
+    return axiosClient.delete(`/accounts/${uuid}`);
+  },
+
   updateBindStatus: (uuid, status) => {
     // Cập nhật trạng thái Bind (kết nối) của tài khoản
     return axiosClient.patch(`/accounts/${uuid}/bind-status`, { status });
