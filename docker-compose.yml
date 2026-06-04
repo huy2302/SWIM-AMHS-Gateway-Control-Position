@@ -1,0 +1,10 @@
+services:
+  react-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gateway-fe
+    # Nginx serves the app on port 80, but we want to access it on port 3000
+    ports:
+      - "3000:80"
+    restart: unless-stopped

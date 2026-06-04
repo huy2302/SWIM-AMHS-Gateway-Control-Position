@@ -26,9 +26,9 @@ export default function Bottombar() {
         {/* <h3>Connected to server Nova</h3> */}
       </div>
       <div>
-        <h3>
+        {/* <h3>
           Up time: <span className="time">{formatUptime(uptime)}</span>
-        </h3>
+        </h3> */}
       </div>
     </div>
   );

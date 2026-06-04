@@ -6,54 +6,6 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import gatewayApi from "@/api/gatewayApi";
 import { useSelector } from "react-redux";
 
-// const summaryStats = [
-//   {
-//     title: "AMQP Received",
-//     value: "1,245",
-//     subtitle: "Total messages",
-//     trend: "+12.5% vs last 1 hour",
-//     color: "#2563eb",
-//     background: "#e3edfc"
-//   },
-//   {
-//     title: "AMQP Sent",
-//     value: "850",
-//     subtitle: "Total messages",
-//     trend: "+8.7% vs last 1 hour",
-//     color: "#10b981",
-//     background: "#e7f7ed"
-//   },
-//   {
-//     title: "AMHS Received",
-//     value: "932",
-//     subtitle: "Total messages",
-//     trend: "+5.4% vs last 1 hour",
-//     color: "#8755fa",
-//     background: "#f0e6fa"
-//   },
-//   {
-//     title: "AMHS Sent",
-//     value: "1,001",
-//     subtitle: "Total messages",
-//     trend: "+7.3% vs last 1 hour",
-//     color: "#f97316",
-//     background: "#fdede3"
-//   },
-// ];
-
-// const iconStats = (title, color) => {
-//   if (title.includes("AMQP Received")) {
-//     return <Download style={{ color: color }}/>;
-//   } else if (title.includes("AMQP Sent")) {
-//     return <ArrowUpFromLine style={{ color: color }}/>;
-//   } else if (title.includes("AMHS Received")) {
-//     return <Mail style={{ color: color }}/>;
-//   } else if (title.includes("AMHS Sent")) {
-//     return <Send style={{ color: color }}/>;
-//   }
-//   return null;
-// };
-
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [refreshInterval, setRefreshInterval] = useState(2);
@@ -61,12 +13,14 @@ export default function Dashboard() {
     { name: "Pending", value: 0, color: "#fbff0b" },
     { name: "Converted", value: 0, color: "#5999ff" },
     { name: "Convert Failed", value: 0, color: "#EF4444" },
+    { name: "Sent", value: 0, color: "#4bf13c" },
     { name: "Un router", value: 0, color: "#a1a1a1" },
   ]);
   const [amhsData, setAmhsData] = useState([
     { name: "Pending", value: 0, color: "#fbff0b" },
     { name: "Converted", value: 0, color: "#5999ff" },
     { name: "Convert Failed", value: 0, color: "#EF4444" },
+    { name: "Publish", value: 0, color: "#4bf13c" },
     { name: "Undefinded", value: 0, color: "#a1a1a1" },
   ]);
 
@@ -81,12 +35,14 @@ export default function Dashboard() {
         { name: "Pending", value: response?.database?.gw_in?.pending, color: '#fbff0b' },
         { name: "Converted", value: response?.database?.gw_in?.transformed, color: '#5999ff' },
         { name: "Convert Failed", value: response?.database?.gw_in?.convertFailed, color: '#EF4444' },
+        { name: "Sent", value: response?.database?.gw_in?.sent, color: '#4bf13c' },
         { name: "Un router", value: response?.database?.gw_in?.unrouted, color: '#a1a1a1' }
       ])
       setAmhsData([
         { name: "Pending", value: response?.database?.gw_out?.pending, color: '#fbff0b' },
         { name: "Converted", value: response?.database?.gw_out?.transformed, color: '#5999ff' },
         { name: "Convert Failed", value: response?.database?.gw_out?.convertFailed, color: '#EF4444' },
+        { name: "Publish", value: response?.database?.gw_out?.published, color: '#4bf13c' },
         { name: "Un router", value: response?.database?.gw_out?.unrouted, color: '#a1a1a1' }
       ])
     } catch (error) {
@@ -96,7 +52,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setRefreshInterval(1); // sau 1s đổi về poll 1s
+      setRefreshInterval(1);
     }, 1000);
 
     return () => clearTimeout(t);
@@ -170,31 +126,6 @@ export default function Dashboard() {
 
         </section>
         <section className="dashboard-summary-grid">
-          {
-          // summaryStats.map((stat) => (
-          //   null
-            // <div 
-            //   key={stat.title} 
-            //   className="summary-card flex items-start gap-4 pt-4"
-            // >
-            //   <div 
-            //     className="p-3 w-fit rounded-md"
-            //     style={{ backgroundColor: stat.background }}
-            //   >
-            //     {iconStats(stat.title, stat.color)}
-            //   </div>
-            //   <div>
-            //     <div className="text-[12px] font-bold">{stat.title}</div>
-            //     <div className="text-[1.5rem] font-bold mt-2" style={{ color: stat.color }}>{stat.value}</div>
-            //     <div className="text-[12px] text-[#5d5d5d] mt-2">{stat.subtitle}</div>
-            //   </div>
-            //   {/* <div>
-            //     <div className="summary-card-trend">{stat.trend}</div>
-            //   </div> */}
-            // </div>
-          // ))
-          }
-
           <div className="summary-card flex items-start gap-4 pt-4 relative">
             {loadingOverlay(stats?.database?.gw_out)}
             <div 
@@ -208,6 +139,9 @@ export default function Dashboard() {
                 <span className="text-slate-600">Total</span>
                 <span className="font-bold text-right text-[#2563eb]">{formatNumber(stats?.database?.gw_out?.total)}</span>
 
+                <span className="text-slate-600">Pending</span>
+                <span className="font-bold text-right text-[#7d7d79]">{formatNumber(stats?.database?.gw_out?.pending)}</span>
+                
                 <span className="text-slate-600">Convert Success</span>
                 <span className="font-bold text-right text-[#10b981]">{formatNumber(stats?.database?.gw_out?.transformed)}</span>
 
@@ -241,6 +175,9 @@ export default function Dashboard() {
                 <span className="text-slate-600">Total</span>
                 <span className="font-bold text-right text-[#2563eb]">{formatNumber(stats?.database?.gw_in?.total)}</span>
 
+                <span className="text-slate-600">Pending</span>
+                <span className="font-bold text-right text-[#7d7d79]">{formatNumber(stats?.database?.gw_in?.pending)}</span>
+                
                 <span className="text-slate-600">Convert Success</span>
                 <span className="font-bold text-right text-[#10b981]">{formatNumber(stats?.database?.gw_in?.transformed)}</span>
 
