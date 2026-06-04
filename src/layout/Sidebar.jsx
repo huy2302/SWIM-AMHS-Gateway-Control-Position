@@ -112,14 +112,14 @@ export default function Sidebar() {
         </NavLink>
 
         <NavLink
-          to="/archive"
+          to="/messages"
           className={({ isActive }) =>
             isActive ? "menu-item active" : "menu-item"
           }
           style={{ paddingLeft: collapsed ? "16px" : null }}
         >
           <Archive size={18} />
-          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>Archive</span>
+          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>Messages</span>
         </NavLink>
 
         <NavLink

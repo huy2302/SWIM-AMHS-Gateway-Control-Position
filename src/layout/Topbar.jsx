@@ -7,7 +7,7 @@ const titleMap = {
   accounts: "Accounts Management",
   routing: "Routing Configuration",
   log: "Live Logs",
-  archive: "Archive Viewer",
+  messages: "Message Infomation",
   admin: "Admin Console",
   system: "System Monitor",
 };
