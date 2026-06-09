@@ -2,25 +2,22 @@ import React, { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "../layout/DashboardLayout";
 import gatewayApi from "../api/gatewayApi";
 import {
-  Save,
-  ArrowRightLeft,
   Plus,
   Trash2,
-  Settings2,
   ArrowUpRight,
   ArrowDownLeft,
-  CheckCircle2,
-  ArrowRight,
   X,
   Search,
 } from "lucide-react";
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
+import { 
+  showSuccessToast, 
+  showErrorToast, 
+} from '../constants/toastIcons'; 
+import toast from 'react-hot-toast';
 
 const createTimestamp = () => new Date().toISOString();
-
-const formatRuleTimestamp = (timestamp) =>
-  timestamp ? new Date(timestamp).toLocaleString() : "-";
 
 const createA2SRule = () => ({
   id: `a2s-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
@@ -348,6 +345,7 @@ const RoutingView = () => {
         handleRemoveS2aRule(deleteRule.id);
       }
 
+      showSuccessToast(`Rule ${deleteRule.id} deleted successfully`, toast);
       setStatusMessage(`✓ Rule ${deleteRule.id} deleted successfully`);
       setStatusType("success");
       setShowDeleteModal(false);
@@ -357,6 +355,7 @@ const RoutingView = () => {
     catch (error) {
       console.error("Error when delete rule:", error);
       setDeleteError(error.message || "Failed to delete rule");
+      showErrorToast(`Failed to delete rule: ${error.message || "Unknown error"}`, toast);
     }
   };
 
@@ -530,10 +529,12 @@ const RoutingView = () => {
         await gatewayApi.createRouting(updatedData);
       }
 
+      showSuccessToast(`Rule ${editingRule.id} saved successfully`, toast);
       setStatusMessage(`✓ Rule ${editingRule.id} saved successfully`);
       setStatusType("success");
       handleCloseEdit();
     } catch (error) {
+      showErrorToast(`Failed to save rule: ${error.message || "Unknown error"}`, toast);
       console.error("Error when save rule:", error);
       setStatusMessage(error.message || "Failed to save rule");
       setStatusType("error");

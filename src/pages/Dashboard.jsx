@@ -232,13 +232,13 @@ export default function Dashboard() {
               <div className="text-[12px] font-bold">Message Flow</div>
               <div className="text-[12px] grid grid-cols-[1fr_auto] gap-x-8 gap-y-2 w-full text-sm">
                 <span className="text-slate-600">Total Received</span>
-                <span className="font-bold text-slate-800 text-right">{formatNumber(stats?.database?.gw_out?.published + stats?.database?.gw_in?.sent)}</span>
+                <span className="font-bold text-slate-800 text-right">{formatNumber((stats?.database?.gw_out?.published || 0) + (stats?.database?.gw_in?.sent || 0))}</span>
                 
                 <span className="text-slate-600">AMHS → SWIM</span>
-                <span className="font-bold text-slate-800 text-right">{formatNumber(stats?.database?.gw_out?.published)}</span>
+                <span className="font-bold text-slate-800 text-right">{formatNumber(stats?.database?.gw_out?.published || 0)}</span>
 
                 <span className="text-slate-600">SWIM → AMHS</span>
-                <span className="font-bold text-slate-800 text-right">{formatNumber(stats?.database?.gw_in?.sent)}</span>
+                <span className="font-bold text-slate-800 text-right">{formatNumber(stats?.database?.gw_in?.sent || 0)}</span>
               </div>
             </div>
           </div>
@@ -549,7 +549,7 @@ const formatNumber = (num) => {
 const loadingOverlay = (data) => {
   if (!data) 
     return (
-      <div className="absolute backdrop-blur-[1px] flex top-0 left-0 w-[100%] h-[100%] bg-[#00000047] rounded-md">
+      <div className="absolute backdrop-blur-[1px] flex top-0 left-0 w-[100%] h-[100%] bg-[#0000002b] rounded-md">
         <div className="relative items-center w-[100%] block max-w-sm p-6 bg-neutral-primary-soft shadow-xs">
           <div role="status" className="absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
           <svg aria-hidden="true" className="w-8 h-8 text-[#000] animate-spin fill-[#fff]" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

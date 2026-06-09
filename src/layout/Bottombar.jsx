@@ -1,3 +1,4 @@
+import { Unplug } from "lucide-react";
 import React from "react";
 import { useSelector } from "react-redux";
 
@@ -6,8 +7,8 @@ export default function Bottombar() {
 
   if (status === "error") {
     return (
-      <div className="fixed bottom-0 right-0 bg-red-600 text-white px-4 py-2 text-xs">
-        🚨 System monitoring is DOWN
+      <div className="flex justify-between items-center gap-2 fixed bottom-0 right-0 bg-red-600 text-white px-4 py-2 text-xs">
+        <Unplug size={18} /> System monitoring is DOWN
       </div>
     );
   }

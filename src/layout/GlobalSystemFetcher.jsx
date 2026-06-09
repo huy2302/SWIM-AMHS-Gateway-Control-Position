@@ -1,10 +1,81 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setUptime, setSystemError, setUsedProcess  } from "../store/systemSlice";
+import { setUptime, setSystemError, setUsedProcess } from "../store/systemSlice";
 import gatewayApi from "../api/gatewayApi";
+import { 
+  showSuccessToast, 
+  showWarningToast 
+} from '../constants/toastIcons'; 
+import toast from "react-hot-toast";
 
 export default function GlobalSystemFetcher() {
   const dispatch = useDispatch();
+  
+  // Lấy danh sách event đã toast từ sessionStorage
+  const getToastedIds = () => {
+    const saved = sessionStorage.getItem('toastedEventIds');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  };
+
+  // Lưu danh sách event đã toast
+  const saveToastedIds = (ids) => {
+    sessionStorage.setItem('toastedEventIds', JSON.stringify([...ids]));
+  };
+
+  const status = [
+    "ROUTING_DELETED",
+    "ROUTING_UPDATED",
+    "HIGH_MEMORY",
+    "APPLICATION_START",
+    "APPLICATION_STOP",
+    "HIGH_CPU"
+  ]
+
+  useEffect(() => {
+    const toastedIds = getToastedIds();
+
+    const fetchSystemHistories = async () => {
+      try {
+        const response = await gatewayApi.getSystemEvents({
+          page: 0,
+          size: 1,
+        });
+
+        const systemEvent = response?.content[0]; // Lấy event mới nhất
+        if (!systemEvent) return;
+
+        if (!toastedIds.has(systemEvent.id) && status.includes(systemEvent.eventType)) {
+          // Toast tùy theo loại event
+          switch (systemEvent.eventType) {
+            case "ROUTING_DELETED":
+              showWarningToast(systemEvent.title, toast);
+              break;
+            case "ROUTING_UPDATED":
+              showWarningToast(systemEvent.title, toast);
+              break;
+            case "HIGH_MEMORY":
+            case "HIGH_CPU":
+              showWarningToast(systemEvent.title, toast);
+              break;
+            default:
+              showSuccessToast(systemEvent.title, toast);
+          }
+
+          // Đánh dấu event này đã toast
+          toastedIds.add(systemEvent.id);
+          saveToastedIds(toastedIds);
+        }
+      } catch (err) {
+        console.error("FETCH SYSTEM HISTORIES FAILED:", err.message);
+      }
+    };
+
+    fetchSystemHistories();
+
+    const interval = setInterval(fetchSystemHistories, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchSystem = async () => {
@@ -19,10 +90,11 @@ export default function GlobalSystemFetcher() {
         
         clearTimeout(timeoutId);
         
-        const uptime = response?.gatewayCp?.serviceUptimeSec ?? 0;
+        const uptime = response?.gatewayCp?.jvmUptimeSeconds;
         dispatch(setUptime(uptime));
         dispatch(setUsedProcess({
           gatewayCp: response.gatewayCp,
+          mysqlCp: response.mysql,
         }));
       } catch (err) {
         clearTimeout(timeoutId);

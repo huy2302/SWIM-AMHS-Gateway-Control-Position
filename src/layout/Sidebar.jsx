@@ -2,12 +2,12 @@ import {
   Monitor,
   Mail,
   Unplug,
-  SettingsIcon,
   MonitorCog,
   Archive,
   TriangleAlert,
   ChevronLeft,
   ChevronRight,
+  History,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import ServerMonitor from "../components/ServerMonitor";
@@ -28,11 +28,11 @@ export default function Sidebar() {
         id: Date.now(),
       };
 
-      setLogs((prevLogs) => {
-        const updatedLogs = [...prevLogs, newLog];
-        // Chỉ giữ lại 50 dòng log mới nhất để tránh lag trình duyệt
-        return updatedLogs.slice(-50);
-      });
+      // setLogs((prevLogs) => {
+      //   const updatedLogs = [...prevLogs, newLog];
+      //   // Chỉ giữ lại 50 dòng log mới nhất để tránh lag trình duyệt
+      //   return updatedLogs.slice(-50);
+      // });
     }, 2000); // Cứ mỗi 2 giây bắn 1 log mới
 
     return () => clearInterval(interval);
@@ -122,7 +122,7 @@ export default function Sidebar() {
           <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>Messages</span>
         </NavLink>
 
-        <NavLink
+        {/* <NavLink
           to="/admin"
           className={({ isActive }) =>
             isActive ? "menu-item active" : "menu-item"
@@ -131,7 +131,7 @@ export default function Sidebar() {
         >
           <SettingsIcon size={18} />
           <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>Admin</span>
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="/system"
@@ -142,6 +142,17 @@ export default function Sidebar() {
         >
           <MonitorCog size={18} />
           <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>System Monitor</span>
+        </NavLink>
+
+        <NavLink
+          to="/system-events"
+          className={({ isActive }) =>
+            isActive ? "menu-item active" : "menu-item"
+          }
+          style={{ paddingLeft: collapsed ? "16px" : null }}
+        >
+          <History size={18} />
+          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>System History</span>
         </NavLink>
       </nav>
 

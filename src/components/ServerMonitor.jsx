@@ -15,26 +15,25 @@ const ServerMonitor = () => {
   });
   const { GatewayProcess } = useSelector((state) => state.system);
 
-  // console.log(GatewayProcess)
   const [cpuHistory, setCpuHistory] = useState(Array(20).fill(0));
 
   useEffect(() => {
-    if (typeof GatewayProcess?.systemCpu !== "number") return;
+    if (typeof GatewayProcess?.processCpuLoad !== "number") return;
 
     setCpuHistory(prev => [
       ...prev.slice(1),
-      Math.min(Math.max(GatewayProcess?.systemCpu * 100, 0), 100) // clamp 0–100
+      Math.min(Math.max(GatewayProcess?.processCpuLoad, 0), 100) // clamp 0–100
     ]);
 
     setMetrics(prev => ({
       ...prev,
       cpu: [
         ...prev.cpu.slice(1),
-        Math.min(Math.max(GatewayProcess?.systemCpu*100, 0), 100) // clamp 0–100
+        Math.min(Math.max(GatewayProcess?.processCpuLoad, 0), 100) // clamp 0–100
       ]
     }));
     
-  }, [GatewayProcess?.systemCpu]);
+  }, [GatewayProcess?.processCpuLoad]);
 
   const cpuPoints = cpuHistory
     .map((val, i) => `${i * 9},${(30 - (val / 100) * 30)}`)
@@ -54,7 +53,7 @@ const ServerMonitor = () => {
           <div className="flex justify-between text-[10px]">
             <span className="text-slate-300">CPU Usage</span>
             <span className="text-green-400 font-mono">
-              {(GatewayProcess?.systemCpu*100)?.toFixed(2) ?? 0}%
+              {(GatewayProcess?.processCpuLoad)?.toFixed(2) ?? 0}%
             </span>
           </div>
           <svg viewBox="0 0 180 30" className="w-full h-8 overflow-visible">
@@ -71,21 +70,21 @@ const ServerMonitor = () => {
         <div className="space-y-1">
           <div className="flex justify-between text-[10px]">
             <span className="text-slate-300">Memory Usage</span>
-            <span className="text-blue-400 font-mono">{GatewayProcess?.totalRamPercent?.toFixed(2) ?? 0}%</span>
+            <span className="text-blue-400 font-mono">{GatewayProcess?.ramUsedPercent?.toFixed(2) ?? 0}%</span>
           </div>
           <div className="h-1.5 w-full bg-slate-700 rounded-full mt-3 overflow-hidden">
             <div
               className="h-full bg-blue-500 transition-all duration-1000"
-              style={{ width: `${GatewayProcess?.totalRamPercent}%` }}
+              style={{ width: `${GatewayProcess?.ramUsedPercent}%` }}
             />
           </div>
           <p className="text-[10px] text-slate-400 text-right italic">
-            {GatewayProcess?.usedPhysicalMemoryMb ?? 0}GB / {GatewayProcess?.totalPhysicalMemoryMb ?? 0}GB
+            {GatewayProcess?.usedPhysicalMemoryMb ?? 0}MB / {GatewayProcess?.totalPhysicalMemoryMb ?? 0}MB
           </p>
         </div>
 
         {/* ROM (Storage) - Tuyến tính */}
-        <div className="space-y-1 border-t border-slate-700/30 pt-2">
+        {/* <div className="space-y-1 border-t border-slate-700/30 pt-2">
           <div className="flex justify-between text-[10px]">
             <span className="text-slate-300">Disk Usage</span>
             <span className="text-orange-400 font-mono">{metrics.rom}%</span>
@@ -95,9 +94,9 @@ const ServerMonitor = () => {
               className="h-full bg-orange-500"
               style={{ width: `${metrics.rom}%` }}
             />
-          </div>
+          </div> */}
           {/* <p className="text-[8px] text-slate-400 italic">Used: {metrics.usedDiskGb.toFixed(2)}GB / {metrics.totalDiskGb.toFixed(2)}GB</p> */}
-        </div>
+        {/* </div> */}
 
       </div>
     </div>

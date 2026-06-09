@@ -7,6 +7,7 @@ import AdminView from "./pages/AdminView";
 import SystemMonitorView from "./pages/SystemMonitorView";
 // import NewGatewayDashboard from "./pages/NewGatewayDashboard";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import SystemEvents from "./pages/SystemEventsView";
 
 /**
  * Main App component that sets up routing for the Swim Monitor application.
@@ -33,6 +34,8 @@ function App() {
         <Route path="admin" element={<AdminView />} />
         {/* System monitor view for detailed system stats */}
         <Route path="system" element={<SystemMonitorView />} />
+        {/* System events view */}
+        <Route path="system-events" element={<SystemEvents />} />
       </Routes>
     </BrowserRouter>
   );

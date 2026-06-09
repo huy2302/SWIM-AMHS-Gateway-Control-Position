@@ -4,20 +4,19 @@ import {
   Plus,
   Trash2,
   Edit3,
-  Copy,
   Play,
   Square,
-  Download,
-  Upload,
-  Save,
-  Link,
-  Link2Off,
   X,
 } from "lucide-react";
 import gatewayApi from "../api/gatewayApi";
 import { useEffect } from "react";
 import { useCallback } from "react";
 import ConfirmModal from "@/components/ConfirmModal";
+import toast from "react-hot-toast";
+import { 
+  showSuccessToast, 
+  showErrorToast, 
+} from '../constants/toastIcons'; 
 
 export default function Account() {
   const [accounts, setAccounts] = useState([]);
@@ -120,19 +119,19 @@ export default function Account() {
   };
 
   const handleDelete = (id) => {
-    console.log(id)
     
     if (gatewayApi.deleteAccount(id)) {
-      alert("Account deleted successfully!");
       setAccounts(accounts.filter(acc => acc.id !== selectedId));
       setSelectedId(null);
+      showSuccessToast("Account deleted successfully!", toast);
     } else {
-      alert("Failed to delete account: " + (response.message || "Unknown error"));
       setSelectedId(null);
+      showErrorToast("Failed to delete account: " + (response.message || "Unknown error"), toast);
     }
   };
 
   const handleToggleStatus = (status) => {
+    showSuccessToast(`Account ${status === "ACTIVE" ? "enabled" : "disabled"} successfully!`, toast);
     setAccounts(accounts.map(acc => 
       acc.id === selectedId ? { ...acc, status } : acc
     ));
@@ -168,6 +167,8 @@ export default function Account() {
         setAccounts(accounts.map((acc) => 
           acc.id === editingAccountId ? updatedAccount : acc
         ));
+
+        showSuccessToast("Account updated successfully!", toast);
       } else {
         const response = await gatewayApi.createAccount(savedAccount);
         const createdAccount = response?.data ?? response ?? savedAccount;
@@ -178,7 +179,7 @@ export default function Account() {
       setEditingAccountId(null);
     } catch (error) {
       console.error("Lỗi khi lưu account:", error);
-      alert(error?.message || "Lỗi khi lưu account");
+      showErrorToast(error?.message || "Lỗi khi lưu account", toast);
     } finally {
       setLoading(false);
     }

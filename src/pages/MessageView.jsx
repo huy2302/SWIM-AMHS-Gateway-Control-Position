@@ -115,12 +115,6 @@ const MessageView = () => {
             </select>
           </div>
 
-          <button
-            onClick={() => setShowFilter(!showFilter)}
-            className="transition-all"
-          >
-            <FunnelPlus color="#000" />
-          </button>
           <div className="flex-1 min-w-[300px] relative">
             {/* <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" /> */}
             {/* <input
@@ -143,7 +137,7 @@ const MessageView = () => {
         </div>
 
         <div
-          className={`flex-1 bg-slate-900 border-x border-b border-slate-800 rounded-b-xl transition-all duration-300 ease-in-out ${showFilter ? 'max-h-[600px] opacity-100 mb-3 px-4 py-2' : 'max-h-0 opacity-0'} `}
+          className={`flex-1 bg-slate-900 border-x border-b border-slate-800 rounded-b-xl transition-all duration-300 ease-in-out max-h-[600px] opacity-100 mb-3 px-4 py-2`}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
             {/* Callsign */}

@@ -5,6 +5,7 @@ const initialState = {
   status: "connecting",   // idle | running | error
   error: null,
   GatewayProcess: null,
+  Mysql: null,
 };
 
 const systemSlice = createSlice({
@@ -22,6 +23,7 @@ const systemSlice = createSlice({
     },
     setUsedProcess: (state, action) => {
       state.GatewayProcess = action.payload.gatewayCp;
+      state.Mysql = action.payload.mysql;
     }
   },
 });

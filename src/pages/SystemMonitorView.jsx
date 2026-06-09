@@ -13,33 +13,16 @@ import {
 } from "recharts";
 import {
   LayoutGrid,
-  Database,
-  Cpu,
-  Activity,
-  RefreshCw,
   Save,
-  Monitor,
-  Mail,
-  RouterIcon,
-  Logs,
-  Archive,
-  SettingsIcon,
-  MonitorCog,
 } from "lucide-react";
-import {
-  // data,
-  NavLink
-} from "react-router-dom";
 import DashboardLayout from "../layout/DashboardLayout";
-import gatewayApi from "../api/gatewayApi";
-import { useDispatch } from "react-redux";
-import { setUptime } from "../store/systemSlice";
+import { useSelector } from "react-redux";
 
 const generateData = () =>
   [...Array(20)].map((_, i) => ({
     time: i,
-    processCpu: 0,
-    systemCpu: 0,
+    processCpuLoad: 0,
+    systemCpuLoad: 0,
     heapUsedMb: 0,
     totalPhysicalMemoryMb: 0,
     totalRamPercent: 0,
@@ -48,26 +31,18 @@ const generateData = () =>
     upTime: null
   }));
 
-const normalizePercent = (value) =>
-  typeof value === "number" && !Number.isNaN(value)
-    ? Number((value * 100).toFixed(1))
-    : 0;
-
-const toChartPoint = (health, prevTime) => {
-  const gatewayCp = health?.gatewayCp || {};
-  const mysql = health?.mysql || {};
-
+const toChartPoint = (gatewayCp, mysql, prevTime) => {
   return {
     time: prevTime + 1,
-    processCpu: normalizePercent(gatewayCp.processCpu),
-    systemCpu: normalizePercent(gatewayCp.systemCpu),
-    heapUsedMb: Number(gatewayCp.heapUsedMb ?? 0),
-    totalPhysicalMemoryMb: Number(gatewayCp.totalPhysicalMemoryMb ?? 0),
-    usedPhysicalMemoryMb: Number(gatewayCp.usedPhysicalMemoryMb ?? 0),
-    totalRamPercent: normalizePercent(gatewayCp.totalRamPercent),
-    mysqlConnections: Number(mysql.connections ?? 0),
-    mysqlCpu: normalizePercent(mysql.cpuPercent),
-    upTime: Number(gatewayCp.serviceUptimeSec ?? 0)
+    processCpuLoad: gatewayCp?.processCpuLoad,
+    systemCpuLoad: gatewayCp?.systemCpuLoad,
+    heapUsedMb: Number(gatewayCp?.heapUsedMb ?? 0),
+    totalPhysicalMemoryMb: Number(gatewayCp?.totalPhysicalMemoryMb ?? 0),
+    usedPhysicalMemoryMb: Number(gatewayCp?.usedPhysicalMemoryMb ?? 0),
+    totalRamPercent: gatewayCp?.totalRamPercent,
+    mysqlConnections: Number(mysql?.connections ?? 0),
+    mysqlCpu: mysql?.cpuPercent,
+    upTime: Number(gatewayCp?.serviceUptimeSec ?? 0)
   };
 };
 
@@ -75,43 +50,20 @@ const SystemMonitorView = () => {
   const [activeTab, setActiveTab] = useState("CPU");
   const [data, setData] = useState(generateData());
   const [refreshInterval, setRefreshInterval] = useState(2);
-  const dispatch = useDispatch();
-
-  const fetchSystemMonitor = async () => {
-    try {
-      const response = await gatewayApi.getSystemHealth();
-      
-      setData((prev) => [
-        ...prev.slice(1),
-        toChartPoint(response, prev[prev.length - 1]?.time ?? 0),
-      ]);
-      // console.log(response.gatewayCp.systemCpu + ' - ' + response.gatewayCp.processCpu);
-      dispatch(setUptime(response.gatewayCp.serviceUptimeSec));
-
-    } catch (error) {
-      console.error("Error fetching system health:", error);
-    }
-  };
+  const { GatewayProcess, Mysql } = useSelector((state) => state.system);
   
   useEffect(() => {
-    const t = setTimeout(() => {
-      setRefreshInterval(1); // sau 1s đổi về poll 1s
-    }, 1000);
+    setData((prev) => [
+      ...prev.slice(1),
+      toChartPoint(GatewayProcess, Mysql, prev[prev.length - 1]?.time ?? 0),
+    ]);
+  }, [GatewayProcess]);
 
-    return () => clearTimeout(t);
-  }, []);
-
-  useEffect(() => {
-    // fetchSystemMonitor();
-    const interval = setInterval(fetchSystemMonitor, refreshInterval * 1000);
-    return () => clearInterval(interval);
-  }, [refreshInterval]);
-  
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-4 gap-4 overflow-y-auto">
         {/* Top Toolbar */}
-        <div className="bg-white p-3 rounded-lg border border-slate-300 flex items-center justify-between shadow-lg">
+        {/* <div className="bg-white p-3 rounded-lg border border-slate-300 flex items-center justify-between shadow-lg">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-slate-600 font-bold uppercase">
@@ -134,7 +86,7 @@ const SystemMonitorView = () => {
               <Save size={14} /> WRITE TO LOG
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Grid Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_8fr] gap-4 flex-1">
@@ -147,9 +99,9 @@ const SystemMonitorView = () => {
               }`}
             >
               CPU
-              {data[19]?.processCpu >= 0 && (
+              {GatewayProcess?.processCpuLoad >= 0 && (
                 <span className="text-[12px] text-green-500 font-light">
-                  {data[19]?.processCpu}%
+                  {GatewayProcess?.processCpuLoad?.toFixed(2)}%
                 </span>
               )}
             </button>
@@ -160,9 +112,9 @@ const SystemMonitorView = () => {
               }`}
             >
               Memory
-              {data[19]?.usedPhysicalMemoryMb >= 0 && (
+              {GatewayProcess?.usedPhysicalMemoryMb >= 0 && (
                 <span className="text-[12px] text-green-500 font-light">
-                  {data[19]?.usedPhysicalMemoryMb}/{data[19]?.totalPhysicalMemoryMb} MB
+                  {GatewayProcess?.usedPhysicalMemoryMb}/{GatewayProcess?.totalPhysicalMemoryMb} MB
                 </span>
               )}
             </button>
@@ -177,7 +129,7 @@ const SystemMonitorView = () => {
           </div>
           <div>
             {activeTab === "CPU" && (
-              <ChartCard title="CPU Usage (%)" color="#ef4444" unit="%" data={data} type={activeTab}>
+              <ChartCard title="CPU Usage (%)" color="#ef4444" unit="%" data={data} type={activeTab} card={GatewayProcess}>
                 <AreaChart data={data}>
                   <defs>
                     <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
@@ -229,7 +181,8 @@ const SystemMonitorView = () => {
                   {/* Đường thứ nhất: Process CPU */}
                   <Area
                     type="monotone"
-                    dataKey="processCpu"
+                    dataKey="processCpuLoad"
+                    name="Process CPU Load"
                     stroke="#ef4444"
                     fillOpacity={1}
                     fill="url(#colorCpu)"
@@ -239,7 +192,8 @@ const SystemMonitorView = () => {
                   {/* Đường thứ hai: System CPU */}
                   <Area
                     type="monotone"
-                    dataKey="systemCpu"
+                    dataKey="systemCpuLoad"
+                    name="System CPU Load"
                     stroke="#3b82f6"
                     fill="url(#colorSystem)"
                     fillOpacity={1}
@@ -257,6 +211,7 @@ const SystemMonitorView = () => {
                 unit="MB"
                 data={data}
                 type={activeTab}
+                card={GatewayProcess}
               >
                 <LineChart data={data}>
                   <CartesianGrid
@@ -268,7 +223,7 @@ const SystemMonitorView = () => {
                   <YAxis 
                     stroke="#64748b" 
                     fontSize={10} 
-                    domain={[0, data[19].totalPhysicalMemoryMb]} 
+                    domain={[0, GatewayProcess?.totalPhysicalMemoryMb || 0]} 
                     allowDataOverflow={true}
                   />
                   <Tooltip
@@ -282,6 +237,7 @@ const SystemMonitorView = () => {
                   <Line
                     type="stepAfter"
                     dataKey="heapUsedMb"
+                    name="Process Memory Used"
                     stroke="#eab308"
                     dot={false}
                     isAnimationActive={false}
@@ -292,6 +248,7 @@ const SystemMonitorView = () => {
                     type="stepAfter"
                     dataKey="usedPhysicalMemoryMb"
                     stroke="#3b34ff"
+                    name="System Memory Used"
                     dot={false}
                     isAnimationActive={false}
                     strokeWidth={2}
@@ -331,8 +288,8 @@ const SystemMonitorView = () => {
 };
 
 // Component khung cho mỗi biểu đồ
-const ChartCard = ({ title, children, color, data, type }) => {
-  const upTimeSeconds = formatUptime(data[19]?.upTime);
+const ChartCard = ({ title, children, color, data, type, card }) => {
+  const upTimeSeconds = formatUptime(card?.jvmUptimeSeconds);
   
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col h-[600px] shadow-lg">
@@ -353,28 +310,35 @@ const ChartCard = ({ title, children, color, data, type }) => {
       </div>
       {type === "CPU" ? (
         <div className="grid grid-cols-2 gap-0 rounded-lg overflow-hidden">
-          {/* Ô 1: Gateway Application */}
+          {/* Ô 2: CPU Information */}
           <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Gateway Application</h3>
-            <p className="text-[24px]">{data[19]?.processCpu}%</p>
-          </div>
-
-          {/* Ô 2: MySQL Service */}
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">MySQL Service</h3>
-            <p className="text-[24px]">{data[19]?.mysqlCpu}%</p>
-          </div>
-
-          {/* Ô 3: Total CPU Utilization */}
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Total System Load</h3>
-            <p className="text-[24px]">{data[19]?.systemCpu}%</p>
+            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">CPU Information</h3>
+            <p className="text-[18px]">{card?.cpuName}</p>
           </div>
 
           {/* Ô 4: Up time */}
           <div className="p-4">
             <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Up Time</h3>
             <p className="text-[24px] font-mono text-slate-200">{upTimeSeconds}</p>
+          </div>
+
+          <div className="p-4">
+            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">CPU Cores</h3>
+            <p className="text-[18px]">{card?.physicalCores} cores / {card?.logicalCores} threads</p>
+          </div>
+
+          {/* Ô 3: Total CPU Utilization */}
+          <div className="p-4">
+            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Total System Load</h3>
+            <p className="text-[24px]">{card?.systemCpuLoad?.toFixed(2)}%</p>
+          </div>
+
+         
+
+           {/* Ô 1: Used load */}
+          <div className="p-4">
+            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Used load</h3>
+            <p className="text-[24px]">{card?.processCpuLoad?.toFixed(2)}%</p>
           </div>
         </div>
       )
@@ -383,18 +347,18 @@ const ChartCard = ({ title, children, color, data, type }) => {
           {/* Ô 1: Gateway Application */}
           <div className="p-4">
             <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">In use Process</h3>
-            <p className="text-[24px]">{data[19]?.heapUsedMb} MB</p>
+            <p className="text-[24px]">{card?.heapUsedMb} MB</p>
           </div>
 
           <div className="p-4">
             <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">In use System Memory</h3>
-            <p className="text-[24px]">{data[19]?.usedPhysicalMemoryMb} MB</p>
+            <p className="text-[24px]">{card?.usedPhysicalMemoryMb} MB</p>
           </div>
 
           {/* Ô 3: Total System Memory */}
           <div className="p-4">
             <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Total System Memory</h3>
-            <p className="text-[24px]">{data[19]?.totalPhysicalMemoryMb} MB</p>
+            <p className="text-[24px]">{card?.totalPhysicalMemoryMb} MB</p>
           </div>
         </div>
         )
