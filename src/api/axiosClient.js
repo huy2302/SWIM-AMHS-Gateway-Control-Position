@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:8180/api', // Đổi port nếu Spring Boot chạy port khác
+  baseURL: import.meta.env.VITE_API_URL || 'http://192.168.22.188:8180/api', // Đổi port nếu Spring Boot chạy port khác
   headers: {
     'Content-Type': 'application/json',
   },
