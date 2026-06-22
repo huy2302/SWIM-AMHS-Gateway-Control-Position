@@ -1,0 +1,317 @@
+{
+  "title": {
+    "vi": "Bảng điều khiển Gateway Monitor",
+    "en": "Gateway Monitor Dashboard"
+  },
+  "systemHealthy": {
+    "vi": "Hệ thống hoạt động bình thường",
+    "en": "All systems are operating normally"
+  },
+  "uptime": {
+    "vi": "Thời gian hoạt động",
+    "en": "Up time"
+  },
+  "administrator": {
+    "vi": "Quản trị viên",
+    "en": "Administrator"
+  },
+  "lastUpdated": {
+    "vi": "Cập nhật lần cuối",
+    "en": "Last updated"
+  },
+
+  "health": {
+    "title": {
+      "vi": "TRẠNG THÁI HỆ THỐNG TỐT",
+      "en": "SYSTEM HEALTHY"
+    },
+    "error": {
+      "vi": "MẤT KẾT NỐI ĐẾN SERVER",
+      "en": "DISCONNECT TO SERVER"
+    },
+    "try": {
+      "vi": "Đang thử kết nối lại đến server...",
+      "en": "Trying to reconnect to the server..."
+    },
+    "description": {
+      "vi": "Hệ thống hoạt động bình thường",
+      "en": "All systems are operating normally"
+    },
+    "totalErrorsToday": {
+      "vi": "Tổng số lỗi hôm nay",
+      "en": "Total errors today"
+    },
+    "lastErrorTime": {
+      "vi": "Thời gian lỗi gần nhất",
+      "en": "Last error time"
+    },
+    "runningSince": {
+      "vi": "Hoạt động từ",
+      "en": "Running since"
+    }
+  },
+
+  "amhsSent": {
+    "title": {
+      "vi": "AMHS đã gửi",
+      "en": "AMHS Sent"
+    },
+    "total": {
+      "vi": "Tổng",
+      "en": "Total"
+    },
+    "pending": {
+      "vi": "Đang chờ",
+      "en": "Pending"
+    },
+    "convertSuccess": {
+      "vi": "Chuyển đổi thành công",
+      "en": "Convert Success"
+    },
+    "publishSuccess": {
+      "vi": "Publish thành công",
+      "en": "Publish Success"
+    },
+    "error": {
+      "vi": "Lỗi",
+      "en": "Error"
+    },
+    "successRate": {
+      "vi": "Tỷ lệ thành công",
+      "en": "Success Rate"
+    }
+  },
+
+  "amqpSent": {
+    "title": {
+      "vi": "AMQP đã gửi",
+      "en": "AMQP Sent"
+    },
+    "total": {
+      "vi": "Tổng",
+      "en": "Total"
+    },
+    "pending": {
+      "vi": "Đang chờ",
+      "en": "Pending"
+    },
+    "convertSuccess": {
+      "vi": "Chuyển đổi thành công",
+      "en": "Convert Success"
+    },
+    "sentSuccess": {
+      "vi": "Gửi thành công",
+      "en": "Sent Success"
+    },
+    "noRouting": {
+      "vi": "Không tìm thấy tuyến",
+      "en": "No Routing"
+    },
+    "error": {
+      "vi": "Lỗi",
+      "en": "Error"
+    }
+  },
+
+  "conversionStatus": {
+    "title": {
+      "vi": "Trạng thái chuyển đổi",
+      "en": "Conversion Status"
+    },
+    "successfulConversions": {
+      "vi": "Chuyển đổi thành công",
+      "en": "Successful conversions"
+    },
+    "failedConversions": {
+      "vi": "Chuyển đổi thất bại",
+      "en": "Failed conversions"
+    },
+    "successRate": {
+      "vi": "Tỷ lệ thành công",
+      "en": "Success rate"
+    }
+  },
+
+  "messageFlow": {
+    "title": {
+      "vi": "Luồng bản tin",
+      "en": "Message Flow"
+    },
+    "totalReceived": {
+      "vi": "Tổng nhận",
+      "en": "Total Received"
+    },
+    "amhsToSwim": {
+      "vi": "AMHS → SWIM",
+      "en": "AMHS → SWIM"
+    },
+    "swimToAmhs": {
+      "vi": "SWIM → AMHS",
+      "en": "SWIM → AMHS"
+    }
+  },
+
+  "server": {
+    "title": {
+      "vi": "Thông tin máy chủ",
+      "en": "Server Information"
+    },
+    "consoleConnection": {
+      "vi": "Kết nối Console",
+      "en": "Console Connection"
+    },
+    "connecting": {
+      "vi": "Đang kết nối đến server ...",
+      "en": "Connecting to server ..."
+    },
+    "connectedSupervisor": {
+      "vi": "Đã kết nối (Supervisor)",
+      "en": "Connected (Supervisor)"
+    },
+    "serverName": {
+      "vi": "Tên máy chủ",
+      "en": "Server name"
+    },
+    "runningSince": {
+      "vi": "Khởi động từ",
+      "en": "Server running since"
+    },
+    "uptime": {
+      "vi": "Thời gian hoạt động",
+      "en": "Server up time"
+    },
+    "version": {
+      "vi": "Phiên bản phần mềm",
+      "en": "Server Software Version"
+    },
+    "runState": {
+      "vi": "Trạng thái",
+      "en": "Run State"
+    },
+    "running": {
+      "vi": "Đang chạy",
+      "en": "Running"
+    },
+    "stop": {
+      "vi": "Đã dừng",
+      "en": "Stop"
+    },
+    "memoryUsage": {
+      "vi": "Bộ nhớ sử dụng (MB)",
+      "en": "Memory Usage (MB)"
+    },
+    "allocated": {
+      "vi": "Đã cấp phát",
+      "en": "Allocated"
+    },
+    "unused": {
+      "vi": "Chưa sử dụng",
+      "en": "Unused"
+    },
+    "diskSpace": {
+      "vi": "Dung lượng ổ đĩa (GB)",
+      "en": "Disk Space (GB)"
+    },
+    "free": {
+      "vi": "Còn trống",
+      "en": "Free"
+    },
+    "total": {
+      "vi": "Tổng",
+      "en": "Total"
+    }
+  },
+
+  "swimToAmhsQueue": {
+    "title": {
+      "vi": "SWIM → AMHS (Hàng đợi AMQP)",
+      "en": "SWIM → AMHS (AMQP Queue)"
+    },
+    "total": {
+      "vi": "Tổng",
+      "en": "Total"
+    },
+    "pending": {
+      "vi": "Đang chờ",
+      "en": "Pending"
+    },
+    "converted": {
+      "vi": "Đã chuyển đổi",
+      "en": "Converted"
+    },
+    "convertedFailed": {
+      "vi": "Chuyển đổi thất bại",
+      "en": "Converted Failed"
+    },
+    "sent": {
+      "vi": "Đã gửi",
+      "en": "Sent"
+    },
+    "noRouting": {
+      "vi": "Không có tuyến",
+      "en": "No Routing"
+    }
+  },
+
+  "queueOverview": {
+    "title": {
+      "vi": "Tổng quan hàng đợi",
+      "en": "Queue Overview"
+    },
+    "pending": {
+      "vi": "Đang chờ",
+      "en": "Pending"
+    },
+    "converted": {
+      "vi": "Đã chuyển đổi",
+      "en": "Converted"
+    },
+    "convertFailed": {
+      "vi": "Chuyển đổi thất bại",
+      "en": "Convert Failed"
+    },
+    "sent": {
+      "vi": "Đã gửi",
+      "en": "Sent"
+    },
+    "publish": {
+      "vi": "Phát hành",
+      "en": "Publish"
+    },
+    "noRouting": {
+      "vi": "Không có tuyến",
+      "en": "No Routing"
+    }
+  },
+
+  "amhsToSwim": {
+    "title": {
+      "vi": "AMHS → SWIM",
+      "en": "AMHS → SWIM"
+    },
+    "total": {
+      "vi": "Tổng",
+      "en": "Total"
+    },
+    "pending": {
+      "vi": "Đang chờ",
+      "en": "Pending"
+    },
+    "converted": {
+      "vi": "Đã chuyển đổi",
+      "en": "Converted"
+    },
+    "convertedFailed": {
+      "vi": "Chuyển đổi thất bại",
+      "en": "Converted Failed"
+    },
+    "published": {
+      "vi": "Đã publish",
+      "en": "Published"
+    },
+    "undefined": {
+      "vi": "Không xác định",
+      "en": "Undefined"
+    }
+  }
+}

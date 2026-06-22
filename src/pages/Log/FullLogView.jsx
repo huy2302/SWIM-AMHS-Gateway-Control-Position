@@ -4,14 +4,11 @@ import {
   Copy,
   RefreshCcw,
   Calendar,
-  FolderOpen,
   Search,
-  Info,
-  ChevronRight,
-  Loader2 // Thêm icon loading
+  Loader2
 } from "lucide-react";
-import DashboardLayout from "../layout/DashboardLayout";
-import gatewayApi from "../api/gatewayApi"; // Import file API bạn đã viết
+import DashboardLayout from "@/layout/DashboardLayout";
+import gatewayApi from "@/api/gatewayApi"; // Import file API bạn đã viết
 
 const FullLogView = () => {
   const [logs, setLogs] = useState([]); // Dữ liệu log từ API

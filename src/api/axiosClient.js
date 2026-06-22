@@ -11,7 +11,29 @@ const axiosClient = axios.create({
 export const authUtils = {
   // Lưu auth data sau khi login thành công
   saveAuth: (authData) => {
-    localStorage.setItem('auth', JSON.stringify(authData));
+    const parseJwtExpiry = (token) => {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.exp ? payload.exp * 1000 : Date.now() + 3600 * 1000;
+      } catch (err) {
+        return Date.now() + 3600 * 1000;
+      }
+    };
+
+    const expiresAt = authData.expiresAt
+      ? typeof authData.expiresAt === 'string'
+        ? Date.parse(authData.expiresAt)
+        : authData.expiresAt
+      : authData.token
+      ? parseJwtExpiry(authData.token)
+      : Date.now() + 3600 * 1000;
+
+    const savedAuth = {
+      ...authData,
+      expiresAt,
+    };
+
+    localStorage.setItem('auth', JSON.stringify(savedAuth));
   },
 
   // Lấy auth data
@@ -25,20 +47,32 @@ export const authUtils = {
     localStorage.removeItem('auth');
   },
 
-  // Kiểm tra có token hợp lệ không
+  // Kiểm tra phiên đăng nhập còn hiệu lực
   isAuthenticated: () => {
     const auth = authUtils.getAuth();
-    if (!auth?.token) return false;
+    if (!auth) return false;
 
-    try {
-      // Giải mã JWT để kiểm tra expiration (đơn giản)
-      const payload = JSON.parse(atob(auth.token.split('.')[1]));
-      const currentTime = Date.now() / 1000;
-      return payload.exp > currentTime;
-    } catch (error) {
-      console.warn('Invalid token format:', error);
+    if (auth.expiresAt && Date.now() > auth.expiresAt) {
+      authUtils.removeAuth();
       return false;
     }
+
+    if (auth.token) {
+      try {
+        const payload = JSON.parse(atob(auth.token.split('.')[1]));
+        const currentTime = Date.now() / 1000;
+        if (payload.exp && payload.exp <= currentTime) {
+          authUtils.removeAuth();
+          return false;
+        }
+      } catch (error) {
+        console.warn('Invalid token format:', error);
+        authUtils.removeAuth();
+        return false;
+      }
+    }
+
+    return Boolean(auth.token || auth.user);
   }
 };
 
@@ -72,27 +106,50 @@ axiosClient.interceptors.response.use(
     console.error('❌ API Error:', error.config?.url, error.response?.status, error.response?.data);
 
     // Nếu gặp lỗi 401 và chưa retry, thử refresh token
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    axiosClient.interceptors.response.use(
+      (response) => response.data,
+      async (error) => {
+        const originalRequest = error.config;
 
-      try {
-        const refreshResponse = await axiosClient.post('/auth/refresh');
+        const isAuthEndpoint =
+          originalRequest?.url?.includes('/auth/login') ||
+          originalRequest?.url?.includes('/auth/refresh');
 
-        const auth = authUtils.getAuth();
-        const newAuthData = {
-          ...auth,
-          token: refreshResponse.token
-        };
-        authUtils.saveAuth(newAuthData);
+        if (isAuthEndpoint) {
+          return Promise.reject(error);
+        }
 
-        originalRequest.headers['Authorization'] = `Bearer ${refreshResponse.token}`;
-        return axiosClient(originalRequest);
+        if (
+          error.response?.status === 401 &&
+          !originalRequest._retry
+        ) {
+          originalRequest._retry = true;
 
-      } catch (refreshError) {
-        authUtils.removeAuth();
-        window.location.href = '/login';
+          try {
+            const refreshResponse =
+              await axiosClient.post('/auth/refresh');
+
+            const auth = authUtils.getAuth();
+
+            authUtils.saveAuth({
+              ...auth,
+              token: refreshResponse.token,
+            });
+
+            originalRequest.headers.Authorization =
+              `Bearer ${refreshResponse.token}`;
+
+            return axiosClient(originalRequest);
+
+          } catch (refreshError) {
+            authUtils.removeAuth();
+            window.location.href = '/login';
+          }
+        }
+
+        return Promise.reject(error);
       }
-    }
+    );
 
     return Promise.reject(error);
   }

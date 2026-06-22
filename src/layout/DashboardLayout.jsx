@@ -1,4 +1,4 @@
-import Sidebar from "./Sidebar";
+import Sidebar from "./Sidebar/Sidebar";
 import Topbar from "./Topbar";
 import "../styles/dashboard.css";
 import Bottombar from "./Bottombar";

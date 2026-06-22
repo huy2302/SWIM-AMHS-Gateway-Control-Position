@@ -1,0 +1,244 @@
+{
+    "source": {
+      "label": {
+        "vi": "Nguồn",
+        "en": "Source"
+      }
+    },
+    "filters": {
+      "origin": {
+        "label": {
+          "vi": "Nơi gửi",
+          "en": "Origin"
+        }
+      },
+      "address": {
+        "label": {
+          "vi": "Địa chỉ",
+          "en": "Address"
+        }
+      },
+      "messageId": {
+        "label": {
+          "vi": "ID điện văn",
+          "en": "Message ID"
+        }
+      },
+      "rawText": {
+        "label": {
+          "vi": "Nội dung điện văn gốc",
+          "en": "Raw Text"
+        },
+        "placeholder": {
+          "vi": "Tìm kiếm theo điện văn gốc...",
+          "en": "Search raw message..."
+        }
+      },
+      "status": {
+        "label": {
+          "vi": "Trạng thái",
+          "en": "Status"
+        },
+        "all": {
+          "vi": "Tất cả trạng thái",
+          "en": "All Status"
+        }
+      },
+      "filterButton": {
+        "vi": "Lọc",
+        "en": "Filter"
+      }
+    },
+    "table": {
+      "amqp": {
+        "time": {
+          "vi": "Thời gian",
+          "en": "Time"
+        },
+        "source": {
+          "vi": "Nguồn",
+          "en": "source"
+        },
+        "origin": {
+          "vi": "Nơi gửi",
+          "en": "Origin"
+        },
+        "address": {
+          "vi": "Địa chỉ",
+          "en": "Address"
+        },
+        "textRaw": {
+          "vi": "Điện văn gốc",
+          "en": "Text Raw"
+        },
+        "status": {
+          "vi": "Trạng thái",
+          "en": "Status"
+        }
+      },
+      "x400": {
+        "id": {
+          "vi": "ID",
+          "en": "ID"
+        },
+        "date": {
+          "vi": "Ngày",
+          "en": "Date"
+        },
+        "origin": {
+          "vi": "Nơi gửi",
+          "en": "Origin"
+        },
+        "filingTime": {
+          "vi": "Thời gian bay",
+          "en": "Filing Time"
+        },
+        "messageId": {
+          "vi": "ID điện văn",
+          "en": "Message ID"
+        },
+        "textRaw": {
+          "vi": "Điện văn gốc",
+          "en": "Text Raw"
+        },
+        "status": {
+          "vi": "Trạng thái",
+          "en": "Status"
+        }
+      }
+    },
+    "pagination": {
+      "showing": {
+        "vi": "Hiển thị ",
+        "en": "Showing "
+      },
+      "entries": {
+        "vi": " điện văn",
+        "en": " entries"
+      },
+      "sourceTable": {
+        "vi": "Bảng nguồn: ",
+        "en": "Source Table: "
+      },
+      "refreshing": {
+        "vi": "Đang làm mới dữ liệu...",
+        "en": "Refreshing data..."
+      }
+    },
+    "modal": {
+      "title": {
+        "vi": "Chi tiết tin nhắn AMHS",
+        "en": "AMHS Message Detail"
+      },
+      "fields": {
+        "messageId": {
+          "vi": "ID ĐIỆN VĂN",
+          "en": "MESSAGE ID"
+        },
+        "subject": {
+          "vi": "CHỦ ĐỀ",
+          "en": "SUBJECT"
+        },
+        "origin": {
+          "vi": "NƠI GỬI",
+          "en": "ORIGIN"
+        },
+        "address": {
+          "vi": "ĐỊA CHỈ",
+          "en": "ADDRESS"
+        },
+        "source": {
+          "vi": "NGUỒN",
+          "en": "SOURCE"
+        },
+        "addressingSource": {
+          "vi": "NGUỒN ĐỊA CHỈ",
+          "en": "ADDRESSING SOURCE"
+        },
+        "bodyType": {
+          "vi": "LOẠI NỘI DUNG",
+          "en": "BODY TYPE"
+        },
+        "contentType": {
+          "vi": "KIỂU NỘI DUNG",
+          "en": "CONTENT TYPE"
+        },
+        "priority": {
+          "vi": "ƯU TIÊN",
+          "en": "PRIORITY"
+        },
+        "time": {
+          "vi": "THỜI GIAN",
+          "en": "TIME"
+        },
+        "errorType": {
+          "vi": "LOẠI LỖI",
+          "en": "ERROR TYPE"
+        }
+      },
+      "sections": {
+        "rawMessage": {
+          "vi": "Nội dung thô",
+          "en": "Raw Message Content"
+        },
+        "payload": {
+          "vi": "Nội dung tải",
+          "en": "Payload Content"
+        },
+        "amqpProperties": {
+          "vi": "Thuộc tính AMQP",
+          "en": "AMQP Properties"
+        }
+      },
+      "buttons": {
+        "close": {
+          "vi": "Đóng",
+          "en": "Close"
+        },
+        "copy": {
+          "vi": "SAO CHÉP",
+          "en": "COPY"
+        },
+        "copyAll": {
+          "vi": "Sao chép tất cả",
+          "en": "Copy All"
+        },
+        "copied": {
+          "vi": "Đã sao chép",
+          "en": "Copied"
+        }
+      },
+      "na": {
+        "vi": "N/A",
+        "en": "N/A"
+      },
+      "none": {
+        "vi": "KHÔNG CÓ",
+        "en": "NONE"
+      }
+    },
+    "toast": {
+      "fetchFailed": {
+        "vi": "Không thể tải dữ liệu tin nhắn",
+        "en": "Failed to load messages"
+      },
+      "copySuccess": {
+        "vi": "Đã sao chép vào clipboard",
+        "en": "Copied to clipboard"
+      },
+      "copyFailed": {
+        "vi": "Sao chép thất bại",
+        "en": "Failed to copy"
+      }
+    },
+    "empty": {
+      "title": {
+        "vi": "Không có tin nhắn nào",
+        "en": "No messages found"
+      },
+      "description": {
+        "vi": "Không tìm thấy tin nhắn nào phù hợp với bộ lọc của bạn",
+        "en": "No messages match your filters"
+      }
+    }
+}

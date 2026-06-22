@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { UserRound } from "lucide-react";
+import UserMenu from "../components/UserMenu";
 
 const titleMap = {
   monitor: "Gateway Monitor Dashboard",
@@ -38,7 +39,8 @@ export default function Topbar() {
       </div>
 
       <div className="mr-4">
-        <UserRound />
+        {/* <UserRound /> */}
+        <UserMenu />
       </div>
     </div>
   );

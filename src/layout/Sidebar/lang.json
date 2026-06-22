@@ -1,0 +1,60 @@
+{
+  "toggle": {
+    "expand": {
+      "vi": "Mở rộng sidebar",
+      "en": "Expand sidebar"
+    },
+    "collapse": {
+      "vi": "Thu gọn sidebar",
+      "en": "Collapse sidebar"
+    }
+  },
+  "title": {
+    "vi": "AMHS SWIM Gateway",
+    "en": "AMHS SWIM Gateway"
+  },
+  "menu": {
+    "monitor": {
+      "vi": "Giám sát",
+      "en": "Monitor"
+    },
+    "accounts": {
+      "vi": "Tài khoản",
+      "en": "Accounts"
+    },
+    "routing": {
+      "vi": "Cấu hình định tuyến",
+      "en": "Routing"
+    },
+    "logs": {
+      "vi": "Logs hệ thống",
+      "en": "Logs"
+    },
+    "messages": {
+      "vi": "Điện văn (Bản tin)",
+      "en": "Messages"
+    },
+    "systemMonitor": {
+      "vi": "Tài nguyên hệ thống",
+      "en": "System Monitor"
+    },
+    "systemHistory": {
+      "vi": "Lịch sử hệ thống",
+      "en": "System History"
+    }
+  },
+  "serverMonitor": {
+    "title": {
+      "vi": "Tài nguyên",
+      "en": "System Status"
+    },
+     "cpu": {
+      "vi": "CPU đã dùng",
+      "en": "CPU Usage"
+    },
+     "ram": {
+      "vi": "RAM đã dùng",
+      "en": "Memory Usage"
+    }
+  }
+}

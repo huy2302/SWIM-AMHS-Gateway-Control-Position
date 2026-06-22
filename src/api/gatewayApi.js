@@ -176,7 +176,24 @@ const gatewayApi = {
   getSystemEvents: (params) => {
     // Lấy dữ liệu từ bảng system_history (System Events)
     return axiosClient.get('/system-history', { params });
-  }
+  },
+
+  getSystemEventsByUser: (params) => {
+    if (params.userId) {
+      // Lấy dữ liệu từ bảng system_history (System Events)
+      return axiosClient.get('/system-history/user', { params });
+    } else {
+      return axiosClient.get('/system-history', { params });
+    }
+  },
+
+  postReadNotify: async (userId, historyId) => {
+    return axiosClient.put(`/user-system-history/user/${userId}/history/${historyId}/read`);
+  },
+
+  postReadAllNotify: async (userId) => {
+    return axiosClient.put(`/user-system-history/user/${userId}/read-all`);
+  },
 };
 
 export default gatewayApi;

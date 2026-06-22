@@ -1,0 +1,353 @@
+{
+    "tabs": {
+      "a2s": {
+        "vi": "OUT (AMHS → SWIM)",
+        "en": "OUT (AMHS → SWIM)"
+      },
+      "s2a": {
+        "vi": "IN (SWIM → AMHS)",
+        "en": "IN (SWIM → AMHS)"
+      }
+    },
+    "title": {
+      "a2s": {
+        "vi": "Luồng đi (AMHS → SWIM)",
+        "en": "Outbound Rules (AMHS → SWIM)"
+      },
+      "s2a": {
+        "vi": "Luồng vào (SWIM → AMHS)",
+        "en": "Inbound Rules (SWIM → AMHS)"
+      }
+    },
+    "table": {
+      "id": {
+        "vi": "#",
+        "en": "#"
+      },
+      "messageType": {
+        "vi": "Loại tin",
+        "en": "Message Type"
+      },
+      "sendTopic": {
+        "vi": "Topic gửi",
+        "en": "Send Topic"
+      },
+      "receiveTopic": {
+        "vi": "Topic nhận",
+        "en": "Receive Topic"
+      },
+      "recipients": {
+        "vi": "Người nhận",
+        "en": "Recipients"
+      },
+      "originator": {
+        "vi": "Người gửi",
+        "en": "Originator"
+      },
+      "priority": {
+        "vi": "Ưu tiên",
+        "en": "Priority"
+      },
+      "active": {
+        "vi": "Trạng thái",
+        "en": "Active"
+      },
+      "action": {
+        "vi": "Thao tác",
+        "en": "Action"
+      }
+    },
+    "filter": {
+      "title": {
+        "vi": "Bộ lọc:",
+        "en": "Filter:"
+      },
+      "allMessageTypes": {
+        "vi": "Tất cả loại tin",
+        "en": "All Message Types"
+      },
+      "allStatus": {
+        "vi": "Tất cả trạng thái",
+        "en": "All Status"
+      },
+      "active": {
+        "vi": "Hoạt động",
+        "en": "Active"
+      },
+      "inactive": {
+        "vi": "Không hoạt động",
+        "en": "Inactive"
+      },
+      "searchPlaceholder": {
+        "vi": "Tìm kiếm...",
+        "en": "Search..."
+      },
+      "searchButton": {
+        "vi": "Tìm kiếm",
+        "en": "Search"
+      }
+    },
+    "buttons": {
+      "addRule": {
+        "vi": "THÊM RULE",
+        "en": "ADD RULE"
+      },
+      "saveRule": {
+        "vi": "Lưu rule",
+        "en": "Save Rule"
+      },
+      "cancel": {
+        "vi": "Hủy",
+        "en": "Cancel"
+      },
+      "delete": {
+        "vi": "Xóa",
+        "en": "Delete"
+      }
+    },
+    "status": {
+      "on": {
+        "vi": "🟢 BẬT",
+        "en": "🟢 ON"
+      },
+      "off": {
+        "vi": "🔴 TẮT",
+        "en": "🔴 OFF"
+      },
+      "active": {
+        "vi": "Hoạt động",
+        "en": "Active"
+      },
+      "inactive": {
+        "vi": "Không hoạt động",
+        "en": "Inactive"
+      }
+    },
+    "modal": {
+      "editTitle": {
+        "vi": "CHỈNH SỬA RULE - ",
+        "en": "EDIT RULE - "
+      },
+      "deleteTitle": {
+        "vi": "Xác nhận xóa rule ID: ",
+        "en": "Confirm Delete Rule ID: "
+      },
+      "deleteMessage": {
+        "vi": "Bạn có chắc chắn muốn xóa rule này? Hành động này không thể hoàn tác.",
+        "en": "Are you sure you want to delete this rule? This action cannot be undone."
+      },
+      "topicLabel": {
+        "vi": "Topic: ",
+        "en": "Topic: "
+      },
+      "passwordLabel": {
+        "vi": "Nhập mật khẩu",
+        "en": "Enter Password"
+      },
+      "passwordPlaceholder": {
+        "vi": "Nhập mật khẩu",
+        "en": "Enter password"
+      },
+      "deleteError": {
+        "vi": "Mật khẩu không đúng",
+        "en": "Incorrect password"
+      }
+    },
+    "form": {
+      "a2s": {
+        "messageType": {
+          "label": {
+            "vi": "Loại tin *",
+            "en": "Message Type *"
+          },
+          "placeholder": {
+            "vi": "Nhập hoặc chọn loại tin, nhấn Enter",
+            "en": "Enter or select message type, press Enter"
+          },
+          "addButton": {
+            "vi": "Thêm",
+            "en": "Add"
+          },
+          "hint": {
+            "vi": "Bạn có thể nhập bằng tay hoặc chọn từ danh sách. Nhập nhiều mục, mỗi mục cách nhau dấu phẩy hoặc nhấn Enter.",
+            "en": "You can type manually or select from list. Enter multiple items separated by commas or press Enter."
+          }
+        },
+        "sendTopic": {
+          "label": {
+            "vi": "Topic gửi * (AMQP Topic)",
+            "en": "Send Topic * (AMQP Topic)"
+          },
+          "placeholder": {
+            "vi": "ats/met/metar",
+            "en": "ats/met/metar"
+          }
+        },
+        "priority": {
+          "label": {
+            "vi": "Ưu tiên (AMHS: SS=cao nhất, KK=thấp nhất)",
+            "en": "Priority (AMHS: SS=highest, KK=lowest)"
+          },
+          "options": {
+            "ss": {
+              "vi": "SS (Cao nhất)",
+              "en": "SS (Highest)"
+            },
+            "dd": {
+              "vi": "DD",
+              "en": "DD"
+            },
+            "ff": {
+              "vi": "FF (Bình thường)",
+              "en": "FF (Normal)"
+            },
+            "gg": {
+              "vi": "GG",
+              "en": "GG"
+            },
+            "kk": {
+              "vi": "KK (Thấp nhất)",
+              "en": "KK (Lowest)"
+            }
+          }
+        },
+        "note": {
+          "label": {
+            "vi": "Ghi chú",
+            "en": "Note"
+          },
+          "placeholder": {
+            "vi": "Gửi IWXXM METAR lên topic ats/met/metar",
+            "en": "Send IWXXM METAR to topic ats/met/metar"
+          }
+        }
+      },
+      "s2a": {
+        "receiveTopic": {
+          "label": {
+            "vi": "Topic nhận * (AMQP Topic)",
+            "en": "Receive Topic * (AMQP Topic)"
+          },
+          "placeholder": {
+            "vi": "ats/met/metar",
+            "en": "ats/met/metar"
+          }
+        },
+        "messageFilter": {
+          "label": {
+            "vi": "Bộ lọc tin (Trống = tất cả)",
+            "en": "Message Filter (Empty = all)"
+          },
+          "placeholder": {
+            "vi": "METAR, FPL...",
+            "en": "METAR, FPL..."
+          }
+        },
+        "recipients": {
+          "label": {
+            "vi": "Người nhận * (Danh sách AFTN address, cách nhau dấu cách)",
+            "en": "Recipients * (List of AFTN addresses, space separated)"
+          },
+          "placeholder": {
+            "vi": "VVHHZQZX VVHHZTZX VVHHZDZX",
+            "en": "VVHHZQZX VVHHZTZX VVHHZDZX"
+          }
+        },
+        "originator": {
+          "label": {
+            "vi": "Người gửi (AFTN address)",
+            "en": "Originator (AFTN address)"
+          },
+          "placeholder": {
+            "vi": "VVHHZPZX",
+            "en": "VVHHZPZX"
+          },
+          "error": {
+            "vi": "Phải có đúng 8 ký tự",
+            "en": "Must be exactly 8 characters"
+          }
+        },
+        "priority": {
+          "label": {
+            "vi": "Ưu tiên (SWIM: 0=cao nhất, 9=thấp nhất)",
+            "en": "Priority (SWIM: 0=highest, 9=lowest)"
+          },
+          "options": {
+            "0": "0 (SS/DD)",
+            "1": "1 (SS/DD)",
+            "2": "2 (FF)",
+            "3": "3 (FF)",
+            "4": "4 (GG)",
+            "5": "5 (GG)",
+            "6": "6 (GG)",
+            "7": "7 (KK)",
+            "8": "8 (KK)",
+            "9": "9 (KK)"
+          }
+        },
+        "note": {
+          "label": {
+            "vi": "Ghi chú",
+            "en": "Note"
+          },
+          "placeholder": {
+            "vi": "Tất cả METAR gửi cho Hanoi MET + ACC",
+            "en": "All METAR send to Hanoi MET + ACC"
+          }
+        }
+      },
+      "common": {
+        "status": {
+          "label": {
+            "vi": "Trạng thái",
+            "en": "Status"
+          },
+          "active": {
+            "vi": "Hoạt động",
+            "en": "Active"
+          },
+          "inactive": {
+            "vi": "Không hoạt động",
+            "en": "Inactive"
+          }
+        },
+        "note": {
+          "label": {
+            "vi": "Ghi chú",
+            "en": "Note"
+          }
+        }
+      }
+    },
+    "toast": {
+      "deleteSuccess": {
+        "vi": "Xóa rule thành công!",
+        "en": "Rule deleted successfully!"
+      },
+      "deleteFailed": {
+        "vi": "Xóa rule thất bại: ",
+        "en": "Failed to delete rule: "
+      },
+      "saveSuccess": {
+        "vi": "Lưu rule thành công!",
+        "en": "Rule saved successfully!"
+      },
+      "saveFailed": {
+        "vi": "Lưu rule thất bại: ",
+        "en": "Failed to save rule: "
+      },
+      "fetchFailed": {
+        "vi": "Không thể tải dữ liệu routing từ API.",
+        "en": "Cannot load routing data from API."
+      }
+    },
+    "priority": {
+      "amhs": {
+        "ss": "SS (Cao nhất)",
+        "dd": "DD",
+        "ff": "FF (Bình thường)",
+        "gg": "GG",
+        "kk": "KK (Thấp nhất)"
+      }
+    }
+}

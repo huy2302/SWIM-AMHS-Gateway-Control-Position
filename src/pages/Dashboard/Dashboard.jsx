@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from "react";
-import DashboardLayout from "../layout/DashboardLayout";
-import { SAMPLE_STATS } from "../data/sampleData";
-import { Antenna, ArrowDownToLine, ArrowUpFromLine, BookText, Cable, ChartColumn, Check, Clock, Database, Download, Mail, Send, X } from "lucide-react";
+import DashboardLayout from "@/layout/DashboardLayout";
+import { Antenna, ArrowUpFromLine, BookText, Cable, ChartColumn, Check, Clock, Database, Mail, X } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import gatewayApi from "@/api/gatewayApi";
 import { useSelector } from "react-redux";
+import { t } from "@/i18n/translator";
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [refreshInterval, setRefreshInterval] = useState(2);
   const [amqpData, setAmqpData] = useState([
-    { name: "Pending", value: 0, color: "#fbff0b" },
-    { name: "Converted", value: 0, color: "#5999ff" },
-    { name: "Convert Failed", value: 0, color: "#EF4444" },
-    { name: "Sent", value: 0, color: "#4bf13c" },
-    { name: "Un router", value: 0, color: "#a1a1a1" },
+    { name: t("dashboard.queueOverview.pending"), value: 0, color: "#fbff0b" },
+    { name: t("dashboard.queueOverview.converted"), value: 0, color: "#5999ff" },
+    { name: t("dashboard.queueOverview.convertFailed"), value: 0, color: "#EF4444" },
+    { name: t("dashboard.queueOverview.sent"), value: 0, color: "#4bf13c" },
+    { name: t("dashboard.queueOverview.noRouting"), value: 0, color: "#a1a1a1" },
   ]);
   const [amhsData, setAmhsData] = useState([
-    { name: "Pending", value: 0, color: "#fbff0b" },
-    { name: "Converted", value: 0, color: "#5999ff" },
-    { name: "Convert Failed", value: 0, color: "#EF4444" },
-    { name: "Publish", value: 0, color: "#4bf13c" },
-    { name: "Undefinded", value: 0, color: "#a1a1a1" },
+    { name: t("dashboard.queueOverview.pending"), value: 0, color: "#fbff0b" },
+    { name: t("dashboard.queueOverview.converted"), value: 0, color: "#5999ff" },
+    { name: t("dashboard.queueOverview.convertFailed"), value: 0, color: "#EF4444" },
+    { name: t("dashboard.queueOverview.publish"), value: 0, color: "#4bf13c" },
+    { name: t("dashboard.queueOverview.noRouting"), value: 0, color: "#a1a1a1" },
   ]);
 
   const { GatewayProcess, status, uptime } = useSelector((state) => state.system);
@@ -32,18 +32,18 @@ export default function Dashboard() {
       const response = await gatewayApi.getDashboardStats();
       setStats(response);
       setAmqpData([
-        { name: "Pending", value: response?.database?.gw_in?.pending, color: '#fbff0b' },
-        { name: "Converted", value: response?.database?.gw_in?.transformed, color: '#5999ff' },
-        { name: "Convert Failed", value: response?.database?.gw_in?.convertFailed, color: '#EF4444' },
-        { name: "Sent", value: response?.database?.gw_in?.sent, color: '#4bf13c' },
-        { name: "Un router", value: response?.database?.gw_in?.unrouted, color: '#a1a1a1' }
+        { name: t("dashboard.queueOverview.pending"), value: response?.database?.gw_in?.pending, color: '#fbff0b' },
+        { name: t("dashboard.queueOverview.converted"), value: response?.database?.gw_in?.transformed, color: '#5999ff' },
+        { name: t("dashboard.queueOverview.convertFailed"), value: response?.database?.gw_in?.convertFailed, color: '#EF4444' },
+        { name: t("dashboard.queueOverview.sent"), value: response?.database?.gw_in?.sent, color: '#4bf13c' },
+        { name: t("dashboard.queueOverview.noRouting"), value: response?.database?.gw_in?.unrouted, color: '#a1a1a1' }
       ])
       setAmhsData([
-        { name: "Pending", value: response?.database?.gw_out?.pending, color: '#fbff0b' },
-        { name: "Converted", value: response?.database?.gw_out?.transformed, color: '#5999ff' },
-        { name: "Convert Failed", value: response?.database?.gw_out?.convertFailed, color: '#EF4444' },
-        { name: "Publish", value: response?.database?.gw_out?.published, color: '#4bf13c' },
-        { name: "Un router", value: response?.database?.gw_out?.unrouted, color: '#a1a1a1' }
+        { name: t("dashboard.queueOverview.pending"), value: response?.database?.gw_out?.pending, color: '#fbff0b' },
+        { name: t("dashboard.queueOverview.converted"), value: response?.database?.gw_out?.transformed, color: '#5999ff' },
+        { name: t("dashboard.queueOverview.convertFailed"), value: response?.database?.gw_out?.convertFailed, color: '#EF4444' },
+        { name: t("dashboard.queueOverview.publish"), value: response?.database?.gw_out?.published, color: '#4bf13c' },
+        { name: t("dashboard.queueOverview.noRouting"), value: response?.database?.gw_out?.unrouted, color: '#a1a1a1' }
       ])
     } catch (error) {
       console.error("Error fetching system health:", error);
@@ -69,7 +69,7 @@ export default function Dashboard() {
         <section className="dashboard-hero flex flex-col bg-[rgba(34, 197, 94, 0.12)]">
           <div className="flex items-center justify-end gap-2 mb-2">
             <Clock />
-            <span className="text-[14px]">Last updated: 12/05/2025 10:25:12</span>
+            <span className="text-[14px]">{t("dashboard.lastUpdated")}: 12/05/2025 10:25:12</span>
           </div>
           <div 
             className="hero-card flex items-center justify-between"
@@ -85,8 +85,8 @@ export default function Dashboard() {
                         <X />
                       </div>
                       <div>
-                        <h2 className="text-red-500 text-[18px]">DISCONNECT TO SERVER</h2>
-                        <span>Trying to reconnect to the server...</span>
+                        <h2 className="text-red-500 text-[18px]">{t("dashboard.health.error")}</h2>
+                        <span>{t("dashboard.health.try")}</span>
                       </div>
                     </>
                     :
@@ -95,8 +95,8 @@ export default function Dashboard() {
                         <Check />
                       </div>
                       <div>
-                        <h2 className="text-[oklch(0.66_0.19_151.99)] text-[18px]">SYSTEM HEALTHY</h2>
-                        <span>All systems are operating normally</span>
+                        <h2 className="text-[oklch(0.66_0.19_151.99)] text-[18px]">{t("dashboard.health.title")}</h2>
+                        <span>{t("dashboard.health.description")}</span>
                       </div>
                     </>
                   }
@@ -106,19 +106,19 @@ export default function Dashboard() {
             
             <div className="hero-details">
               <div className="hero-detail-item">
-                <div className="detail-label">Total errors today</div>
+                <div className="detail-label">{t("dashboard.health.totalErrorsToday")}</div>
                 <div className="detail-value">5</div>
               </div>
             </div>
             <div className="hero-details">
               <div className="hero-detail-item">
-                <div className="detail-label">Last error time</div>
+                <div className="detail-label">{t("dashboard.health.lastErrorTime")}</div>
                 <div className="detail-value">10:25:12</div>
               </div>
             </div>
             <div className="hero-details">
               <div className="hero-detail-item">
-                <div className="detail-label">Running since</div>
+                <div className="detail-label">{t("dashboard.health.runningSince")}</div>
                 <div className="detail-value">{formatDate(startTime)}</div>
               </div>
             </div>
@@ -134,24 +134,24 @@ export default function Dashboard() {
               <Mail style={{ color: "#8755fa" }}/>
             </div>
             <div>
-              <div className="text-[12px] font-bold">AMHS Sent</div>
+              <div className="text-[12px] font-bold">{t("dashboard.amhsSent.title")}</div>
               <div className="text-[12px] grid grid-cols-[1fr_auto] gap-x-8 gap-y-2 w-full text-sm">
-                <span className="text-slate-600">Total</span>
+                <span className="text-slate-600">{t("dashboard.amhsSent.total")}</span>
                 <span className="font-bold text-right text-[#2563eb]">{formatNumber(stats?.database?.gw_out?.total)}</span>
 
-                <span className="text-slate-600">Pending</span>
+                <span className="text-slate-600">{t("dashboard.amhsSent.pending")}</span>
                 <span className="font-bold text-right text-[#7d7d79]">{formatNumber(stats?.database?.gw_out?.pending)}</span>
                 
-                <span className="text-slate-600">Convert Success</span>
+                <span className="text-slate-600">{t("dashboard.amhsSent.convertSuccess")}</span>
                 <span className="font-bold text-right text-[#10b981]">{formatNumber(stats?.database?.gw_out?.transformed)}</span>
 
-                <span className="text-slate-600">Publish Success</span>
+                <span className="text-slate-600">{t("dashboard.amhsSent.publishSuccess")}</span>
                 <span className="font-bold text-right text-[#10b981]">{formatNumber(stats?.database?.gw_out?.published)}</span>
 
-                <span className="text-slate-600">Error</span>
+                <span className="text-slate-600">{t("dashboard.amhsSent.error")}</span>
                 <span className="font-bold text-right text-[#ef4444]">{formatNumber(stats?.database?.gw_out?.failed)}</span>
                 
-                <span className="text-slate-600">Success Rate</span>
+                <span className="text-slate-600">{t("dashboard.amhsSent.successRate")}</span>
                 <span 
                   className="font-bold text-right" 
                   style={{ color: ColorByRate(stats?.database?.gw_out?.transformed, stats?.database?.gw_out?.total)}} 
@@ -170,25 +170,25 @@ export default function Dashboard() {
               <ArrowUpFromLine style={{ color: "#f97316" }}/>
             </div>
             <div>
-              <div className="text-[12px] font-bold">AMQP Sent</div>
+              <div className="text-[12px] font-bold">{t("dashboard.amqpSent.title")}</div>
               <div className="text-[12px] grid grid-cols-[1fr_auto] gap-x-8 gap-y-2 w-full text-sm">
-                <span className="text-slate-600">Total</span>
+                <span className="text-slate-600">{t("dashboard.amqpSent.total")}</span>
                 <span className="font-bold text-right text-[#2563eb]">{formatNumber(stats?.database?.gw_in?.total)}</span>
 
-                <span className="text-slate-600">Pending</span>
+                <span className="text-slate-600">{t("dashboard.amqpSent.pending")}</span>
                 <span className="font-bold text-right text-[#7d7d79]">{formatNumber(stats?.database?.gw_in?.pending)}</span>
                 
-                <span className="text-slate-600">Convert Success</span>
+                <span className="text-slate-600">{t("dashboard.amqpSent.convertSuccess")}</span>
                 <span className="font-bold text-right text-[#10b981]">{formatNumber(stats?.database?.gw_in?.transformed)}</span>
 
 
-                <span className="text-slate-600">Sent Success</span>
+                <span className="text-slate-600">{t("dashboard.amqpSent.sentSuccess")}</span>
                 <span className="font-bold text-right text-[#10b981]">{formatNumber(stats?.database?.gw_in?.sent)}</span>
 
-                <span className="text-slate-600">No Routing</span>
+                <span className="text-slate-600">{t("dashboard.amqpSent.noRouting")}</span>
                 <span className="font-bold text-right text-[#9b9998]">{formatNumber(stats?.database?.gw_in?.unrouted)}</span>
 
-                <span className="text-slate-600">Error</span>
+                <span className="text-slate-600">{t("dashboard.amqpSent.error")}</span>
                 <span className="font-bold text-right text-[#ef4444]">{formatNumber(stats?.database?.gw_in?.failed)}</span>
               </div>
             </div>
@@ -202,15 +202,15 @@ export default function Dashboard() {
               <Cable style={{ color: "#10b981" }}/>
             </div>
             <div>
-              <div className="text-[12px] font-bold">Conversion Status</div>
+              <div className="text-[12px] font-bold">{t("dashboard.conversionStatus.title")}</div>
               <div className="text-[12px] grid grid-cols-[1fr_auto] gap-x-8 gap-y-2 w-full text-sm">
-                <span className="text-slate-600">Successful conversions</span>
+                <span className="text-slate-600">{t("dashboard.conversionStatus.successfulConversions")}</span>
                 <span className="font-bold text-right text-[#2563eb]">1,561</span>
 
-                <span className="text-slate-600">Failed conversions</span>
+                <span className="text-slate-600">{t("dashboard.conversionStatus.failedConversions")}</span>
                 <span className="font-bold text-right text-[#ef4444]">19</span>
 
-                <span className="text-slate-600">Success rate</span>
+                <span className="text-slate-600">{t("dashboard.conversionStatus.successRate")}</span>
                 <span 
                   className="font-bold text-right" 
                   style={{ color: ColorByRate(stats?.database?.gw_out?.transformed, stats?.database?.gw_out?.total)}} 
@@ -229,9 +229,9 @@ export default function Dashboard() {
               <ChartColumn style={{ color: "#2563eb" }}/>
             </div>
             <div>
-              <div className="text-[12px] font-bold">Message Flow</div>
+              <div className="text-[12px] font-bold">{t("dashboard.messageFlow.title")}</div>
               <div className="text-[12px] grid grid-cols-[1fr_auto] gap-x-8 gap-y-2 w-full text-sm">
-                <span className="text-slate-600">Total Received</span>
+                <span className="text-slate-600">{t("dashboard.messageFlow.totalReceived")}</span>
                 <span className="font-bold text-slate-800 text-right">{formatNumber((stats?.database?.gw_out?.published || 0) + (stats?.database?.gw_in?.sent || 0))}</span>
                 
                 <span className="text-slate-600">AMHS → SWIM</span>
@@ -251,66 +251,66 @@ export default function Dashboard() {
                 <div className="bg-[#e3edfc] p-1 rounded-md">
                   <BookText style={{ color: "#2563eb", width: "1em", height: "1em" }} />
                 </div>
-                <p className="panel-label">Server Information</p>
+                <p className="panel-label">{t("dashboard.server.title")}</p>
               </div>
             </div>
 
             <table className="text-[12px]">
               <tbody>
                 <tr>
-                  <td>Console Connection</td>
+                  <td>{t("dashboard.server.consoleConnection")}</td>
                   {
                     status === "error" ? 
                     <td className="text-right text-red-500 font-bold">
                       <span className="w-[8px] h-[8px] bg-red-500 rounded-full mr-2 inline-block"></span>
-                      Connecting to server...
+                      {t("dashboard.server.connecting")}
                     </td>
                     :
                     <td className="text-right text-green-500 font-bold">
                       <span className="w-[8px] h-[8px] bg-green-500 rounded-full mr-2 inline-block"></span>
-                      Connected (Supervisor)
+                      {t("dashboard.server.connectedSupervisor")}
                     </td>
                   }
                 </tr>
                 <tr>
-                  <td>Server name</td>
+                  <td>{t("dashboard.server.serverName")}</td>
                   <td className="text-right font-bold">
                     {stats?.server?.serverName || BouncingDotsLoading()}
                   </td>
                 </tr>
                 <tr>
-                  <td>Server running since</td>
+                  <td>{t("dashboard.server.runningSince")}</td>
                   <td className="text-right font-bold">{formatDate(startTime) || BouncingDotsLoading()}</td>
                 </tr>
                 <tr>
-                  <td>Server up time</td>
+                  <td>{t("dashboard.server.uptime")}</td>
                   <td className="text-right font-bold">{formatUptime(uptime) || BouncingDotsLoading()}</td>
                 </tr>
                 <tr>
-                  <td>Server Software Version</td>
+                  <td>{t("dashboard.server.version")}</td>
                   <td className="text-right font-bold">{stats?.server?.version || BouncingDotsLoading()}</td>
                 </tr>
                 <tr>
-                  <td>Run State</td>
+                  <td>{t("dashboard.server.runState")}</td>
                   {
                     status === "error" ? 
                       <td className="text-right text-red-800 font-bold">
-                        <span className="bg-red-100 p-2 mr-[-8px] rounded-md">Stop</span>
+                        <span className="bg-red-100 p-2 mr-[-8px] rounded-md">{t("dashboard.server.stop")}</span>
                       </td>
                       :
                       <td className="text-right text-green-800 font-bold">
-                        <span className="bg-green-100 p-2 mr-[-8px] rounded-md">Running</span>
+                        <span className="bg-green-100 p-2 mr-[-8px] rounded-md">{t("dashboard.server.running")}</span>
                       </td>
                     }
                 </tr>
                 <tr>
-                  <td>Memory Usage (MB)</td>
-                  <td className="text-right font-bold">Allocated {GatewayProcess?.heapUsedMb}, Unused {GatewayProcess?.totalPhysicalMemoryMb - GatewayProcess?.usedPhysicalMemoryMb}</td>
+                  <td>{t("dashboard.server.memoryUsage")}</td>
+                  <td className="text-right font-bold">{t("dashboard.server.allocated")} {GatewayProcess?.heapUsedMb}, {t("dashboard.server.unused")} {GatewayProcess?.totalPhysicalMemoryMb - GatewayProcess?.usedPhysicalMemoryMb}</td>
                 </tr>
-                <tr>
+                {/* <tr>
                   <td>Disk Space (GB)</td>
                   <td className="text-right font-bold">Free 129.2 GB, Total 1.9 TB</td>
-                </tr>
+                </tr> */}
               </tbody>
             </table>
           </div>
@@ -321,44 +321,44 @@ export default function Dashboard() {
                 <div className="bg-[#f0e6fa] p-1 rounded-md">
                   <Database style={{ color: "#8b5cf6", width: "1em", height: "1em"}} />
                 </div>
-                <p className="panel-label">SWIM → AMHS (AMQP Queue)</p>
+                <p className="panel-label">{t("dashboard.swimToAmhsQueue.title")}</p>
               </div>
             </div>
 
             <table className="text-[12px]">
               <tbody>
                 <tr>
-                  <td>Total</td>
+                  <td>{t("dashboard.swimToAmhsQueue.total")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_in?.total)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Pending</td>
+                  <td>{t("dashboard.swimToAmhsQueue.pending")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_in?.pending)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Converted</td>
+                  <td>{t("dashboard.swimToAmhsQueue.converted")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_in?.transformed)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Converted Failed</td>
+                  <td>{t("dashboard.swimToAmhsQueue.convertedFailed")}</td>
                   <td className="text-right font-bold text-red-500">
                     {formatNumber(stats?.database?.gw_in?.convertFailed)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Sent</td>
+                  <td>{t("dashboard.swimToAmhsQueue.sent")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_in?.sent)}
                   </td>
                 </tr>
                 <tr>
-                  <td>No Routing</td>
+                  <td>{t("dashboard.swimToAmhsQueue.noRouting")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_in?.unrouted)}
                   </td>
@@ -392,7 +392,7 @@ export default function Dashboard() {
                 
               </div>
               <div className="flex flex-col gap-3 min-w-[140px]">
-                <h3 className="text-[12px] font-bold">Queue Overview</h3>
+                <h3 className="text-[12px] font-bold">{t("dashboard.queueOverview.title")}</h3>
                 {amqpData.map((item, index) => (
                   <div key={index} className="flex items-center justify-between gap-4">
                     {/* Phần chấm màu và Tên trạng thái */}
@@ -428,37 +428,37 @@ export default function Dashboard() {
             <table className="text-[12px]">
               <tbody>
                 <tr>
-                  <td>Total</td>
+                  <td>{t("dashboard.amhsToSwim.total")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_out?.total)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Pending</td>
+                  <td>{t("dashboard.amhsToSwim.pending")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_out?.pending)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Converted</td>
+                  <td>{t("dashboard.amhsToSwim.converted")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_out?.transformed)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Converted Failed</td>
+                  <td>{t("dashboard.amhsToSwim.convertedFailed")}</td>
                   <td className="text-right font-bold text-red-500">
                     {formatNumber(stats?.database?.gw_out?.convertFailed)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Published</td>
+                  <td>{t("dashboard.amhsToSwim.published")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_out?.published)}
                   </td>
                 </tr>
                 <tr>
-                  <td>Undefinded</td>
+                  <td>{t("dashboard.amhsToSwim.undefined")}</td>
                   <td className="text-right font-bold">
                     {formatNumber(stats?.database?.gw_out?.undefinded)}
                   </td>
@@ -492,7 +492,7 @@ export default function Dashboard() {
                 
               </div>
               <div className="flex flex-col gap-3 min-w-[140px]">
-                <h3 className="text-[12px] font-bold">Connection Status</h3>
+                <h3 className="text-[12px] font-bold">{t("dashboard.queueOverview.title")}</h3>
                 {amhsData.map((item, index) => (
                   <div key={index} className="flex items-center justify-between gap-4">
                     {/* Phần chấm màu và Tên trạng thái */}

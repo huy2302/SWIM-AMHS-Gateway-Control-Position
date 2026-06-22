@@ -1,0 +1,198 @@
+{
+    "title": {
+      "vi": "Nhật ký hệ thống",
+      "en": "System Logs"
+    },
+    "toolbar": {
+      "clear": {
+        "vi": "Xóa",
+        "en": "Clear"
+      },
+      "copy": {
+        "vi": "Sao chép",
+        "en": "Copy"
+      },
+      "todayLog": {
+        "vi": "Nhật ký hôm nay",
+        "en": "Today's Log"
+      },
+      "update": {
+        "vi": "Cập nhật",
+        "en": "Update"
+      },
+      "searchPlaceholder": {
+        "vi": "Tìm kiếm Message ID...",
+        "en": "Search Message ID..."
+      }
+    },
+    "table": {
+      "id": {
+        "vi": "#",
+        "en": "#"
+      },
+      "time": {
+        "vi": "THỜI GIAN",
+        "en": "TIME"
+      },
+      "dir": {
+        "vi": "HƯỚNG",
+        "en": "DIR"
+      },
+      "msgId": {
+        "vi": "MSG ID",
+        "en": "MSG ID"
+      },
+      "type": {
+        "vi": "LOẠI",
+        "en": "TYPE"
+      },
+      "prio": {
+        "vi": "ƯU TIÊN",
+        "en": "PRIO"
+      },
+      "message": {
+        "vi": "TIN NHẮN",
+        "en": "MESSAGE"
+      },
+      "topic": {
+        "vi": "TOPIC",
+        "en": "TOPIC"
+      },
+      "status": {
+        "vi": "TRẠNG THÁI",
+        "en": "STATUS"
+      }
+    },
+    "status": {
+      "success": {
+        "vi": "THÀNH CÔNG",
+        "en": "SUCCESS"
+      },
+      "ackReceived": {
+        "vi": "ĐÃ NHẬN ACK",
+        "en": "ACK_RECEIVED"
+      },
+      "waitingAck": {
+        "vi": "ĐANG CHỜ ACK",
+        "en": "WAITING_ACK"
+      },
+      "sending": {
+        "vi": "ĐANG GỬI",
+        "en": "SENDING"
+      },
+      "validating": {
+        "vi": "ĐANG XÁC THỰC",
+        "en": "VALIDATING"
+      },
+      "routing": {
+        "vi": "ĐANG ĐỊNH TUYẾN",
+        "en": "ROUTING"
+      },
+      "transforming": {
+        "vi": "ĐANG CHUYỂN ĐỔI",
+        "en": "TRANSFORMING"
+      },
+      "routingFailed": {
+        "vi": "ĐỊNH TUYẾN THẤT BẠI",
+        "en": "ROUTING_FAILED"
+      },
+      "validationFailed": {
+        "vi": "XÁC THỰC THẤT BẠI",
+        "en": "VALIDATION_FAILED"
+      },
+      "transformationFailed": {
+        "vi": "CHUYỂN ĐỔI THẤT BẠI",
+        "en": "TRANSFORMATION_FAILED"
+      },
+      "sendFailed": {
+        "vi": "GỬI THẤT BẠI",
+        "en": "SEND_FAILED"
+      },
+      "ackTimeout": {
+        "vi": "HẾT THỜI GIAN CHỜ ACK",
+        "en": "ACK_TIMEOUT"
+      },
+      "failed": {
+        "vi": "THẤT BẠI",
+        "en": "FAILED"
+      }
+    },
+    "direction": {
+      "out": {
+        "vi": "RA",
+        "en": "OUT"
+      },
+      "in": {
+        "vi": "VÀO",
+        "en": "IN"
+      }
+    },
+    "priority": {
+      "ss": {
+        "vi": "SS (Cao nhất)",
+        "en": "SS (Highest)"
+      },
+      "dd": {
+        "vi": "DD (Cao)",
+        "en": "DD (High)"
+      },
+      "ff": {
+        "vi": "FF (Trung bình)",
+        "en": "FF (Normal)"
+      },
+      "gg": {
+        "vi": "GG (Thấp)",
+        "en": "GG (Low)"
+      },
+      "kk": {
+        "vi": "KK (Thấp nhất)",
+        "en": "KK (Lowest)"
+      }
+    },
+    "preview": {
+      "title": {
+        "vi": "Chi tiết nhật ký",
+        "en": "Log Detail"
+      },
+      "messageId": {
+        "vi": "Message ID:",
+        "en": "Message ID:"
+      },
+      "payload": {
+        "vi": "Payload:",
+        "en": "Payload:"
+      },
+      "error": {
+        "vi": "Lỗi:",
+        "en": "Error:"
+      },
+      "noData": {
+        "vi": "Không có dữ liệu",
+        "en": "No data"
+      }
+    },
+    "toast": {
+      "copied": {
+        "vi": "Đã sao chép vào clipboard!",
+        "en": "Copied to clipboard!"
+      },
+      "fetchFailed": {
+        "vi": "Không thể tải dữ liệu nhật ký",
+        "en": "Failed to load logs"
+      },
+      "noLogs": {
+        "vi": "Không có nhật ký nào",
+        "en": "No logs available"
+      }
+    },
+    "empty": {
+      "title": {
+        "vi": "Không có nhật ký nào",
+        "en": "No logs found"
+      },
+      "description": {
+        "vi": "Không tìm thấy nhật ký nào phù hợp với tìm kiếm của bạn",
+        "en": "No logs match your search"
+      }
+    }
+}

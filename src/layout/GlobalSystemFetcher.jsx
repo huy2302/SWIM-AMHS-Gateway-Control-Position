@@ -7,9 +7,13 @@ import {
   showWarningToast 
 } from '../constants/toastIcons'; 
 import toast from "react-hot-toast";
+import { useSystemStore } from '../hooks/systemStore';
 
 export default function GlobalSystemFetcher() {
   const dispatch = useDispatch();
+  
+  const setSystemData = useSystemStore((state) => state.setSystemData);
+  const setError = useSystemStore((state) => state.setError);
   
   // Lấy danh sách event đã toast từ sessionStorage
   const getToastedIds = () => {
@@ -31,17 +35,21 @@ export default function GlobalSystemFetcher() {
     "HIGH_CPU"
   ]
 
+  const user = JSON.parse(localStorage.getItem('user'));
+
   useEffect(() => {
     const toastedIds = getToastedIds();
-
+    
     const fetchSystemHistories = async () => {
       try {
-        const response = await gatewayApi.getSystemEvents({
+        const response = await gatewayApi.getSystemEventsByUser({
           page: 0,
           size: 1,
+          userId: user?.userId
         });
+        setSystemData(response.unreadCount);
 
-        const systemEvent = response?.content[0]; // Lấy event mới nhất
+        const systemEvent = response?.histories?.content[0];
         if (!systemEvent) return;
 
         if (!toastedIds.has(systemEvent.id) && status.includes(systemEvent.eventType)) {
@@ -66,6 +74,7 @@ export default function GlobalSystemFetcher() {
           saveToastedIds(toastedIds);
         }
       } catch (err) {
+        setError(err.message);
         console.error("FETCH SYSTEM HISTORIES FAILED:", err.message);
       }
     };

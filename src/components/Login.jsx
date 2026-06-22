@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { authApi } from '../api/authApi';
+import { useAuth } from './AuthContext';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/monitor';
+
+  // save data login to context
+  const { login } = useAuth();
+
+  useEffect(() => {
+    if (authApi.isAuthenticated()) {
+      navigate(from, { replace: true });
+    }
+  }, [from, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -16,9 +31,15 @@ const Login = () => {
       const response = await authApi.login(username, password);
       console.log('Login successful:', response);
 
-      // Redirect hoặc cập nhật state app
-      // window.location.href = '/dashboard';
+      // Lưu trực tiếp response.data
+      const userData = response; // { username, role, token, expiresIn }
 
+      localStorage.setItem('token', userData.token);
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      login(userData, userData.token);
+
+      navigate(from, { replace: true });
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {

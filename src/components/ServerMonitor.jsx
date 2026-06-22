@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { t } from "@/i18n/translator";
 
 const ServerMonitor = () => {
   const [metrics, setMetrics] = useState({
@@ -43,7 +44,7 @@ const ServerMonitor = () => {
     <div className="bg-slate-100 border border-slate-300 rounded-lg flex flex-col shadow-inner">
       <div className="flex justify-between items-center border-b border-slate-300/50 px-3 py-1">
         <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
-          System Status
+          {t("sidebar.serverMonitor.title")}
         </span>
       </div>
 
@@ -51,7 +52,7 @@ const ServerMonitor = () => {
         {/* CPU - Sparkline */}
         <div className="space-y-1">
           <div className="flex justify-between text-[10px]">
-            <span className="text-slate-300">CPU Usage</span>
+            <span className="text-slate-300">{t("sidebar.serverMonitor.cpu")}</span>
             <span className="text-green-400 font-mono">
               {(GatewayProcess?.processCpuLoad)?.toFixed(2) ?? 0}%
             </span>
@@ -69,7 +70,7 @@ const ServerMonitor = () => {
         {/* RAM - Progress Bar */}
         <div className="space-y-1">
           <div className="flex justify-between text-[10px]">
-            <span className="text-slate-300">Memory Usage</span>
+            <span className="text-slate-300">{t("sidebar.serverMonitor.ram")}</span>
             <span className="text-blue-400 font-mono">{GatewayProcess?.ramUsedPercent?.toFixed(2) ?? 0}%</span>
           </div>
           <div className="h-1.5 w-full bg-slate-700 rounded-full mt-3 overflow-hidden">

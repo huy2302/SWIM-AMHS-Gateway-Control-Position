@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import DashboardLayout from "../layout/DashboardLayout";
-import gatewayApi from "../api/gatewayApi";
+import DashboardLayout from "../../layout/DashboardLayout";
+import gatewayApi from "../../api/gatewayApi";
 import {
   Plus,
   Trash2,
@@ -14,8 +14,9 @@ import 'simplebar-react/dist/simplebar.min.css';
 import { 
   showSuccessToast, 
   showErrorToast, 
-} from '../constants/toastIcons'; 
+} from '../../constants/toastIcons'; 
 import toast from 'react-hot-toast';
+import { t } from "@/i18n/translator";
 
 const createTimestamp = () => new Date().toISOString();
 
@@ -274,7 +275,7 @@ const RoutingView = () => {
       setS2aRules(Array.isArray(s2a) ? s2a.map(normalizeS2aApiRule) : []);
     } catch (error) {
       console.error("Lỗi khi lấy cấu hình routing:", error);
-      setStatusMessage(error?.message || "Không thể tải dữ liệu routing từ API.");
+      setStatusMessage(error?.message || t("routing.toast.fetchFailed"));
       setStatusType("error");
     } finally {
       setLoadingRoutes(false);
@@ -334,7 +335,7 @@ const RoutingView = () => {
 
   const handleConfirmDelete = async () => {
     if (deletePassword !== "1") {
-      setDeleteError("Incorrect password");
+      setDeleteError(t("routing.modal.deleteError"));
       return;
     }
     try {
@@ -345,8 +346,8 @@ const RoutingView = () => {
         handleRemoveS2aRule(deleteRule.id);
       }
 
-      showSuccessToast(`Rule ${deleteRule.id} deleted successfully`, toast);
-      setStatusMessage(`✓ Rule ${deleteRule.id} deleted successfully`);
+      showSuccessToast(t("routing.toast.deleteSuccess"), toast);
+      setStatusMessage(`✓ Rule ${deleteRule.id} ${t("routing.toast.deleteSuccess")}`);
       setStatusType("success");
       setShowDeleteModal(false);
       setDeleteRule(null);
@@ -354,8 +355,8 @@ const RoutingView = () => {
     }
     catch (error) {
       console.error("Error when delete rule:", error);
-      setDeleteError(error.message || "Failed to delete rule");
-      showErrorToast(`Failed to delete rule: ${error.message || "Unknown error"}`, toast);
+      setDeleteError(error.message || t("routing.toast.deleteFailed"));
+      showErrorToast(`${t("routing.toast.deleteFailed")}${error.message || t("routing.toast.deleteFailed")}`, toast);
     }
   };
 
@@ -529,14 +530,14 @@ const RoutingView = () => {
         await gatewayApi.createRouting(updatedData);
       }
 
-      showSuccessToast(`Rule ${editingRule.id} saved successfully`, toast);
-      setStatusMessage(`✓ Rule ${editingRule.id} saved successfully`);
+      showSuccessToast(t("routing.toast.saveSuccess"), toast);
+      setStatusMessage(`✓ Rule ${editingRule.id} ${t("routing.toast.saveSuccess")}`);
       setStatusType("success");
       handleCloseEdit();
     } catch (error) {
-      showErrorToast(`Failed to save rule: ${error.message || "Unknown error"}`, toast);
+      showErrorToast(`${t("routing.toast.saveFailed")}${error.message || t("routing.toast.saveFailed")}`, toast);
       console.error("Error when save rule:", error);
-      setStatusMessage(error.message || "Failed to save rule");
+      setStatusMessage(error.message || t("routing.toast.saveFailed"));
       setStatusType("error");
     }
   };
@@ -588,7 +589,7 @@ const RoutingView = () => {
               activeTab === "A2S" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
             }`}
           >
-            <ArrowUpRight size={16} /> OUT (AMHS → SWIM)
+            <ArrowUpRight size={16} /> {t("routing.tabs.a2s")}
           </button>
           <button
             onClick={() => {
@@ -598,7 +599,7 @@ const RoutingView = () => {
               activeTab === "S2A" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
             }`}
           >
-            <ArrowDownLeft size={16} /> IN (SWIM → AMHS)
+            <ArrowDownLeft size={16} /> {t("routing.tabs.s2a")}
           </button>
         </div>
 
@@ -609,14 +610,14 @@ const RoutingView = () => {
             <div className="border-b border-slate-200">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-bold text-slate-600 uppercase tracking-wider">
-                  {activeTab === "A2S" ? "Outbound Rules (AMHS → SWIM)" : "Inbound Rules (SWIM → AMHS)"}
+                  {activeTab === "A2S" ? t("routing.title.a2s") : t("routing.title.s2a")}
                 </h2>
                 <button
                   onClick={handleAddNewRule}
                   disabled={loadingRoutes}
                   className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-md active:scale-95"
                 >
-                  <Plus size={16} /> ADD RULE
+                  <Plus size={16} /> {t("routing.buttons.addRule")}
                 </button>
               </div>
 
@@ -624,13 +625,13 @@ const RoutingView = () => {
               <div className="flex items-center gap-4 bg-slate-50 p-3 rounded mb-4">
                 <div className="flex items-center gap-2">
                   <Search size={16} className="text-slate-500" />
-                  <span className="text-sm font-medium text-slate-600">Filter:</span>
+                  <span className="text-sm font-medium text-slate-600">{t("routing.filter.title")}</span>
                   <select
                     value={filterMessageType}
                     onChange={(e) => setFilterMessageType(e.target.value)}
                     className="px-3 py-1 border border-slate-300 rounded text-sm bg-white"
                   >
-                    <option value="">All Message Types</option>
+                    <option value="">{t("routing.filter.allMessageTypes")}</option>
                     <option value="METAR">METAR</option>
                     <option value="TAF">TAF</option>
                     <option value="FPL">FPL</option>
@@ -648,15 +649,15 @@ const RoutingView = () => {
                     onChange={(e) => setFilterStatus(e.target.value)}
                     className="px-3 py-1 border border-slate-300 rounded text-sm bg-white"
                   >
-                    <option value="">All Status</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value="">{t("routing.filter.allStatus")}</option>
+                    <option value="Active">{t("routing.filter.active")}</option>
+                    <option value="Inactive">{t("routing.filter.inactive")}</option>
                   </select>
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
+                    placeholder={t("routing.filter.searchPlaceholder")}
                     className="px-3 py-1 border border-slate-300 rounded text-sm bg-white min-w-[200px]"
                   />
                   <button
@@ -664,7 +665,7 @@ const RoutingView = () => {
                     onClick={() => {}}
                     className="px-3 py-1 bg-indigo-600 text-white rounded text-sm hover:bg-indigo-700"
                   >
-                    Search
+                    {t("routing.filter.searchButton")}
                   </button>
                 </div>
               </div>
@@ -675,25 +676,25 @@ const RoutingView = () => {
               <table className="w-full">
                 <thead className="bg-slate-50">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">#</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.id")}</th>
                     {activeTab === "A2S" ? (
                       <>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Message Type</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Send Topic</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Priority</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Active</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.messageType")}</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.sendTopic")}</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.priority")}</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.active")}</th>
                       </>
                     ) : (
                       <>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Receive Topic</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.receiveTopic")}</th>
                         {/* <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Message Filter</th> */}
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Recipients</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Originator</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Priority</th>
-                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Active</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.recipients")}</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.originator")}</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.priority")}</th>
+                        <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.active")}</th>
                       </>
                     )}
-                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">Action</th>
+                    <th className="px-4 py-3 text-left text-xs font-bold text-slate-600 uppercase">{t("routing.table.action")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -712,7 +713,7 @@ const RoutingView = () => {
                           <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                             rule.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
-                            {rule.active ? '🟢 ON' : '🔴 OFF'}
+                            {rule.active ? t("routing.status.on") : t("routing.status.off")}
                           </span>
                         </td>
                         <td className="px-4 py-3">
@@ -747,7 +748,7 @@ const RoutingView = () => {
                           <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                             rule.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                           }`}>
-                            {rule.active ? '🟢 ON' : '🔴 OFF'}
+                            {rule.active ? t("routing.status.on") : t("routing.status.off")}
                           </span>
                         </td>
                         <td className="px-4 py-3">
@@ -780,7 +781,7 @@ const RoutingView = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-slate-200 sticky top-0 bg-white">
               <h3 className="text-lg font-bold text-slate-800">
-                EDIT RULE - {activeTab === "A2S" ? "OUT (AMHS → SWIM)" : "IN (SWIM → AMHS)"}
+                {t("routing.modal.editTitle")}{activeTab === "A2S" ? t("routing.tabs.a2s") : t("routing.tabs.s2a")}
               </h3>
               <button
                 onClick={handleCloseEdit}
@@ -797,7 +798,7 @@ const RoutingView = () => {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Message Type *
+                      {t("routing.form.a2s.messageType.label")}
                     </label>
                     <div className="border border-slate-300 rounded px-3 py-2 bg-white">
                       <div className="flex flex-wrap gap-2 mb-2">
@@ -824,7 +825,7 @@ const RoutingView = () => {
                           value={msgTypeInput}
                           onChange={(e) => setMsgTypeInput(e.target.value)}
                           onKeyDown={handleA2sMsgTypeKeyDown}
-                          placeholder="Nhập hoặc chọn loại tin, nhấn Enter"
+                          placeholder={t("routing.form.a2s.messageType.placeholder")}
                           className="flex-1 px-2 py-2 border border-slate-200 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
                         <button
@@ -832,7 +833,7 @@ const RoutingView = () => {
                           onClick={() => addA2sMsgType(msgTypeInput)}
                           className="px-3 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                         >
-                          Add
+                          {t("routing.form.a2s.messageType.addButton")}
                         </button>
                       </div>
                       <datalist id="a2s-msg-types">
@@ -840,43 +841,45 @@ const RoutingView = () => {
                           <option key={type} value={type} />
                         ))}
                       </datalist>
-                      <p className="mt-2 text-xs text-slate-500">Bạn có thể nhập bằng tay hoặc chọn từ danh sách. Nhập nhiều mục, mỗi mục cách nhau dấu phẩy hoặc nhấn Enter.</p>
+                      <p className="mt-2 text-xs text-slate-500">
+                        {t("routing.form.a2s.messageType.hint")}
+                      </p>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Send Topic * (AMQP Topic)
+                      {t("routing.form.a2s.sendTopic.label")}
                     </label>
                     <input
                       type="text"
                       value={editFormData.topic || ""}
                       onChange={(e) => handleEditFormChange("topic", e.target.value)}
-                      placeholder="ats/met/metar"
+                      placeholder={t("routing.form.a2s.sendTopic.placeholder")}
                       className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Priority (AMHS: SS=max, KK=min)
+                      {t("routing.form.a2s.priority.label")}
                     </label>
                     <select
                       value={editFormData.priority || "FF"}
                       onChange={(e) => handleEditFormChange("priority", e.target.value)}
                       className="px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     >
-                      <option value="SS">SS (Highest)</option>
-                      <option value="DD">DD</option>
-                      <option value="FF">FF (Normal)</option>
-                      <option value="GG">GG</option>
-                      <option value="KK">KK (Lowest)</option>
+                      <option value="SS">{t("routing.form.a2s.priority.options.ss")}</option>
+                      <option value="DD">{t("routing.form.a2s.priority.options.dd")}</option>
+                      <option value="FF">{t("routing.form.a2s.priority.options.ff")}</option>
+                      <option value="GG">{t("routing.form.a2s.priority.options.gg")}</option>
+                      <option value="KK">{t("routing.form.a2s.priority.options.kk")}</option>
                     </select>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Status
+                      {t("routing.form.common.status.label")}
                     </label>
                     <div className="flex items-center space-x-4">
                       <label className="flex items-center">
@@ -887,7 +890,7 @@ const RoutingView = () => {
                           onChange={() => handleEditFormChange("active", true)}
                           className="mr-2"
                         />
-                        Active
+                        {t("routing.form.common.status.active")}
                       </label>
                       <label className="flex items-center">
                         <input
@@ -897,19 +900,19 @@ const RoutingView = () => {
                           onChange={() => handleEditFormChange("active", false)}
                           className="mr-2"
                         />
-                        Inactive
+                        {t("routing.form.common.status.inactive")}
                       </label>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Note
+                      {t("routing.form.common.note.label")}
                     </label>
                     <textarea
                       value={editFormData.note || ""}
                       onChange={(e) => handleEditFormChange("note", e.target.value)}
-                      placeholder="Gửi IWXXM METAR lên topic ats/met/metar"
+                      placeholder={t("routing.form.a2s.note.placeholder")}
                       rows={3}
                       className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
@@ -920,38 +923,38 @@ const RoutingView = () => {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Receive Topic * (AMQP Topic)
+                      {t("routing.form.s2a.receiveTopic.label")}
                     </label>
                     <input
                       type="text"
                       value={editFormData.receiveTopic || editFormData.topic || ""}
                       onChange={(e) => handleEditFormChange("receiveTopic", e.target.value)}
-                      placeholder="ats/met/metar"
+                      placeholder={t("routing.form.s2a.receiveTopic.placeholder")}
                       className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Message Filter (Trống = tất cả)
+                      {t("routing.form.s2a.messageFilter.label")}
                     </label>
                     <input
                       type="text"
                       value={editFormData.msgFilter || ""}
                       onChange={(e) => handleEditFormChange("msgFilter", e.target.value)}
-                      placeholder="METAR, FPL..."
+                      placeholder={t("routing.form.s2a.messageFilter.placeholder")}
                       className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Recipients * (Danh sách AFTN address, cách nhau dấu cách)
+                      {t("routing.form.s2a.recipients.label")}
                     </label>
                     <textarea
                       value={editFormData.recipients || ""}
                       onChange={(e) => handleEditFormChange("recipients", e.target.value)}
-                      placeholder="VVHHZQZX VVHHZTZX VVHHZDZX"
+                      placeholder={t("routing.form.s2a.recipients.placeholder")}
                       rows={2}
                       className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
@@ -959,7 +962,7 @@ const RoutingView = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Originator (AFTN address sample)
+                      {t("routing.form.s2a.originator.label")}
                     </label>
                     <input
                       type="text"
@@ -968,12 +971,12 @@ const RoutingView = () => {
                         const value = e.target.value;
                         handleEditFormChange("originator", value);
                         if (value && value.length !== 8) {
-                          setOriginatorError("Must be exactly 8 characters");
+                          setOriginatorError(t("routing.form.s2a.originator.error"));
                         } else {
                           setOriginatorError("");
                         }
                       }}
-                      placeholder="VVHHZPZX"
+                      placeholder={t("routing.form.s2a.originator.placeholder")}
                       className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                         originatorError ? "border-red-500" : "border-slate-300"
                       }`}
@@ -985,7 +988,7 @@ const RoutingView = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Priority (SWIM: 0=max, 9=min)
+                      {t("routing.form.s2a.priority.label")}
                     </label>
                     <select
                       value={editFormData.prioritySwim || "Unset"}
@@ -994,7 +997,7 @@ const RoutingView = () => {
                     >
                       {SWIM_PRIORITIES.map((p) => (
                         <option key={p} value={p}>
-                          {p} ({p <= 1 ? "SS/DD" : p <= 3 ? "FF" : p <= 6 ? "GG" : "KK"})
+                          {t(`routing.form.s2a.priority.options.${p}`)}
                         </option>
                       ))}
                     </select>
@@ -1002,7 +1005,7 @@ const RoutingView = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Status
+                      {t("routing.form.common.status.label")}
                     </label>
                     <div className="flex items-center space-x-4">
                       <label className="flex items-center">
@@ -1013,7 +1016,7 @@ const RoutingView = () => {
                           onChange={() => handleEditFormChange("active", true)}
                           className="mr-2"
                         />
-                        Active
+                        {t("routing.form.common.status.active")}
                       </label>
                       <label className="flex items-center">
                         <input
@@ -1023,19 +1026,19 @@ const RoutingView = () => {
                           onChange={() => handleEditFormChange("active", false)}
                           className="mr-2"
                         />
-                        Inactive
+                        {t("routing.form.common.status.inactive")}
                       </label>
                     </div>
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Note
+                      {t("routing.form.common.note.label")}
                     </label>
                     <textarea
                       value={editFormData.note || ""}
                       onChange={(e) => handleEditFormChange("note", e.target.value)}
-                      placeholder="Tất cả METAR gửi cho Hanoi MET + ACC"
+                      placeholder={t("routing.form.s2a.note.placeholder")}
                       rows={3}
                       className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                     />
@@ -1049,13 +1052,13 @@ const RoutingView = () => {
                   onClick={handleCloseEdit}
                   className="px-4 py-2 text-slate-600 border border-slate-300 rounded hover:bg-slate-50"
                 >
-                  Cancel
+                  {t("routing.buttons.cancel")}
                 </button>
                 <button
                   onClick={handleSaveEditRule}
                   className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                 >
-                  Save Rule
+                  {t("routing.buttons.saveRule")}
                 </button>
               </div>
             </div>
@@ -1068,22 +1071,22 @@ const RoutingView = () => {
         <div className="fixed inset-0 bg-[#0000001a] bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-96">
             <h3 className="text-lg font-bold text-slate-800 mb-4">
-              Confirm Delete Rule ID: {deleteRule?.id}
+              {t("routing.modal.deleteTitle")}{deleteRule?.id}
             </h3>
             <p className="text-sm text-slate-600 mb-4">
-              Are you sure you want to delete this rule? This action cannot be undone.<br />
-              Topic: <strong>{getTopicName(deleteRule)}</strong> 
+              {t("routing.modal.deleteMessage")}<br />
+              {t("routing.modal.topicLabel")}<strong>{getTopicName(deleteRule)}</strong> 
             </p>
             <div className="mb-4">
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Enter Password
+                {t("routing.modal.passwordLabel")}
               </label>
               <input
                 type="password"
                 value={deletePassword}
                 onChange={(e) => setDeletePassword(e.target.value)}
                 className="w-full px-3 py-2 border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Enter password"
+                placeholder={t("routing.modal.passwordPlaceholder")}
               />
               {deleteError && (
                 <p className="text-red-600 text-sm mt-1">{deleteError}</p>
@@ -1094,13 +1097,13 @@ const RoutingView = () => {
                 onClick={handleCancelDelete}
                 className="px-4 py-2 text-slate-600 border border-slate-300 rounded hover:bg-slate-50"
               >
-                Cancel
+                {t("routing.buttons.cancel")}
               </button>
               <button
                 onClick={handleConfirmDelete}
                 className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
-                Delete
+                {t("routing.buttons.delete")}
               </button>
             </div>
           </div>

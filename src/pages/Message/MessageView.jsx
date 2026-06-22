@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from "react";
-import DashboardLayout from "../layout/DashboardLayout";
-import { Search, Database, X, Copy, Check, Loader2, FunnelPlus } from "lucide-react";
-import gatewayApi from "../api/gatewayApi"; // Giả định file api đã tạo ở bước trước
-import { Funnel } from "recharts";
+import DashboardLayout from "@/layout/DashboardLayout";
+import { Search, X, Copy, Check, Loader2 } from "lucide-react";
+import gatewayApi from "@/api/gatewayApi";
+import { t } from "@/i18n/translator";
 
 const MessageView = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [modalData, setModalData] = useState(null);
   const [isCopied, setIsCopied] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showFilter, setShowFilter] = useState(false);
 
   // States cho Filter và Search
   const [searchType, setSearchType] = useState("AMQP"); // AMQP hoặc X.400
   const [direction, setDirection] = useState("All");
-  const [searchTerm, setSearchTerm] = useState("");
   const [rows, setRows] = useState([]);
 
   const [filters, setFilters] = useState({
@@ -104,7 +102,7 @@ const MessageView = () => {
         {/* Search Header */}
         <div className="bg-slate-900 p-4 rounded-t-xl border border-slate-800 flex flex-wrap gap-4 items-center shadow-2xl">
           <div className="flex items-center gap-2 bg-black/40 px-3 py-2 rounded border border-slate-800">
-            <span className="text-[10px] text-slate-500 font-bold uppercase">Source</span>
+            <span className="text-[10px] text-slate-500 font-bold uppercase">{t("messages.source.label")}</span>
             <select
               value={searchType}
               onChange={(e) => setSearchType(e.target.value)}
@@ -160,7 +158,7 @@ const MessageView = () => {
             {/* Origin */}
             <div className="flex flex-col gap-1">
               <label className="text-[12px] font-medium text-gray-700">
-                Origin
+                {t("messages.filters.origin.label")}
               </label>
 
               <input
@@ -177,7 +175,7 @@ const MessageView = () => {
             {/* Address */}
             <div className="flex flex-col gap-1">
               <label className="text-[12px] font-medium text-gray-700">
-                Address
+                {t("messages.filters.address.label")}
               </label>
 
               <input
@@ -194,7 +192,7 @@ const MessageView = () => {
             {/* Message ID */}
             <div className="flex flex-col gap-1">
               <label className="text-[12px] font-medium text-gray-700">
-                Message ID
+                {t("messages.filters.messageId.label")}
               </label>
 
               <input
@@ -211,7 +209,7 @@ const MessageView = () => {
             {/* Raw Text */}
             <div className="flex flex-col gap-1 md:col-span-2 xl:col-span-3">
               <label className="text-[12px] font-medium text-gray-700">
-                Raw Text
+                {t("messages.filters.rawText.label")}
               </label>
 
               <input
@@ -220,7 +218,7 @@ const MessageView = () => {
                   handleFilterChange('text', e.target.value)
                 }
                 type="text"
-                placeholder="Search raw message..."
+                placeholder={t("messages.filters.rawText.placeholder")}
                 className="border border-gray-300 rounded-lg px-3 py-1 text-[12px] outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -228,7 +226,7 @@ const MessageView = () => {
             {/* Status */}
             <div className="flex flex-col gap-1">
               <label className="text-[12px] font-medium text-gray-700">
-                Status
+                {t("messages.filters.status.label")}
               </label>
 
               <select
@@ -238,7 +236,7 @@ const MessageView = () => {
                 }
                 className="border border-gray-300 rounded-lg px-3 py-2 text-[12px] outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All Status</option>
+                <option value="">{t("messages.filters.status.all")}</option>
                 <option value="0">PENDING</option>
                 <option value="1">PROCESSING</option>
                 <option value="2">TRANSFORMED</option>
@@ -252,7 +250,7 @@ const MessageView = () => {
               className="w-fit bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-xs flex items-center gap-2 transition-all active:scale-95 shadow-lg"
             >
               {loading ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />} 
-              Filter
+              {t("messages.filters.filterButton")}
             </button>
           </div>      
         </div>
@@ -266,22 +264,22 @@ const MessageView = () => {
                   <>
                     <th className="px-4 py-3">ID</th>
                     <th className="px-4 py-3">MSG ID</th>
-                    <th className="px-4 py-3">Time</th>
-                    <th className="px-4 py-3">source</th>
-                    <th className="px-4 py-3">Origin</th>
-                    <th className="px-4 py-3">Address</th>
-                    <th className="px-4 py-3">Text Raw</th>
-                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">{t("messages.table.amqp.time")}</th>
+                    <th className="px-4 py-3">{t("messages.table.amqp.source")}</th>
+                    <th className="px-4 py-3">{t("messages.table.amqp.origin")}</th>
+                    <th className="px-4 py-3">{t("messages.table.amqp.address")}</th>
+                    <th className="px-4 py-3">{t("messages.table.amqp.textRaw")}</th>
+                    <th className="px-4 py-3">{t("messages.table.amqp.status")}</th>
                   </>
                 ) : (
                   <>
-                    <th className="px-4 py-3">ID</th>
-                    <th className="px-4 py-3">Date</th>
-                    <th className="px-4 py-3">Origin</th>
-                    <th className="px-4 py-3">Filing Time</th>
-                    <th className="px-4 py-3">Message ID</th>
-                    <th className="px-4 py-3">Text Raw</th>
-                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">{t("messages.table.x400.id")}</th>
+                    <th className="px-4 py-3">{t("messages.table.x400.date")}</th>
+                    <th className="px-4 py-3">{t("messages.table.x400.origin")}</th>
+                    <th className="px-4 py-3">{t("messages.table.x400.filingTime")}</th>
+                    <th className="px-4 py-3">{t("messages.table.x400.messageId")}</th>
+                    <th className="px-4 py-3">{t("messages.table.x400.textRaw")}</th>
+                    <th className="px-4 py-3">{t("messages.table.x400.status")}</th>
                   </>
                 )}
               </tr>
@@ -334,7 +332,7 @@ const MessageView = () => {
             <div className="bg-slate-800 border-b border-slate-700 px-6 py-4 flex items-center justify-between">
               <div className="flex flex-col">
                 <span className="text-xs uppercase tracking-[0.2em] text-slate-700">
-                  AMHS Message Detail
+                  {t("messages.modal.title")}
                 </span>
 
                 <div className="flex items-center gap-3 mt-1">
@@ -361,49 +359,49 @@ const MessageView = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-2">
 
                 <DetailBox
-                  label="MESSAGE ID"
+                  label={t("messages.modal.fields.messageId")}
                   value={modalData.messageId}
                   onCopy={() => handleCopy(modalData.messageId)}
                 />
 
                 <DetailBox
-                  label="SUBJECT"
+                  label={t("messages.modal.fields.subject")}
                   value={modalData.subject}
                   onCopy={() => handleCopy(modalData.subject)}
                 />
 
                 <DetailBox
-                  label="ORIGIN"
+                  label={t("messages.modal.fields.origin")}
                   value={modalData.origin}
                   onCopy={() => handleCopy(modalData.origin)}
                 />
 
                 <DetailBox
-                  label="ADDRESS"
+                  label={t("messages.modal.fields.address")}
                   value={modalData.address}
                   onCopy={() => handleCopy(modalData.address)}
                 />
 
                 <DetailBox
-                  label="SOURCE"
+                  label={t("messages.modal.fields.source")}
                   value={modalData.source}
                   onCopy={() => handleCopy(modalData.source)}
                 />
 
                 <DetailBox
-                  label="ADDRESSING SOURCE"
+                  label={t("messages.modal.fields.addressingSource")}
                   value={modalData.addressingSource}
                   onCopy={() => handleCopy(modalData.addressingSource)}
                 />
 
                 <DetailBox
-                  label="BODY TYPE"
+                  label={t("messages.modal.fields.bodyType")}
                   value={modalData.bodyType}
                   onCopy={() => handleCopy(modalData.bodyType)}
                 />
 
                 <DetailBox
-                  label="CONTENT TYPE"
+                  label={t("messages.modal.fields.contentType")}
                   value={modalData.contentType}
                   onCopy={() => handleCopy(modalData.contentType)}
                 />
@@ -415,21 +413,21 @@ const MessageView = () => {
                 />
 
                 <DetailBox
-                  label="PRIORITY"
+                  label={t("messages.modal.fields.priority")}
                   value={modalData.priority}
                   onCopy={() => handleCopy(modalData.priority)}
                 />
 
                 <DetailBox
-                  label="TIME"
+                  label={t("messages.modal.fields.time")}
                   value={modalData.time}
                   onCopy={() => handleCopy(modalData.time)}
                 />
 
                 <DetailBox
-                  label="ERROR TYPE"
-                  value={modalData.errorType || "NONE"}
-                  onCopy={() => handleCopy(modalData.errorType || "NONE")}
+                  label={t("messages.modal.fields.errorType")}
+                  value={modalData.errorType || t("messages.modal.none")}
+                  onCopy={() => handleCopy(modalData.errorType || t("messages.modal.none"))}
                 />
 
               </div>
@@ -438,14 +436,14 @@ const MessageView = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Raw Message Content
+                    {t("messages.modal.sections.rawMessage")}
                   </span>
 
                   <button
                     onClick={() => handleCopy(modalData.text)}
                     className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold"
                   >
-                    COPY
+                    {t("messages.modal.buttons.copy")}
                   </button>
                 </div>
 
@@ -460,14 +458,14 @@ const MessageView = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    Payload Content
+                    {t("messages.modal.sections.payload")}
                   </span>
 
                   <button
                     onClick={() => handleCopy(modalData.payloadContent)}
                     className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold"
                   >
-                    COPY
+                    {t("messages.modal.buttons.copy")}
                   </button>
                 </div>
 
@@ -482,14 +480,14 @@ const MessageView = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    AMQP Properties
+                    {t("messages.modal.sections.amqpProperties")}
                   </span>
 
                   <button
                     onClick={() => handleCopy(modalData.amqpProperties)}
                     className="text-[11px] text-blue-400 hover:text-blue-300 font-semibold"
                   >
-                    COPY
+                    {t("messages.modal.buttons.copy")}
                   </button>
                 </div>
 
@@ -509,7 +507,7 @@ const MessageView = () => {
                 onClick={() => setModalData(null)}
                 className="px-4 py-2 text-sm rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 transition"
               >
-                Close
+                {t("messages.modal.buttons.close")}
               </button>
 
               <button
@@ -521,7 +519,7 @@ const MessageView = () => {
                 className="bg-blue-600 hover:bg-blue-500 transition text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
               >
                 {isCopied ? <Check size={16} /> : <Copy size={16} />}
-                {isCopied ? "Copied" : "Copy All"}
+                {isCopied ? t("messages.modal.buttons.copied") : t("messages.modal.buttons.copyAll")}
               </button>
 
             </div>
@@ -531,8 +529,8 @@ const MessageView = () => {
       )}
 
         <div className="bg-slate-950 border border-slate-800 rounded-b-xl p-2 px-4 flex justify-between items-center text-[10px] text-slate-500 italic shadow-inner">
-          <span>{loading ? "Refreshing data..." : `Showing ${rows.length} ${searchType} entries`}</span>
-          <span>Source Table: {searchType === "AMQP" ? "gwin" : "gwout"}</span>
+          <span>{loading ? t("messages.pagination.refreshing") : `${t("messages.pagination.showing")}${rows.length}${t("messages.pagination.entries")}`}</span>
+          <span>{t("messages.pagination.sourceTable")}{searchType === "AMQP" ? "gwin" : "gwout"}</span>
         </div>
       </div>
     </DashboardLayout>
@@ -545,22 +543,9 @@ const DetailBox = ({ label, value, onCopy }) => (
       <span className="text-[10px] text-slate-500 font-bold uppercase">{label}</span>
       <button onClick={onCopy} className="text-blue-500 hover:text-blue-400"><Copy size={12} /></button>
     </div>
-    <div className="bg-black/40 px-2 py-1 rounded border border-slate-800 text-slate-300 break-all overflow-y-auto text-[10px]">{value || "N/A"}</div>
+    <div className="bg-black/40 px-2 py-1 rounded border border-slate-800 text-slate-300 break-all overflow-y-auto text-[10px]">{value || t("messages.modal.na")}</div>
   </div>
 );
-
-const StatusBadge = ({ status }) => {
-  const info = getStatusInfo(status);
-
-  return (
-    <span
-      className={`px-3 py-1 rounded-full text-xs font-semibold`}
-      style={{color: info.color}}
-    >
-      {info.label}
-    </span>
-  );
-};
 
 const renderAmhsStatus = (status) => {
   const statusMap = {

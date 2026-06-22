@@ -13,9 +13,8 @@ import {
 } from "recharts";
 import {
   LayoutGrid,
-  Save,
 } from "lucide-react";
-import DashboardLayout from "../layout/DashboardLayout";
+import DashboardLayout from "@/layout/DashboardLayout";
 import { useSelector } from "react-redux";
 
 const generateData = () =>
@@ -62,32 +61,6 @@ const SystemMonitorView = () => {
   return (
     <DashboardLayout>
       <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-4 gap-4 overflow-y-auto">
-        {/* Top Toolbar */}
-        {/* <div className="bg-white p-3 rounded-lg border border-slate-300 flex items-center justify-between shadow-lg">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-slate-600 font-bold uppercase">
-                Refresh every
-              </span>
-              <input
-                type="number"
-                min="1"
-                value={refreshInterval}
-                onChange={(e) =>
-                  setRefreshInterval(Math.max(1, Number(e.target.value) || 1))
-                }
-                className="bg-white border border-slate-300 rounded px-2 py-1 text-xs w-16 text-slate-900 outline-none focus:border-blue-500"
-              />
-              <span className="text-[10px] text-slate-600 font-medium">
-                seconds
-              </span>
-            </div>
-            <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded text-[11px] font-bold text-slate-900 transition-all active:scale-95">
-              <Save size={14} /> WRITE TO LOG
-            </button>
-          </div>
-        </div> */}
-
         {/* Grid Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_8fr] gap-4 flex-1">
           {/* Tab Switcher */}

@@ -1,0 +1,42 @@
+{
+    "title": {
+      "vi": "Đăng nhập",
+      "en": "Login"
+    },
+    "subtitle": {
+      "vi": "Màn quản trị hệ thống AMHS SWIM Gateway",
+      "en": "AMHS SWIM Gateway Administration Portal"
+    },
+    "details": {
+      "vi": "Cổng thông tin quản trị giám sát",
+      "en": "Monitoring Administration Portal"
+    },
+    "username": {
+      "vi": "Tên đăng nhập",
+      "en": "Username"
+    },
+    "password": {
+      "vi": "Mật khẩu",
+      "en": "Password"
+    },
+    "remember": {
+      "vi": "Ghi nhớ đăng nhập",
+      "en": "Remember me"
+    },
+    "forgot": {
+      "vi": "Quên mật khẩu",
+      "en": "Forgot password"
+    },
+    "signin": {
+      "vi": "Đang đăng nhập",
+      "en": "SIGNING IN..."
+    },
+    "details2": {
+      "vi": "Hệ thống giám sát & quản lý kết nối giữa AMHS và SWIM",
+      "en": "Monitoring & management system connecting AMHS and SWIM"
+    },
+    "company": {
+      "vi": "Tổng công ty quản lý bay Việt Nam",
+      "en": "Vietnam Air Traffic Management Corporation"
+    }
+}
