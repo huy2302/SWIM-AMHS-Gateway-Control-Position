@@ -77,10 +77,10 @@ export default function Dashboard() {
     <DashboardLayout>
       <div className="dashboard-page mt-[-10px] pt-0">
         <section className="dashboard-hero flex flex-col bg-[rgba(34, 197, 94, 0.12)]">
-          <div className="flex items-center justify-end gap-2 mb-2">
+          {/* <div className="flex items-center justify-end gap-2 mb-2">
             <Clock />
             <span className="text-[14px]">{t("dashboard.lastUpdated")}: 12/05/2025 10:25:12</span>
-          </div>
+          </div> */}
           <div 
             className="hero-card flex items-center justify-between"
             style={ status === "error" ? { background: "#fcf3f3" } : { background: "#f3fcf5"}}
@@ -232,7 +232,7 @@ export default function Dashboard() {
                     , (stats?.database?.gw_in?.total) + (stats?.database?.gw_out?.total)
                   )}} 
                 >
-                  {percentTranferRate}%
+                  {percentTranferRate.toFixed(1)}%
                 </span>
               </div>
             </div>
@@ -336,107 +336,7 @@ export default function Dashboard() {
             <div className="panel-header">
               <div className="flex items-center gap-2">
                 <div className="bg-[#f0e6fa] p-1 rounded-md">
-                  <Database style={{ color: "#8b5cf6", width: "1em", height: "1em"}} />
-                </div>
-                <p className="panel-label">{t("dashboard.swimToAmhsQueue.title")}</p>
-              </div>
-            </div>
-
-            <table className="text-[12px]">
-              <tbody>
-                <tr>
-                  <td>{t("dashboard.swimToAmhsQueue.total")}</td>
-                  <td className="text-right font-bold">
-                    {formatNumber(stats?.database?.gw_in?.total)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>{t("dashboard.swimToAmhsQueue.pending")}</td>
-                  <td className="text-right font-bold">
-                    {formatNumber(stats?.database?.gw_in?.pending)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>{t("dashboard.swimToAmhsQueue.converted")}</td>
-                  <td className="text-right font-bold">
-                    {formatNumber(stats?.database?.gw_in?.transformed)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>{t("dashboard.swimToAmhsQueue.convertedFailed")}</td>
-                  <td className="text-right font-bold text-red-500">
-                    {formatNumber(stats?.database?.gw_in?.convertFailed)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>{t("dashboard.swimToAmhsQueue.sent")}</td>
-                  <td className="text-right font-bold">
-                    {formatNumber(stats?.database?.gw_in?.sent)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>{t("dashboard.swimToAmhsQueue.noRouting")}</td>
-                  <td className="text-right font-bold">
-                    {formatNumber(stats?.database?.gw_in?.unrouted)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div className="flex items-center justify-between mt-8 gap-16 flex-wrap">
-              <div className="relative w-[120px] h-[120px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Tooltip 
-                      contentStyle={{ background: '#fff', borderRadius: '6px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
-                    />
-                    <Pie
-                      data={amqpData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={40} // Bán kính vòng trong (bỏ dòng này nếu muốn biểu đồ tròn đặc)
-                      outerRadius={60} // Bán kính vòng ngoài
-                      paddingAngle={0}  // Khoảng cách nhỏ giữa các miếng bánh
-                      dataKey="value"
-                      isAnimationActive={false}
-                    >
-                      {amqpData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                
-              </div>
-              <div className="flex flex-col gap-3 min-w-[140px]">
-                <h3 className="text-[12px] font-bold">{t("dashboard.queueOverview.title")}</h3>
-                {amqpData.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between gap-4">
-                    {/* Phần chấm màu và Tên trạng thái */}
-                    <div className="flex items-center gap-2">
-                      <span 
-                        className="w-2 h-2 rounded-full shrink-0" 
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <span className="text-[12px] text-sm font-medium text-slate-600">{item.name}</span>
-                    </div>
-                    
-                    {/* Phần số lượng / phần trăm hiển thị phía sau */}
-                    <span className="text-[12px] text-sm text-slate-800">
-                      {item.value} ({((item.value / stats?.database?.gw_in?.total) * 100).toFixed(1)}%)
-                    </span>
-
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="dashboard-panel compact-panel">
-            <div className="panel-header">
-              <div className="flex items-center gap-2">
-                <div className="bg-[#fdede3] p-1 rounded-md">
-                  <Antenna style={{ color: "#f97316", width: "1em", height: "1em" }} />
+                  <Antenna style={{ color: "#8b5cf6", width: "1em", height: "1em"}} />
                 </div>
                 <p className="panel-label">AMHS → SWIM</p>
               </div>
@@ -531,6 +431,106 @@ export default function Dashboard() {
               </div>
             </div>
 
+          </div>
+
+          <div className="dashboard-panel compact-panel">
+            <div className="panel-header">
+              <div className="flex items-center gap-2">
+                <div className="bg-[#fdede3] p-1 rounded-md">
+                  <Database style={{ color: "#f97316", width: "1em", height: "1em" }} />
+                </div>
+                <p className="panel-label">{t("dashboard.swimToAmhsQueue.title")}</p>
+              </div>
+            </div>
+
+            <table className="text-[12px]">
+              <tbody>
+                <tr>
+                  <td>{t("dashboard.swimToAmhsQueue.total")}</td>
+                  <td className="text-right font-bold">
+                    {formatNumber(stats?.database?.gw_in?.total)}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{t("dashboard.swimToAmhsQueue.pending")}</td>
+                  <td className="text-right font-bold">
+                    {formatNumber(stats?.database?.gw_in?.pending)}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{t("dashboard.swimToAmhsQueue.converted")}</td>
+                  <td className="text-right font-bold">
+                    {formatNumber(stats?.database?.gw_in?.transformed)}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{t("dashboard.swimToAmhsQueue.convertedFailed")}</td>
+                  <td className="text-right font-bold text-red-500">
+                    {formatNumber(stats?.database?.gw_in?.convertFailed)}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{t("dashboard.swimToAmhsQueue.sent")}</td>
+                  <td className="text-right font-bold">
+                    {formatNumber(stats?.database?.gw_in?.sent)}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{t("dashboard.swimToAmhsQueue.noRouting")}</td>
+                  <td className="text-right font-bold">
+                    {formatNumber(stats?.database?.gw_in?.unrouted)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="flex items-center justify-between mt-8 gap-16 flex-wrap">
+              <div className="relative w-[120px] h-[120px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Tooltip 
+                      contentStyle={{ background: '#fff', borderRadius: '6px', border: 'none', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}
+                    />
+                    <Pie
+                      data={amqpData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40} // Bán kính vòng trong (bỏ dòng này nếu muốn biểu đồ tròn đặc)
+                      outerRadius={60} // Bán kính vòng ngoài
+                      paddingAngle={0}  // Khoảng cách nhỏ giữa các miếng bánh
+                      dataKey="value"
+                      isAnimationActive={false}
+                    >
+                      {amqpData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+                
+              </div>
+              <div className="flex flex-col gap-3 min-w-[140px]">
+                <h3 className="text-[12px] font-bold">{t("dashboard.queueOverview.title")}</h3>
+                {amqpData.map((item, index) => (
+                  <div key={index} className="flex items-center justify-between gap-4">
+                    {/* Phần chấm màu và Tên trạng thái */}
+                    <div className="flex items-center gap-2">
+                      <span 
+                        className="w-2 h-2 rounded-full shrink-0" 
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="text-[12px] text-sm font-medium text-slate-600">{item.name}</span>
+                    </div>
+                    
+                    {/* Phần số lượng / phần trăm hiển thị phía sau */}
+                    <span className="text-[12px] text-sm text-slate-800">
+                      {item.value} ({((item.value / stats?.database?.gw_in?.total) * 100).toFixed(1)}%)
+                    </span>
+
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </div>

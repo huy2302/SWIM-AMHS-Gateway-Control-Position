@@ -77,18 +77,20 @@ export default function Topbar() {
           <div className="relative flex items-center justify-center">
             <Bell size={24} />
 
-            <div className="absolute w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center top-[-8px] right-[-4px]">
-    
-            {/* ping layer */}
-            {unreadCount > 0 && (
-              <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping" />
-            )}
 
-            {/* number */}
-            <span className="relative text-[11px] font-bold leading-none">
-              {unreadCount || 0}
-            </span>
-          </div>
+    
+            {unreadCount > 0 && (
+              <div className="absolute w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center top-[-8px] right-[-4px]">
+                {/* ping layer */}
+                <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping" />
+                
+                {/* number un read */}
+                <span className="relative text-[11px] font-bold leading-none">
+                  {unreadCount || 0}
+                </span>
+              </div>
+            )}
+            
           </div>
         </Link>
 

@@ -112,7 +112,7 @@ const FullLogView = () => {
   };
 
   const getStatusColor = (status, isSelected = false) => {
-    if (isSelected) return 'white';
+    if (isSelected) return '#ffffff'; // Thay 'white' thành '#ffffff'
     
     const colors = {
       'SUCCESS': '#4ade80',
@@ -129,7 +129,7 @@ const FullLogView = () => {
       'ACK_TIMEOUT': '#f87171',
       'FAILED': '#f87171',
     };
-    return colors[status] || '#9ca3af';
+    return colors[status] || '#9ca3af'; // Màu mặc định thay vì 'white'
   };
 
   const getPriorityColor = (priority) => {
