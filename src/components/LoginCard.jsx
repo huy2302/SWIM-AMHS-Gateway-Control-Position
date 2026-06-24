@@ -12,6 +12,7 @@ export default function LoginCard() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [language, setLanguage] = useState(localStorage.getItem("language") || "en");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,6 +21,12 @@ export default function LoginCard() {
   // save data login to context
   const { login } = useAuth();
 
+  const handleChangeLang = (e) => {
+    const lang = e.target.value;
+
+    setLanguage(lang);
+    localStorage.setItem("language", lang);
+  }
   useEffect(() => {
     if (authApi.isAuthenticated()) {
       navigate(from, { replace: true });
@@ -149,10 +156,21 @@ export default function LoginCard() {
               size={20}
               className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
             />
-
-            <select className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-12 py-3 outline-none transition hover:border-blue-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100">
-              <option>Tiếng Việt</option>
-              <option>English</option>
+            
+            <select value={language} onChange={handleChangeLang} className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-12 py-3 outline-none transition hover:border-blue-300 focus:border-blue-600 focus:ring-4 focus:ring-blue-100">
+              {
+                language == "vi" ?
+                <>
+                  <option value="vi">Tiếng Việt</option>
+                  <option value="en">English</option>
+                </>
+                :
+                <>
+                  <option value="en">English</option>
+                  <option value="vi">Tiếng Việt</option>
+                </>
+              }
+              
             </select>
           </div>
         </div>

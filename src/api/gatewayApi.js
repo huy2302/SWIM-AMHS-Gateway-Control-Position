@@ -111,7 +111,7 @@ const gatewayApi = {
   },
 
   getMessageLog: async () => {
-    const data = await axiosClient.get('/message-logs/latest');
+    const data = await axiosClient.get('/traffic-logs');
 
     return data;
   },

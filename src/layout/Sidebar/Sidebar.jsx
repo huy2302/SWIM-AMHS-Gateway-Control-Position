@@ -13,14 +13,14 @@ import { useState, useEffect } from "react";
 import ServerMonitor from "@/components/ServerMonitor";
 import { NavLink } from "react-router-dom";
 import { LOG_TEMPLATES } from "@/data/sampleData";
-import { useSystemStore } from '@/hooks/systemStore';
+// import { useSystemStore } from '@/hooks/systemStore';
 import { t } from "@/i18n/translator";
 
 export default function Sidebar() {
   const [logs, setLogs] = useState([]);
   const [collapsed, setCollapsed] = useState(false);
 
-  const unreadCount = useSystemStore((state) => state.unreadCount);
+  // const unreadCount = useSystemStore((state) => state.unreadCount);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -149,30 +149,30 @@ export default function Sidebar() {
           </span>
         </NavLink>
 
-        <NavLink
+        {/* <NavLink
           to="/system-events"
           className={({ isActive }) =>
             isActive ? "menu-item active" : "menu-item"
           }
           style={{ paddingLeft: collapsed ? "16px" : null, position: "relative" }}
         >
-          <div className="absolute w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center top-[-9px] right-[-9px]">
+          <div className="absolute w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center top-[-9px] right-[-9px]"> */}
             {/* Vòng tròn hiệu ứng sóng lan tỏa ra ngoài */}
             {
-              unreadCount > 0 ? 
-              (<span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>)
-              :
-              null
+              // unreadCount > 0 ? 
+              // (<span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>)
+              // :
+              // null
             }
             
             {/* Số thông báo chính đứng yên ở trên */}
-            <span className="relative text-[11px] font-bold leading-none">{unreadCount || 0}</span>
+            {/* <span className="relative text-[11px] font-bold leading-none">{unreadCount || 0}</span>
           </div>
           <History size={18} />
           <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
             {t("sidebar.menu.systemHistory")}
           </span>
-        </NavLink>
+        </NavLink> */}
       </nav>
 
       <div className={`sidebar-extra ${collapsed ? "collapsed" : ""}`}>

@@ -1,7 +1,12 @@
 import { useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
+
 import { useSelector } from "react-redux";
-import { UserRound } from "lucide-react";
+import { Bell, History } from "lucide-react";
 import UserMenu from "../components/UserMenu";
+import { useSystemStore } from '@/hooks/systemStore';
+import { t } from "@/i18n/translator";
+import { Link } from "react-router-dom";
 
 const titleMap = {
   monitor: "Gateway Monitor Dashboard",
@@ -27,6 +32,26 @@ export default function Topbar() {
   const statusTag = statusTags.monitor[1].label;
   const { uptime } = useSelector((state) => state.system);
 
+  const unreadCount = useSystemStore((state) => state.unreadCount);
+  
+  const [language, setLanguage] = useState(
+    localStorage.getItem("language") || "en"
+  );
+
+  const handleChangeLanguage = (e) => {
+    const lang = e.target.value;
+
+    // Lưu vào localStorage
+    localStorage.setItem("language", lang);
+
+    // Cập nhật state
+    setLanguage(lang);
+
+    // Reload để áp dụng ngôn ngữ mới
+    window.location.reload();
+  };
+
+  
   return (
     <div className="flex justify-between items-center">
       <div className="flex flex-col justify-between pl-4 pr-4 pt-4">
@@ -38,8 +63,36 @@ export default function Topbar() {
         Up time: <span className="time">{formatUptime(uptime)}</span>
       </div>
 
-      <div className="mr-4">
-        {/* <UserRound /> */}
+      <div className="mr-4 flex items-center gap-4">
+        {/* Language */}
+        <div>
+          <select value={language} onChange={handleChangeLanguage}>
+            <option value="en">English</option>
+            <option value="vi">Tiếng Việt</option>
+          </select>
+        </div>
+    
+        {/* Notification */}
+        <Link to="/system-events" className="flex items-center">
+          <div className="relative flex items-center justify-center">
+            <Bell size={24} />
+
+            <div className="absolute w-4 h-4 bg-red-500 text-white rounded-full flex items-center justify-center top-[-8px] right-[-4px]">
+    
+            {/* ping layer */}
+            {unreadCount > 0 && (
+              <span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping" />
+            )}
+
+            {/* number */}
+            <span className="relative text-[11px] font-bold leading-none">
+              {unreadCount || 0}
+            </span>
+          </div>
+          </div>
+        </Link>
+
+        {/* User */}
         <UserMenu />
       </div>
     </div>

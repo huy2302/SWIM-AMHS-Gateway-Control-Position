@@ -7,365 +7,447 @@ import {
   Search,
   Loader2
 } from "lucide-react";
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TextField,
+  IconButton,
+  Tooltip,
+  Chip,
+  Alert,
+  Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  CircularProgress,
+  useTheme,
+  alpha
+} from "@mui/material";
 import DashboardLayout from "@/layout/DashboardLayout";
-import gatewayApi from "@/api/gatewayApi"; // Import file API bạn đã viết
+import gatewayApi from "@/api/gatewayApi";
 
 const FullLogView = () => {
-  const [logs, setLogs] = useState([]); // Dữ liệu log từ API
+  const theme = useTheme();
+  const [logs, setLogs] = useState([]);
   const [selectedLog, setSelectedLog] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
-  // 1. Hàm lấy dữ liệu từ API
+  // Hàm lấy dữ liệu từ API
   const fetchLogs = useCallback(async () => {
     try {
       setLoading(true);
-      // Gọi API message-log
       const response = await gatewayApi.getMessageLog();
-      
-      // Giả sử response trả về dạng Page của Spring Boot có trường .content
-      setLogs(response || []); 
+      setLogs(response?.content || []);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu log:", error);
+      setSnackbar({
+        open: true,
+        message: 'Failed to fetch logs',
+        severity: 'error'
+      });
     } finally {
       setLoading(false);
     }
-  }, [page]);
-
-  useEffect(() => {
-    fetchLogs();
-
-    const interval = setInterval(() => {
-      fetchLogs();
-    }, 3000);
-
-    return () => clearInterval(interval);
   }, []);
-  // 2. Tự động lấy dữ liệu khi Component mount hoặc đổi trang
+
   useEffect(() => {
     fetchLogs();
+    const interval = setInterval(fetchLogs, 3000);
+    return () => clearInterval(interval);
   }, [fetchLogs]);
 
-  // 3. Xử lý Search onChange
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-    // Logic tìm kiếm tại local hoặc gọi API search tùy bạn thiết kế
-  };
-
-  // Lọc dữ liệu hiển thị dựa trên search term (Local Filter)
-  const filteredLogs = logs.filter(log => 
-    log.messageId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    log.payload?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Lọc dữ liệu
+  const filteredLogs = logs.filter(log => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    
+    // Tìm kiếm trên các field có sẵn
+    return (
+      log.amqpMessageId?.toLowerCase().includes(searchLower) ||
+      log.ipmId?.toLowerCase().includes(searchLower) ||
+      log.mtsId?.toLowerCase().includes(searchLower) ||
+      log.content?.toLowerCase().includes(searchLower) ||
+      log.raw_content?.toLowerCase().includes(searchLower) ||
+      log.subject?.toLowerCase().includes(searchLower) ||
+      log.type?.toLowerCase().includes(searchLower) ||
+      log.status?.toLowerCase().includes(searchLower) ||
+      log.origin?.toLowerCase().includes(searchLower) ||
+      log.recipients?.toLowerCase().includes(searchLower) ||
+      log.referenceId?.toString().includes(searchLower) ||
+      log.id?.toString().includes(searchLower)
+    );
+  });
 
   const handleCopy = () => {
     if (selectedLog) {
       navigator.clipboard.writeText(
         `${selectedLog.createdAt} [${selectedLog.status}] ${selectedLog.payload || selectedLog.messageId}`
       );
-      alert("Copied to clipboard!");
+      setSnackbar({
+        open: true,
+        message: 'Copied to clipboard!',
+        severity: 'success'
+      });
     }
+  };
+
+  const handleClear = () => {
+    setLogs([]);
+    setSnackbar({
+      open: true,
+      message: 'Logs cleared',
+      severity: 'info'
+    });
   };
 
   const getStatusColor = (status, isSelected = false) => {
-    if (isSelected) return "text-white";
-
-    switch (status) {
-      case "SUCCESS":
-      case "ACK_RECEIVED":
-        return "text-green-400";
-
-      case "WAITING_ACK":
-      case "SENDING":
-      case "VALIDATING":
-      case "ROUTING":
-      case "TRANSFORMING":
-        return "text-blue-400";
-
-      case "ROUTING_FAILED":
-        return "text-yellow-400";
-
-      case "VALIDATION_FAILED":
-      case "TRANSFORMATION_FAILED":
-      case "SEND_FAILED":
-      case "ACK_TIMEOUT":
-      case "FAILED":
-        return "text-red-400";
-
-      default:
-        return "text-gray-400";
-    }
+    if (isSelected) return 'white';
+    
+    const colors = {
+      'SUCCESS': '#4ade80',
+      'ACK_RECEIVED': '#4ade80',
+      'WAITING_ACK': '#60a5fa',
+      'SENDING': '#60a5fa',
+      'VALIDATING': '#60a5fa',
+      'ROUTING': '#60a5fa',
+      'TRANSFORMING': '#60a5fa',
+      'ROUTING_FAILED': '#fbbf24',
+      'VALIDATION_FAILED': '#f87171',
+      'TRANSFORMATION_FAILED': '#f87171',
+      'SEND_FAILED': '#f87171',
+      'ACK_TIMEOUT': '#f87171',
+      'FAILED': '#f87171',
+    };
+    return colors[status] || '#9ca3af';
   };
 
   const getPriorityColor = (priority) => {
-    if (!priority) return "text-gray-400";
-
-    if (priority.startsWith("SS")) {
-      return "text-red-500";
-    }
-
-    if (priority.startsWith("DD")) {
-      return "text-orange-400";
-    }
-
-    if (priority.startsWith("FF")) {
-      return "text-yellow-400";
-    }
-
-    if (priority.startsWith("GG")) {
-      return "text-cyan-400";
-    }
-
-    if (priority.startsWith("KK")) {
-      return "text-gray-400";
-    }
-
-    return "text-white";
+    if (!priority) return '#9ca3af';
+    if (priority.startsWith('SS')) return '#ef4444';
+    if (priority.startsWith('DD')) return '#fb923c';
+    if (priority.startsWith('FF')) return '#facc15';
+    if (priority.startsWith('GG')) return '#22d3ee';
+    if (priority.startsWith('KK')) return '#9ca3af';
+    return '#ffffff';
   };
 
   const getDirectionColor = (dir) => {
     switch (dir) {
-      case "OUT":
-        return "text-blue-400";
-
-      case "IN":
-        return "text-purple-400";
-
-      default:
-        return "text-gray-400";
+      case 'OUT': return '#60a5fa';
+      case 'IN': return '#a78bfa';
+      default: return '#9ca3af';
     }
   };
 
   const isErrorStatus = (status) => {
     return [
-      "FAILED",
-      "VALIDATION_FAILED",
-      "ROUTING_FAILED",
-      "TRANSFORMATION_FAILED",
-      "SEND_FAILED",
-      "ACK_TIMEOUT"
+      'FAILED',
+      'VALIDATION_FAILED',
+      'ROUTING_FAILED',
+      'TRANSFORMATION_FAILED',
+      'SEND_FAILED',
+      'ACK_TIMEOUT'
     ].includes(status);
   };
 
-  const getRowStatusClass = (status, isSelected) => {
+  const getRowBackground = (status, isSelected) => {
     if (isSelected && isErrorStatus(status)) {
-      return `
-        bg-red-600/60
-        text-white
-
-        [&>td]:text-white
-        [&>td>span]:text-white
-      `;
-    } 
-
+      return alpha('#ef4444', 0.6);
+    }
     if (isSelected) {
-      return `
-        bg-blue-600/60
-        text-white
-
-        [&>td]:text-white
-        [&>td>span]:text-white
-      `;
+      return alpha('#3b82f6', 0.6);
     }
-
     if (isErrorStatus(status)) {
-      return `
-        bg-red-500/5
-        text-red-600
-
-        [&>td]:text-red-600
-        [&>td>span]:text-red-600
-      `;
+      return alpha('#ef4444', 0.05);
     }
-
-    return "hover:bg-slate-200";
+    return 'transparent';
   };
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full bg-slate-100 text-slate-900 font-sans">
-        
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        height: '100vh',
+        bgcolor: '#f1f5f9'
+      }}>
         {/* TOOLBAR */}
-        <div className="bg-slate-900 p-2 border-b border-slate-800 flex items-center justify-between shadow-md">
-          <div className="flex items-center gap-1">
-            <ToolbarBtn
-              icon={<XCircle size={14} />}
-              label="Clear"
-              onClick={() => setLogs([])}
-              variant="danger"
-            />
-            <div className="w-[1px] h-6 bg-slate-800 mx-2" />
+        <Box sx={{ 
+          bgcolor: '#F1F5F9', 
+          p: 2, 
+          borderBottom: '1px solid #1e293b',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Tooltip title="Clear logs">
+              <IconButton 
+                onClick={handleClear}
+                sx={{ 
+                  color: '#6b7077',
+                  '&:hover': { color: '#ef4444', bgcolor: alpha('#ef4444', 0.1) }
+                }}
+              >
+                <XCircle size={18} />
+              </IconButton>
+            </Tooltip>
 
-            <ToolbarBtn
-              icon={<Copy size={14} />}
-              label="Copy"
-              onClick={handleCopy}
-              disabled={!selectedLog}
-            />
+            <Box sx={{ width: 1, height: 24, bgcolor: '#1e293b', mx: 2 }} />
 
-            <div className="w-[1px] h-6 bg-slate-800 mx-2" />
+            <Tooltip title="Copy selected log">
+              <IconButton 
+                onClick={handleCopy}
+                // disabled={!selectedLog}
+                sx={{ 
+                  color: '#6b7077',
+                  '&:hover': { color: '#60a5fa', bgcolor: alpha('#3b82f6', 0.1) },
+                  '&.Mui-disabled': { opacity: 0.2 }
+                }}
+              >
+                <Copy size={18} />
+              </IconButton>
+            </Tooltip>
 
-            <ToolbarBtn icon={<Calendar size={14} />} label="Today's Log" />
-            {/* Nút Update với hiệu ứng Loading */}
-            <ToolbarBtn
-              icon={loading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCcw size={14} />}
-              label={loading ? "Update" : "Update"}
-              onClick={fetchLogs}
-              active={loading}
-            />
-          </div>
+            <Box sx={{ width: 1, height: 24, bgcolor: '#1e293b', mx: 2 }} />
 
-          {/* INPUT SEARCH ONCHANGE */}
-          <div className="flex items-center gap-2 bg-black/30 px-3 py-1 rounded-md border border-slate-800">
-            <Search size={14} className="text-slate-500" />
-            <input
-              type="text"
+            <Tooltip title="Today's logs">
+              <IconButton sx={{ color: '#6b7077', '&:hover': { color: '#60a5fa' } }}>
+                <Calendar size={18} />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip title="Refresh logs">
+              <IconButton 
+                onClick={fetchLogs}
+                disabled={loading}
+                sx={{ 
+                  color: '#6b7077',
+                  '&:hover': { color: '#60a5fa' },
+                  '&.Mui-disabled': { opacity: 0.5 }
+                }}
+              >
+                {loading ? (
+                  <CircularProgress size={18} sx={{ color: '#60a5fa' }} />
+                ) : (
+                  <RefreshCcw size={18} />
+                )}
+              </IconButton>
+            </Tooltip>
+          </Box>
+
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <TextField
+              size="small"
               placeholder="Search Message ID..."
               value={searchTerm}
-              onChange={handleSearchChange}
-              className="bg-transparent text-xs outline-none w-32 focus:w-48 transition-all"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  bgcolor: alpha('#c4c9d0', 0.3),
+                  color: '#000000',
+                  borderRadius: 1,
+                  '& fieldset': { borderColor: '#1e293b' },
+                  '&:hover fieldset': { borderColor: '#334155' },
+                  '&.Mui-focused fieldset': { borderColor: '#3b82f6' }
+                },
+                '& .MuiInputBase-input': {
+                  fontSize: '0.75rem',
+                  py: 0.75,
+                  width: '8rem',
+                  '&:focus': { width: '12rem' }
+                }
+              }}
+              InputProps={{
+                startAdornment: <Search size={14} style={{ color: '#64748b', marginRight: 8 }} />
+              }}
             />
-          </div>
-        </div>
+          </Box>
+        </Box>
 
-        {/* TABLE DỮ LIỆU THẬT */}
-        <div className="flex-1 overflow-auto custom-scrollbar relative bg-slate-100">
-          <table className="w-full text-left text-[11px] border-collapse font-mono">
-            <thead className="sticky top-0 bg-white z-20 shadow-sm">
-              <tr className="text-slate-500 border-b border-slate-200">
-                <th className="px-4 py-2 w-8">#</th>
-                <th className="px-4 py-2 w-48">TIME</th>
-                <th className="px-4 py-2 w-24">DIR</th>
-                <th className="px-4 py-2 w-32">MSG ID</th>
-                <th className="px-4 py-2 font-semibold">TYPE</th>
-                <th className="px-4 py-2 font-semibold">PRIO</th>
-                <th className="px-4 py-2 font-semibold">MESSAGE</th>
-                <th className="px-4 py-2 font-semibold">TOPIC</th>
-                <th className="px-4 py-2 font-semibold">STATUS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredLogs.map((log) => (
-                <tr
-                  key={log.id}
-                  onClick={() => setSelectedLog(log)}
-                  className={`
-                    group cursor-pointer border-b border-slate-200 transition-colors
-                    ${getRowStatusClass(
-                      log.processingStatus,
-                      selectedLog?.id === log.id
-                    )}
-                  `}
-                >
-                  <td className="px-4 py-1">
-                    <span>{log.id}</span>
-                  </td>
-
-                  <td className="px-4 py-1 whitespace-nowrap">
-                    <span>{new Date(log.createdAt).toLocaleString()}</span>
-                  </td>
-
-                  <td
-                    className={`px-4 py-1 font-semibold ${getDirectionColor(
-                      log.direction
-                    )}`}
-                  >
-                    <span>{log.direction}</span>
-                  </td>
-
-                  <td className="px-4 py-1 font-mono">
-                    <span>{log.messageId}</span>
-                  </td>
-
-                  <td className="px-4 py-1 font-medium">
-                    <span>{log.amhsMessageType}</span>
-                  </td>
-
-                  <td
-                    className={`px-4 py-1 font-bold ${getPriorityColor(
-                      log.amhsPriority
-                    )}`}
-                  >
-                    <span>{`${log.amhsPriority || "-"} (${log.swimPriority ?? "-"})`}</span>
-                  </td>
-
-                  <td
-                    className="px-4 py-1 truncate max-w-[250px]"
-                    title={log.errorMessage}
-                  >
-                    <span>{log.errorMessage}</span>
-                  </td>
-
-                  <td
-                    className="px-4 py-1 truncate max-w-[220px]"
-                    title={log.swimTopic}
-                  >
-                    <span>{log.swimTopic || "-"}</span>
-                  </td>
-
-                  <td className="px-4 py-1">
-                    <span
-                      className={`
-                        px-2 py-0.5 rounded text-xs font-bold
-                        bg-white/5
-                        ${getStatusColor(
-                          log.processingStatus,
-                          selectedLog?.id === log.id
-                        )}
-                      `}
+        {/* TABLE */}
+        <Box sx={{ flex: 1, overflow: 'auto', bgcolor: '#f1f5f9', position: 'relative' }}>
+          <TableContainer component={Paper} sx={{ 
+            maxHeight: '100%', 
+            bgcolor: 'transparent',
+            boxShadow: 'none'
+          }}>
+            <Table stickyHeader sx={{ minWidth: 650 }}>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>#</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>TIME</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>DIR</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>MTS ID</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>IPM ID</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>TYPE</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>PRIO</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>MESSAGE</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>ORIGIN</TableCell>
+                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>STATUS</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredLogs.map((log) => {
+                  const isSelected = selectedLog?.id === log.id;
+                  const bgColor = getRowBackground(log.processingStatus, isSelected);
+                  const textColor = isSelected ? 'white' : 'inherit';
+                  
+                  return (
+                    <TableRow
+                      key={log.id}
+                      onClick={() => setSelectedLog(log)}
+                      hover
+                      sx={{
+                        cursor: 'pointer',
+                        borderBottom: '1px solid #e2e8f0',
+                        bgcolor: bgColor,
+                        '&:hover': {
+                          bgcolor: isSelected ? bgColor : alpha('#cbd5e1', 0.5)
+                        },
+                        '& td': {
+                          color: textColor,
+                          fontSize: '0.6875rem'
+                        }
+                      }}
                     >
-                      {log.processingStatus}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <TableCell>{log.id}</TableCell>
+                      <TableCell>{new Date(log?.createdTime).toLocaleString()}</TableCell>
+                      <TableCell sx={{ color: getDirectionColor(log.direction), fontWeight: 600 }}>
+                        {log.direction}
+                      </TableCell>
+                      <TableCell sx={{ fontFamily: 'monospace' }}>{log.mtsId}</TableCell>
+                      <TableCell sx={{ fontFamily: 'monospace' }}>{log.ipmId}</TableCell>
+                      <TableCell>{log.type}</TableCell>
+                      <TableCell>
+                        <Typography sx={{ 
+                          color: getPriorityColor(log.amhs_priority),
+                          fontWeight: 'bold'
+                        }}>
+                          {`${log.amhs_priority || '-'} (${log.swim_priority ?? '-'})`}
+                        </Typography>
+                      </TableCell>
+                      <TableCell 
+                        sx={{ 
+                          maxWidth: 250, 
+                          overflow: 'hidden', 
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                        title={log.errorMessage}
+                      >
+                        {log.raw_content}
+                      </TableCell>
+                      <TableCell 
+                        sx={{ 
+                          maxWidth: 220, 
+                          overflow: 'hidden', 
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                        title={log.origin}
+                      >
+                        {log.origin || '-'}
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={log.status}
+                          size="small"
+                          sx={{
+                            bgcolor: alpha(getStatusColor(log.status, isSelected), 0.15),
+                            color: getStatusColor(log.status, isSelected),
+                            fontWeight: 'bold',
+                            fontSize: '0.625rem',
+                            height: 20,
+                            '& .MuiChip-label': { px: 1 }
+                          }}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+                {filteredLogs.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={9} align="center" sx={{ py: 8 }}>
+                      <Typography color="textSecondary">
+                        {loading ? 'Loading logs...' : 'No logs found'}
+                      </Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
 
         {/* PREVIEW PANEL */}
         {selectedLog && (
-          <div className="bg-slate-900 border-t border-blue-500 p-3 flex gap-4">
-            <div className="flex-1">
-              <h4 className="text-[10px] font-bold text-blue-400 uppercase mb-1">Log Detail</h4>
-              <div className="text-xs text-slate-300 bg-black/40 p-2 rounded border border-slate-800 max-h-32 overflow-y-auto">
-                <p><strong>Message ID:</strong> {selectedLog.messageId}</p>
-                <p><strong>Payload:</strong> {selectedLog.payload}</p>
-                {selectedLog.errorMessage && (
-                  <p className="text-red-400 mt-2"><strong>Error:</strong> {selectedLog.errorMessage}</p>
-                )}
-              </div>
-            </div>
-          </div>
+          <Box sx={{ 
+            bgcolor: '#0f172a', 
+            borderTop: '2px solid #3b82f6',
+            p: 2,
+            maxHeight: 200,
+            overflow: 'auto'
+          }}>
+            <Typography sx={{ 
+              fontSize: '0.625rem', 
+              fontWeight: 'bold', 
+              color: '#60a5fa',
+              textTransform: 'uppercase',
+              mb: 1
+            }}>
+              Log Detail
+            </Typography>
+            <Box sx={{ 
+              bgcolor: alpha('#000000', 0.4),
+              p: 1.5,
+              borderRadius: 1,
+              border: '1px solid #1e293b'
+            }}>
+              <Typography sx={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
+                <strong>Message ID:</strong> {selectedLog.messageId}
+              </Typography>
+              <Typography sx={{ fontSize: '0.75rem', color: '#cbd5e1', mt: 0.5 }}>
+                <strong>Payload:</strong> {selectedLog.payload}
+              </Typography>
+              {selectedLog.errorMessage && (
+                <Typography sx={{ fontSize: '0.75rem', color: '#f87171', mt: 0.5 }}>
+                  <strong>Error:</strong> {selectedLog.errorMessage}
+                </Typography>
+              )}
+            </Box>
+          </Box>
         )}
-      </div>
+
+        {/* SNACKBAR NOTIFICATION */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={3000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        >
+          <Alert 
+            onClose={() => setSnackbar({ ...snackbar, open: false })}
+            severity={snackbar.severity}
+            sx={{ width: '100%' }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Box>
     </DashboardLayout>
   );
 };
-
-// Component con cho các nút Toolbar
-const ToolbarBtn = ({
-  icon,
-  label,
-  onClick,
-  disabled = false,
-  active = false,
-  variant = "default",
-}) => (
-  <button
-    disabled={disabled}
-    onClick={onClick}
-    className={`
-      flex items-center gap-1.5 px-3 py-1.5 rounded transition-all text-[12px] font-medium
-      ${disabled ? "opacity-20 cursor-not-allowed" : "hover:bg-slate-800 active:scale-95 cursor-pointer"}
-      ${active ? "bg-slate-800 text-blue-400 shadow-inner" : "text-slate-300"}
-      ${variant === "danger" ? "hover:text-red-400" : ""}
-    `}
-  >
-    <span className={active ? "animate-spin-slow" : ""}>{icon}</span>
-    <span>{label}</span>
-  </button>
-);
 
 export default FullLogView;

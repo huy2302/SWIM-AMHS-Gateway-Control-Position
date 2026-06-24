@@ -2,6 +2,7 @@ import LoginCard from "@/components/LoginCard";
 import background from "@/assets/background.png";
 import vatmLogo from "@/assets/vatm-logo.png";
 import attechLogo from "@/assets/attech-logo.png";
+import { t } from "@/i18n/translator";
 
 export default function LoginPage() {
     return (
@@ -41,8 +42,7 @@ export default function LoginPage() {
                         </h1>
 
                         <p className="max-w-xl text-3xl font-light text-[#204a7d]">
-                            Hệ thống giám sát & quản lý kết nối
-                            AMHS qua SWIM
+                            {t("login.details2")}
                         </p>
 
                         <div className="my-6 h-0.5 w-28 rounded bg-blue-600/50" />

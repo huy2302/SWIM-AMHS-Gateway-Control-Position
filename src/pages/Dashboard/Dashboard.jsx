@@ -63,6 +63,16 @@ export default function Dashboard() {
     return () => clearInterval(interval);
   }, [refreshInterval]);
 
+  const transformed =
+  (stats?.database?.gw_in?.transformed ?? 0) +
+  (stats?.database?.gw_out?.transformed ?? 0);
+
+  const total =
+    (stats?.database?.gw_in?.total ?? 0) +
+    (stats?.database?.gw_out?.total ?? 0);
+
+  const percentTranferRate = total > 0 ? (transformed / total) * 100 : 0;
+
   return (
     <DashboardLayout>
       <div className="dashboard-page mt-[-10px] pt-0">
@@ -205,17 +215,24 @@ export default function Dashboard() {
               <div className="text-[12px] font-bold">{t("dashboard.conversionStatus.title")}</div>
               <div className="text-[12px] grid grid-cols-[1fr_auto] gap-x-8 gap-y-2 w-full text-sm">
                 <span className="text-slate-600">{t("dashboard.conversionStatus.successfulConversions")}</span>
-                <span className="font-bold text-right text-[#2563eb]">1,561</span>
+                <span className="font-bold text-right text-[#2563eb]">
+                  {formatNumber(stats?.database?.gw_in?.transformed + stats?.database?.gw_out?.transformed)}
+                </span>
 
                 <span className="text-slate-600">{t("dashboard.conversionStatus.failedConversions")}</span>
-                <span className="font-bold text-right text-[#ef4444]">19</span>
+                <span className="font-bold text-right text-[#ef4444]">
+                  {formatNumber(stats?.database?.gw_in?.convertFailed + stats?.database?.gw_out?.convertFailed)}
+                </span>
 
                 <span className="text-slate-600">{t("dashboard.conversionStatus.successRate")}</span>
                 <span 
                   className="font-bold text-right" 
-                  style={{ color: ColorByRate(stats?.database?.gw_out?.transformed, stats?.database?.gw_out?.total)}} 
+                  style={{ color: ColorByRate(
+                    (stats?.database?.gw_int?.transformed) + (stats?.database?.gw_out?.transformed)
+                    , (stats?.database?.gw_in?.total) + (stats?.database?.gw_out?.total)
+                  )}} 
                 >
-                  {formatNumber(stats?.database?.gw_out?.transformed / stats?.database?.gw_out?.total * 100).toFixed(1)}%
+                  {percentTranferRate}%
                 </span>
               </div>
             </div>
@@ -523,22 +540,23 @@ export default function Dashboard() {
 
 const formatDate = (dateString) => {
   if (!dateString) return "";
-  
-  const date = new Date(dateString);
-  
+
+  const normalized = dateString.replace("ICT", "GMT+0700");
+  const date = new Date(normalized);
+
   if (isNaN(date.getTime())) return "";
 
-  const options = {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false
-  };
-
-  return new Intl.DateTimeFormat('en-GB', options).format(date).replace(',', '');
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  })
+    .format(date)
+    .replace(",", "");
 };
 
 const formatNumber = (num) => {
@@ -581,7 +599,7 @@ const ColorByRate = (a, b) => {
   if (rate > 0.8) {
     return "#00c951";
   } else if (rate > 0.4) {
-    return "#fbff0b";
+    return "#bcbf07";
   } else {
     return "#ef4444";
   }
