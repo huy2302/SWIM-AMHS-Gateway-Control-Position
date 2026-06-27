@@ -1,0 +1,32 @@
+{
+  "settings": {
+    "title": {
+      "vi": "Cấu hình hệ thống",
+      "en": "System Settings"
+    },
+    "key": {
+      "vi": "Khóa cấu hình",
+      "en": "Config Key"
+    },
+    "value": {
+      "vi": "Giá trị",
+      "en": "Config Value"
+    },
+    "actions": {
+      "vi": "Thao tác",
+      "en": "Actions"
+    },
+    "noData": {
+      "vi": "Không có cấu hình nào được định nghĩa.",
+      "en": "No configurations defined."
+    },
+    "toast": {
+      "vi": "Cập nhật cấu hình thành công!",
+      "en": "Configuration updated successfully!"
+    },
+    "toastFail": {
+      "vi": "Cập nhật cấu hình thất bại!",
+      "en": "Failed to update configuration"
+    }
+  }
+}

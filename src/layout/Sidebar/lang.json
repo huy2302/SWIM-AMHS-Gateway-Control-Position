@@ -1,11 +1,11 @@
 {
   "toggle": {
     "expand": {
-      "vi": "Mở rộng sidebar",
+      "vi": "Mở rộng thanh chức năng",
       "en": "Expand sidebar"
     },
     "collapse": {
-      "vi": "Thu gọn sidebar",
+      "vi": "Thu gọn thanh chức năng",
       "en": "Collapse sidebar"
     }
   },
@@ -13,34 +13,68 @@
     "vi": "AMHS SWIM Gateway",
     "en": "AMHS SWIM Gateway"
   },
+  "sections": {
+    "monitoring": {
+      "vi": "GIÁM SÁT",
+      "en": "MONITOR"
+    },
+    "traffic": {
+      "vi": "ĐIỆN VĂN",
+      "en": "TRAFFIC"
+    },
+    "logs": {
+      "vi": "NHẬT KÝ",
+      "en": "LOGS"
+    },
+    "admin": {
+      "vi": "QUẢN TRỊ",
+      "en": "ADMIN"
+    }
+  },
   "menu": {
     "monitor": {
-      "vi": "Giám sát",
-      "en": "Monitor"
+      "vi": "Tổng quan",
+      "en": "Overview"
+    },
+    "systemMonitor": {
+      "vi": "Giám sát tài nguyên",
+      "en": "Resource Monitor"
+    },
+    "alerts": {
+      "vi": "Cảnh báo",
+      "en": "Alerts"
+    },
+    "messages": {
+      "vi": "Kho điện văn",
+      "en": "Message Archives"
+    },
+    "unrouted": {
+      "vi": "Chờ định tuyến",
+      "en": "Pending Routing"
+    },
+    "routing": {
+      "vi": "Định tuyến",
+      "en": "Routing Rules"
+    },
+    "logs": {
+      "vi": "Nhật ký chuyển đổi",
+      "en": "Conversion Logs"
+    },
+    "systemHistory": {
+      "vi": "Lịch sử hệ thống",
+      "en": "System History"
     },
     "accounts": {
       "vi": "Tài khoản",
       "en": "Accounts"
     },
-    "routing": {
-      "vi": "Cấu hình định tuyến",
-      "en": "Routing"
+    "users": {
+      "vi": "Người dùng",
+      "en": "User Management"
     },
-    "logs": {
-      "vi": "Logs hệ thống",
-      "en": "Logs"
-    },
-    "messages": {
-      "vi": "Điện văn (Bản tin)",
-      "en": "Messages"
-    },
-    "systemMonitor": {
-      "vi": "Tài nguyên hệ thống",
-      "en": "System Monitor"
-    },
-    "systemHistory": {
-      "vi": "Lịch sử hệ thống",
-      "en": "System History"
+    "admin": {
+      "vi": "Cấu hình",
+      "en": "Admin Settings"
     }
   },
   "serverMonitor": {

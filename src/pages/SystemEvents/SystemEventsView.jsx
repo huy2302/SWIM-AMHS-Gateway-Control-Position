@@ -4,10 +4,10 @@ import {
   DialogContent,
   DialogTitle,
 } from "@mui/material";
-import DashboardLayout from "../layout/DashboardLayout";
-import gatewayApi from "../api/gatewayApi";
+import DashboardLayout from "../../layout/DashboardLayout";
+import gatewayApi from "../../api/gatewayApi";
 import { Check } from "lucide-react";
-import TablePagination from "../components/TablePagination";
+import TablePagination from "../../components/TablePagination";
 import { t } from "@/i18n/translator";
 
 const getSeverityStyle = (severity) => {

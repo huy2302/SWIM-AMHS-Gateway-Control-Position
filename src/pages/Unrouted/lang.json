@@ -1,0 +1,264 @@
+{
+  "title": {
+    "vi": "Hàng đợi lỗi định tuyến (Unrouted Queue)",
+    "en": "Unrouted Queue"
+  },
+  "searchPlaceholder": {
+    "vi": "Lọc theo người gửi...",
+    "en": "Filter by originator..."
+  },
+  "selectedText": {
+    "vi": "Đã chọn: ",
+    "en": "Selected: "
+  },
+  "stats": {
+    "title": {
+      "vi": "Số liệu định tuyến (Addressing Stats)",
+      "en": "Addressing Stats"
+    },
+    "total": {
+      "vi": "Tổng số điện văn nhận",
+      "en": "Total Received Messages"
+    },
+    "unroutedCount": {
+      "vi": "Đang chờ xử lý lỗi",
+      "en": "Pending Unrouted"
+    },
+    "successRate": {
+      "vi": "Tỷ lệ định tuyến thành công",
+      "en": "Success Rate"
+    },
+    "distributionTitle": {
+      "vi": "Phân phối nguồn nhận",
+      "en": "Addressing Source Distribution"
+    },
+    "rateTitle": {
+      "vi": "Tỷ lệ định tuyến",
+      "en": "Addressing Success vs Unrouted"
+    },
+    "periods": {
+      "last_hour": {
+        "vi": "1 giờ qua",
+        "en": "Last Hour"
+      },
+      "last_24h": {
+        "vi": "24 giờ qua",
+        "en": "Last 24 Hours"
+      },
+      "last_7d": {
+        "vi": "7 ngày qua",
+        "en": "Last 7 Days"
+      },
+      "last_30d": {
+        "vi": "30 ngày qua",
+        "en": "Last 30 Days"
+      }
+    },
+    "noDistribution": {
+      "vi": "Không có dữ liệu phân phối",
+      "en": "No distribution data available."
+    },
+    "noRate": {
+      "vi": "Không có thống kê tỷ lệ",
+      "en": "No rate statistics available."
+    },
+    "refreshTitle": {
+      "vi": "Làm mới dữ liệu thống kê và hàng đợi",
+      "en": "Refresh statistics and queue"
+    }
+  },
+  "table": {
+    "time": {
+      "vi": "Thời gian",
+      "en": "Time"
+    },
+    "msgid": {
+      "vi": "Mã điện văn",
+      "en": "Message ID"
+    },
+    "originator": {
+      "vi": "Địa chỉ gửi (Originator)",
+      "en": "Originator"
+    },
+    "priority": {
+      "vi": "Độ ưu tiên",
+      "en": "Priority"
+    },
+    "errorMsg": {
+      "vi": "Chi tiết lỗi",
+      "en": "Routing Error Detail"
+    },
+    "actions": {
+      "vi": "Thao tác",
+      "en": "Actions"
+    },
+    "loading": {
+      "vi": "Đang tải hàng đợi...",
+      "en": "Loading unrouted queue..."
+    },
+    "noData": {
+      "vi": "Không có điện văn lỗi định tuyến nào",
+      "en": "No unrouted messages."
+    },
+    "viewDetail": {
+      "vi": "Xem chi tiết",
+      "en": "View Details"
+    }
+  },
+  "actions": {
+    "route": {
+      "vi": "Định tuyến",
+      "en": "Route"
+    },
+    "reject": {
+      "vi": "Từ chối",
+      "en": "Reject"
+    },
+    "batchRoute": {
+      "vi": "Định tuyến hàng loạt",
+      "en": "Batch Route"
+    },
+    "batchReject": {
+      "vi": "Từ chối hàng loạt",
+      "en": "Batch Reject"
+    }
+  },
+  "dialog": {
+    "detailTitle": {
+      "vi": "Chi tiết điện văn lỗi định tuyến",
+      "en": "Unrouted Message Detail"
+    },
+    "routeTitle": {
+      "vi": "Định tuyến điện văn thủ công",
+      "en": "Manual Route Message"
+    },
+    "rejectTitle": {
+      "vi": "Từ chối điện văn",
+      "en": "Reject Message"
+    },
+    "originator": {
+      "vi": "Địa chỉ gửi (Originator)",
+      "en": "Originator"
+    },
+    "originatorPlaceholder": {
+      "vi": "Nhập địa chỉ gửi 8 ký tự (VD: VVTSZQZX)...",
+      "en": "Enter 8-character originator (e.g. VVTSZQZX)..."
+    },
+    "recipients": {
+      "vi": "Địa chỉ nhận (Recipients)",
+      "en": "Recipients"
+    },
+    "recipientsPlaceholder": {
+      "vi": "Nhập danh sách địa chỉ nhận, cách nhau bởi khoảng trắng...",
+      "en": "Enter recipient addresses separated by spaces..."
+    },
+    "note": {
+      "vi": "Ghi chú xử lý",
+      "en": "Processing Note"
+    },
+    "notePlaceholder": {
+      "vi": "Nhập ghi chú xử lý (tùy chọn)...",
+      "en": "Enter optional note..."
+    },
+    "rejectReason": {
+      "vi": "Lý do từ chối",
+      "en": "Reason for Rejection"
+    },
+    "rejectReasonPlaceholder": {
+      "vi": "Nhập lý do từ chối...",
+      "en": "Enter reason for rejection..."
+    },
+    "cancel": {
+      "vi": "Hủy",
+      "en": "Cancel"
+    },
+    "submit": {
+      "vi": "Thực thi",
+      "en": "Execute"
+    },
+    "routeButton": {
+      "vi": "Định tuyến thủ công",
+      "en": "Manual Route"
+    },
+    "rejectButton": {
+      "vi": "Từ chối điện văn",
+      "en": "Reject Message"
+    },
+    "fields": {
+      "origin": {
+        "vi": "ĐỊA CHỈ PHÁT",
+        "en": "ORIGIN"
+      },
+      "address": {
+        "vi": "ĐỊA CHỈ NHẬN",
+        "en": "ADDRESS"
+      },
+      "subject": {
+        "vi": "CHỦ ĐỀ / LOẠI TIN",
+        "en": "SUBJECT / TYPE"
+      },
+      "priority": {
+        "vi": "ĐỘ KHẨN",
+        "en": "PRIORITY"
+      },
+      "time": {
+        "vi": "THỜI GIAN",
+        "en": "TIME"
+      },
+      "errorType": {
+        "vi": "LOẠI LỖI",
+        "en": "ERROR TYPE"
+      },
+      "rawMessage": {
+        "vi": "Nội dung điện văn gốc",
+        "en": "Raw Message Content"
+      },
+      "payload": {
+        "vi": "Nội dung tải (Payload Content)",
+        "en": "Payload Content"
+      }
+    }
+  },
+  "messages": {
+    "loadError": {
+      "vi": "Không thể tải danh sách hàng đợi lỗi",
+      "en": "Failed to load unrouted queue"
+    },
+    "routeSuccess": {
+      "vi": "Đã định tuyến thủ công thành công",
+      "en": "Message manually routed successfully"
+    },
+    "rejectSuccess": {
+      "vi": "Đã từ chối điện văn thành công",
+      "en": "Message rejected successfully"
+    },
+    "batchSuccess": {
+      "vi": "Thực hiện xử lý hàng loạt thành công",
+      "en": "Batch operation executed successfully"
+    },
+    "requiredSendTopic": {
+      "vi": "Vui lòng nhập chủ đề gửi",
+      "en": "Send topic is required"
+    },
+    "requiredOriginator": {
+      "vi": "Vui lòng nhập địa chỉ gửi (8 ký tự)",
+      "en": "Originator (8 uppercase characters) is required"
+    },
+    "requiredRecipients": {
+      "vi": "Vui lòng nhập danh sách địa chỉ nhận",
+      "en": "Recipients list is required"
+    },
+    "failedRoute": {
+      "vi": "Định tuyến điện văn thất bại (Đảm bảo địa chỉ gửi/nhận đúng cấu trúc)",
+      "en": "Failed to route message (Ensure originator and recipients are valid)"
+    },
+    "failedReject": {
+      "vi": "Từ chối điện văn thất bại",
+      "en": "Failed to reject message"
+    },
+    "defaultRejectReason": {
+      "vi": "Từ chối thủ công bởi quản trị viên",
+      "en": "Manually rejected by administrator"
+    }
+  }
+}

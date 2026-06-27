@@ -8,39 +8,20 @@ import {
   ChevronLeft,
   ChevronRight,
   History,
+  Users,
+  Settings,
+  AlertCircle
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import ServerMonitor from "@/components/ServerMonitor";
 import { NavLink } from "react-router-dom";
-import { LOG_TEMPLATES } from "@/data/sampleData";
-// import { useSystemStore } from '@/hooks/systemStore';
 import { t } from "@/i18n/translator";
+import { useAuth } from "@/components/AuthContext";
 
 export default function Sidebar() {
-  const [logs, setLogs] = useState([]);
+  const { user } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
-
-  // const unreadCount = useSystemStore((state) => state.unreadCount);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Lấy ngẫu nhiên 1 mẫu log
-      const randomIndex = Math.floor(Math.random() * LOG_TEMPLATES.length);
-      const newLog = {
-        ...LOG_TEMPLATES[randomIndex],
-        timestamp: new Date().toLocaleTimeString(),
-        id: Date.now(),
-      };
-
-      // setLogs((prevLogs) => {
-      //   const updatedLogs = [...prevLogs, newLog];
-      //   // Chỉ giữ lại 50 dòng log mới nhất để tránh lag trình duyệt
-      //   return updatedLogs.slice(-50);
-      // });
-    }, 2000); // Cứ mỗi 2 giây bắn 1 log mới
-
-    return () => clearInterval(interval);
-  }, []);
+  const isAdmin = user?.role?.toLowerCase() === "admin";
 
   const toggleCollapsed = () => {
     setCollapsed((prev) => !prev);
@@ -49,137 +30,218 @@ export default function Sidebar() {
   return (
     <div
       className={`sidebar flex flex-col p-2 relative transition-all duration-300 ${
-        collapsed ? "collapsed w-[70px]" : "w-[220px]"
+        collapsed ? "collapsed w-[70px]" : "w-[240px]"
       }`}
     >
-      <div className="absolute top-1/2 -right-3 flex flex-col items-center -translate-y-1/2">
+      {/* Collapse Toggle Button */}
+      <div className="absolute top-1/2 -right-3 flex flex-col items-center -translate-y-1/2 z-50">
         <button
           type="button"
           onClick={toggleCollapsed}
-          className="p-1 bg-[#ccc] rounded-full cursor-pointer text-[#1f2937] hover:bg-slate-300 transition-colors"
+          className="p-1 bg-white border border-slate-200 shadow-sm rounded-full cursor-pointer text-slate-600 hover:bg-slate-50 transition-colors"
           title={collapsed ? t("sidebar.toggle.expand") : t("sidebar.toggle.collapse")}
         >
-          {collapsed ? <ChevronRight /> : <ChevronLeft />}
+          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </button>
       </div>
 
-      <div className={`flex items-center gap-2 mb-4 ${collapsed ? "justify-center" : ""}`}>
-        <img className="w-[60px] min-w-[60px]" src="/public/bg2.webp" alt="Logo" />
-        <span className={`sidebar-title ${collapsed ? "collapsed" : ""}`}>
-          AMHS SWIM <br /> Gateway
-        </span>
+      {/* Brand Header */}
+      <div className={`flex items-center gap-2 mb-4 p-2 ${collapsed ? "justify-center" : ""}`}>
+        <img className="w-[45px] min-w-[45px] h-[45px] object-contain" src="/bg2.webp" alt="Logo" />
+        {!collapsed && (
+          <span className="sidebar-title font-extrabold text-[13px] leading-tight text-slate-800 tracking-wide uppercase">
+            AMHS SWIM <br />
+            <span className="text-blue-600 font-bold text-[11px]">Control Position</span>
+          </span>
+        )}
       </div>
 
-      <nav className="space-y-1 w-full divide-y divide-gray-400/40">
-        <NavLink
-          to="/monitor"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-          style={{ paddingLeft: collapsed ? "16px" : null }}
-        >
-          <Monitor size={18} />
-          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
-            {t("sidebar.menu.monitor")}
-          </span>
-        </NavLink>
-
-        <NavLink
-          to="/accounts"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-          style={{ paddingLeft: collapsed ? "16px" : null }}
-        >
-          <Mail size={18} />
-          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
-            {t("sidebar.menu.accounts")}
-          </span>
-        </NavLink>
-
-        <NavLink
-          to="/routing"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-          style={{ paddingLeft: collapsed ? "16px" : null }}
-        >
-          <Unplug size={18} />
-          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
-            {t("sidebar.menu.routing")}
-          </span>
-        </NavLink>
-
-        <NavLink
-          to="/log"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-          style={{ paddingLeft: collapsed ? "16px" : null }}
-        >
-          <TriangleAlert size={18} />
-          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
-            {t("sidebar.menu.logs")}
-          </span>
-        </NavLink>
-
-        <NavLink
-          to="/messages"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-          style={{ paddingLeft: collapsed ? "16px" : null }}
-        >
-          <Archive size={18} />
-          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
-            {t("sidebar.menu.messages")}
-          </span>
-        </NavLink>
-
-        <NavLink
-          to="/system"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-          style={{ paddingLeft: collapsed ? "16px" : null }}
-        >
-          <MonitorCog size={18} />
-          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
-            {t("sidebar.menu.systemMonitor")}
-          </span>
-        </NavLink>
-
-        {/* <NavLink
-          to="/system-events"
-          className={({ isActive }) =>
-            isActive ? "menu-item active" : "menu-item"
-          }
-          style={{ paddingLeft: collapsed ? "16px" : null, position: "relative" }}
-        >
-          <div className="absolute w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center top-[-9px] right-[-9px]"> */}
-            {/* Vòng tròn hiệu ứng sóng lan tỏa ra ngoài */}
-            {
-              // unreadCount > 0 ? 
-              // (<span className="absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75 animate-ping"></span>)
-              // :
-              // null
+      {/* Navigation Groups */}
+      <nav className="flex-1 w-full space-y-3 overflow-y-auto px-1 custom-scrollbar">
+        
+        {/* GROUP 1: GIÁM SÁT & VẬN HÀNH */}
+        <div className="space-y-1">
+          {!collapsed && (
+            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase px-3 mb-1">
+              {t("sidebar.sections.monitoring")}
+            </div>
+          )}
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
             }
-            
-            {/* Số thông báo chính đứng yên ở trên */}
-            {/* <span className="relative text-[11px] font-bold leading-none">{unreadCount || 0}</span>
-          </div>
-          <History size={18} />
-          <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
-            {t("sidebar.menu.systemHistory")}
-          </span>
-        </NavLink> */}
+            title={collapsed ? t("sidebar.menu.monitor") : ""}
+          >
+            <Monitor size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.monitor")}
+            </span>
+          </NavLink>
+
+          <NavLink
+            to="/system"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.systemMonitor") : ""}
+          >
+            <MonitorCog size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.systemMonitor")}
+            </span>
+          </NavLink>
+
+          <NavLink
+            to="/alerts"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.alerts") : ""}
+          >
+            <AlertCircle size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.alerts")}
+            </span>
+          </NavLink>
+        </div>
+
+        {/* GROUP 2: ĐIỆN VĂN & ĐỊNH TUYẾN */}
+        <div className="space-y-1 pt-2 border-t border-slate-100">
+          {!collapsed && (
+            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase px-3 mb-1">
+              {t("sidebar.sections.traffic")}
+            </div>
+          )}
+          <NavLink
+            to="/messages"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.messages") : ""}
+          >
+            <Archive size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.messages")}
+            </span>
+          </NavLink>
+
+          <NavLink
+            to="/unrouted"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.unrouted") : ""}
+          >
+            <Unplug size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.unrouted")}
+            </span>
+          </NavLink>
+
+          <NavLink
+            to="/routing"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.routing") : ""}
+          >
+            <Settings size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.routing")}
+            </span>
+          </NavLink>
+        </div>
+
+        {/* GROUP 3: NHẬT KÝ & LỊCH SỬ */}
+        <div className="space-y-1 pt-2 border-t border-slate-100">
+          {!collapsed && (
+            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase px-3 mb-1">
+              {t("sidebar.sections.logs")}
+            </div>
+          )}
+          <NavLink
+            to="/log"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.logs") : ""}
+          >
+            <TriangleAlert size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.logs")}
+            </span>
+          </NavLink>
+
+          <NavLink
+            to="/system-events"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.systemHistory") : ""}
+          >
+            <History size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.systemHistory")}
+            </span>
+          </NavLink>
+        </div>
+
+        {/* GROUP 4: QUẢN TRỊ & CẤU HÌNH */}
+        <div className="space-y-1 pt-2 border-t border-slate-100">
+          {!collapsed && (
+            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase px-3 mb-1">
+              {t("sidebar.sections.admin")}
+            </div>
+          )}
+          
+          <NavLink
+            to="/accounts"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.accounts") : ""}
+          >
+            <Mail size={17} />
+            <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+              {t("sidebar.menu.accounts")}
+            </span>
+          </NavLink>
+
+          {isAdmin && (
+            <NavLink
+              to="/users"
+              className={({ isActive }) =>
+                isActive ? "menu-item active" : "menu-item"
+              }
+              title={collapsed ? t("sidebar.menu.users") : ""}
+            >
+              <Users size={17} />
+              <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+                {t("sidebar.menu.users")}
+              </span>
+            </NavLink>
+          )}
+
+          {isAdmin && (
+            <NavLink
+              to="/config"
+              className={({ isActive }) =>
+                isActive ? "menu-item active" : "menu-item"
+              }
+              title={collapsed ? t("sidebar.menu.admin") : ""}
+            >
+              <Settings size={17} />
+              <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
+                {t("sidebar.menu.admin")}
+              </span>
+            </NavLink>
+          )}
+        </div>
       </nav>
 
-      <div className={`sidebar-extra ${collapsed ? "collapsed" : ""}`}>
-        {/* <div className="h-56 mt-4">
-          <LogConsole logs={logs} />
-        </div> */}
-
+      {/* Collapsible server resource monitor widget */}
+      <div className={`sidebar-extra mt-2 pt-2 border-t border-slate-100 ${collapsed ? "collapsed opacity-0 max-h-0 overflow-hidden" : "opacity-100"}`}>
         <ServerMonitor />
       </div>
     </div>

@@ -1,0 +1,152 @@
+{
+  "caution": {
+    "vi": "Chú ý: Các thao tác quản trị sẽ sửa đổi trực tiếp cấu hình ứng dụng hoặc dọn dẹp cơ sở dữ liệu hệ thống.",
+    "en": "Caution: Administrative operations will directly modify application settings or prune system databases."
+  },
+  "diagnostics": {
+    "dbStatus": {
+      "vi": "Trạng thái Database",
+      "en": "Database status"
+    },
+    "conversionLogs": {
+      "vi": "Nhật ký chuyển đổi",
+      "en": "Conversion Logs"
+    },
+    "availableDisk": {
+      "vi": "Dung lượng ổ đĩa",
+      "en": "Available Disk"
+    },
+    "activeConnections": {
+      "vi": "Kết nối hoạt động",
+      "en": "Active Connections"
+    },
+    "bound": {
+      "vi": "Đã kết nối",
+      "en": "Bound"
+    },
+    "toastSuccess": {
+      "vi": "Đã hoàn thành kiểm tra chẩn đoán",
+      "en": "Diagnostic check completed"
+    },
+    "toastFail": {
+      "vi": "Chạy chẩn đoán thất bại",
+      "en": "Failed to perform diagnostics"
+    }
+  },
+  "dbOps": {
+    "title": {
+      "vi": "Thao tác Database",
+      "en": "Database Operations"
+    },
+    "purgeLogs": {
+      "vi": "Dọn dẹp nhật ký cũ",
+      "en": "Purge Old Logs"
+    },
+    "purgeDesc": {
+      "vi": "Dọn dẹp bảng nhật ký chuyển đổi",
+      "en": "Cleans conversion log tables"
+    },
+    "toastSuccess": {
+      "vi": "Đã dọn dẹp nhật ký cũ thành công!",
+      "en": "Old database logs cleaned successfully"
+    },
+    "toastFail": {
+      "vi": "Dọn dẹp nhật ký cũ thất bại!",
+      "en": "Failed to clean database"
+    }
+  },
+  "maintenance": {
+    "title": {
+      "vi": "Bảo trì & Chẩn đoán",
+      "en": "Maintenance"
+    },
+    "vacuum": {
+      "vi": "Nén Database (Vacuum)",
+      "en": "Vacuum Database"
+    },
+    "vacuumDesc": {
+      "vi": "Tối ưu hóa kích thước DB và tăng tốc chỉ mục",
+      "en": "Optimizes database size and speeds up indices"
+    },
+    "check": {
+      "vi": "Chạy chẩn đoán",
+      "en": "Check Diagnostics"
+    },
+    "checkDesc": {
+      "vi": "Kiểm tra tài nguyên phần cứng và kết nối DB",
+      "en": "Checks hardware resources and database connections"
+    },
+    "toastSuccess": {
+      "vi": "Bảo trì Database thành công!",
+      "en": "Database maintenance executed successfully"
+    },
+    "toastFail": {
+      "vi": "Bảo trì Database thất bại!",
+      "en": "Failed to perform maintenance"
+    }
+  },
+  "converter": {
+    "title": {
+      "vi": "Bộ chuyển đổi địa chỉ",
+      "en": "Address Converter"
+    },
+    "label": {
+      "vi": "Địa chỉ AFTN/AMHS",
+      "en": "AFTN/AMHS Address"
+    },
+    "placeholder": {
+      "vi": "Ví dụ: FPL hoặc DAD",
+      "en": "e.g. FPL or DAD"
+    },
+    "submit": {
+      "vi": "Chuyển đổi địa chỉ",
+      "en": "Convert Address"
+    },
+    "result": {
+      "vi": "Kết quả",
+      "en": "Result"
+    },
+    "method": {
+      "vi": "Phương thức",
+      "en": "Method"
+    },
+    "noResult": {
+      "vi": "Không tìm thấy kết quả định tuyến",
+      "en": "No routing result"
+    },
+    "toastFail": {
+      "vi": "Chuyển đổi địa chỉ thất bại!",
+      "en": "Failed to convert address"
+    }
+  },
+  "settings": {
+    "title": {
+      "vi": "Cấu hình hệ thống",
+      "en": "System Settings"
+    },
+    "key": {
+      "vi": "Khóa cấu hình",
+      "en": "Config Key"
+    },
+    "value": {
+      "vi": "Giá trị",
+      "en": "Config Value"
+    },
+    "actions": {
+      "vi": "Thao tác",
+      "en": "Actions"
+    },
+    "noData": {
+      "vi": "Không có cấu hình nào được định nghĩa.",
+      "en": "No configurations defined."
+    },
+    "toast": {
+      "vi": "Cập nhật cấu hình thành công!",
+      "en": "Configuration updated successfully!"
+    },
+    "toastFail": {
+      "vi": "Cập nhật cấu hình thất bại!",
+      "en": "Failed to update configuration"
+    }
+  }
+}

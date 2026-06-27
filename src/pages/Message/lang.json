@@ -3,18 +3,32 @@
       "label": {
         "vi": "Nguồn",
         "en": "Source"
+      },
+      "swim": {
+        "vi": "SWIM → AMHS (Chiều vào)",
+        "en": "SWIM → AMHS (Inbound)"
+      },
+      "amhs": {
+        "vi": "AMHS → SWIM (Chiều ra)",
+        "en": "AMHS → SWIM (Outbound)"
       }
     },
     "filters": {
+      "callsign": {
+        "label": {
+          "vi": "Hô hiệu chuyến bay",
+          "en": "Callsign"
+        }
+      },
       "origin": {
         "label": {
-          "vi": "Nơi gửi",
+          "vi": "Địa chỉ phát",
           "en": "Origin"
         }
       },
       "address": {
         "label": {
-          "vi": "Địa chỉ",
+          "vi": "Địa chỉ nhận",
           "en": "Address"
         }
       },
@@ -47,6 +61,14 @@
       "filterButton": {
         "vi": "Lọc",
         "en": "Filter"
+      },
+      "showAdvanced": {
+        "vi": "Bộ lọc nâng cao",
+        "en": "Advanced Filters"
+      },
+      "hideAdvanced": {
+        "vi": "Thu gọn",
+        "en": "Collapse Filters"
       }
     },
     "table": {
@@ -60,16 +82,16 @@
           "en": "source"
         },
         "origin": {
-          "vi": "Nơi gửi",
+          "vi": "Địa chỉ phát",
           "en": "Origin"
         },
         "address": {
-          "vi": "Địa chỉ",
+          "vi": "Địa chỉ nhận",
           "en": "Address"
         },
         "textRaw": {
-          "vi": "Điện văn gốc",
-          "en": "Text Raw"
+          "vi": "Điện văn thô",
+          "en": "Raw Content"
         },
         "status": {
           "vi": "Trạng thái",
@@ -86,11 +108,11 @@
           "en": "Date"
         },
         "origin": {
-          "vi": "Nơi gửi",
+          "vi": "Địa chỉ phát",
           "en": "Origin"
         },
         "filingTime": {
-          "vi": "Thời gian bay",
+          "vi": "Giờ nạp điện văn",
           "en": "Filing Time"
         },
         "messageId": {
@@ -98,8 +120,8 @@
           "en": "Message ID"
         },
         "textRaw": {
-          "vi": "Điện văn gốc",
-          "en": "Text Raw"
+          "vi": "Điện văn thô",
+          "en": "Raw Content"
         },
         "status": {
           "vi": "Trạng thái",
@@ -127,8 +149,8 @@
     },
     "modal": {
       "title": {
-        "vi": "Chi tiết tin nhắn AMHS",
-        "en": "AMHS Message Detail"
+        "vi": "Chi tiết điện văn",
+        "en": "Message Detail"
       },
       "fields": {
         "messageId": {
@@ -140,15 +162,15 @@
           "en": "SUBJECT"
         },
         "origin": {
-          "vi": "NƠI GỬI",
+          "vi": "ĐỊA CHỈ PHÁT",
           "en": "ORIGIN"
         },
         "address": {
-          "vi": "ĐỊA CHỈ",
+          "vi": "ĐỊA CHỈ NHẬN",
           "en": "ADDRESS"
         },
         "source": {
-          "vi": "NGUỒN",
+          "vi": "NGUỒN DỮ LIỆU",
           "en": "SOURCE"
         },
         "addressingSource": {
@@ -164,7 +186,7 @@
           "en": "CONTENT TYPE"
         },
         "priority": {
-          "vi": "ƯU TIÊN",
+          "vi": "ĐỘ KHẨN",
           "en": "PRIORITY"
         },
         "time": {
@@ -174,6 +196,10 @@
         "errorType": {
           "vi": "LOẠI LỖI",
           "en": "ERROR TYPE"
+        },
+        "cpa": {
+          "vi": "KÝ TỰ ĐỘ KHẨN (CPA)",
+          "en": "CPA CHARACTER"
         }
       },
       "sections": {
@@ -219,11 +245,11 @@
     },
     "toast": {
       "fetchFailed": {
-        "vi": "Không thể tải dữ liệu tin nhắn",
+        "vi": "Không thể tải dữ liệu điện văn",
         "en": "Failed to load messages"
       },
       "copySuccess": {
-        "vi": "Đã sao chép vào clipboard",
+        "vi": "Đã sao chép vào bộ nhớ tạm",
         "en": "Copied to clipboard"
       },
       "copyFailed": {
@@ -233,12 +259,130 @@
     },
     "empty": {
       "title": {
-        "vi": "Không có tin nhắn nào",
+        "vi": "Không có điện văn nào",
         "en": "No messages found"
       },
       "description": {
-        "vi": "Không tìm thấy tin nhắn nào phù hợp với bộ lọc của bạn",
+        "vi": "Không tìm thấy điện văn nào phù hợp với bộ lọc của bạn",
         "en": "No messages match your filters"
+      }
+    },
+    "actions": {
+      "retry": {
+        "vi": "Gửi lại",
+        "en": "Retry"
+      },
+      "resolve": {
+        "vi": "Giải quyết",
+        "en": "Resolve"
+      },
+      "cancel": {
+        "vi": "Hủy bỏ",
+        "en": "Cancel"
+      },
+      "delete": {
+        "vi": "Xóa",
+        "en": "Delete"
+      },
+      "label": {
+        "vi": "Thao tác",
+        "en": "Actions"
+      }
+    },
+    "status": {
+      "ALL": {
+        "vi": "Tất cả",
+        "en": "All"
+      },
+      "PENDING": {
+        "vi": "Đang chờ",
+        "en": "Pending"
+      },
+      "PROCESSING": {
+        "vi": "Đang xử lý",
+        "en": "Processing"
+      },
+      "TRANSFORMED": {
+        "vi": "Đã chuyển đổi",
+        "en": "Transformed"
+      },
+      "PUBLISHED": {
+        "vi": "Đã truyền phát",
+        "en": "Published"
+      },
+      "SENT": {
+        "vi": "Đã gửi",
+        "en": "Sent"
+      },
+      "FAILED": {
+        "vi": "Lỗi",
+        "en": "Failed"
+      },
+      "UNROUTED": {
+        "vi": "Chờ định tuyến",
+        "en": "Unrouted"
+      },
+      "PUBLISHING": {
+        "vi": "Đang gửi",
+        "en": "Publishing"
+      },
+      "RESOLVED": {
+        "vi": "Đã giải quyết",
+        "en": "Resolved"
+      },
+      "CANCELLED": {
+        "vi": "Đã hủy",
+        "en": "Cancelled"
+      },
+      "UNKNOWN": {
+        "vi": "Không xác định",
+        "en": "Unknown"
+      }
+    },
+    "ops": {
+      "retrySuccess": {
+        "vi": "Đã lập lịch gửi lại điện văn thành công",
+        "en": "Queued for retry successfully"
+      },
+      "retryFailed": {
+        "vi": "Gửi lại điện văn thất bại",
+        "en": "Failed to retry message"
+      },
+      "resolveSuccess": {
+        "vi": "Đã đánh dấu giải quyết thành công",
+        "en": "Marked as resolved successfully"
+      },
+      "resolveFailed": {
+        "vi": "Đánh dấu giải quyết thất bại",
+        "en": "Failed to resolve message"
+      },
+      "cancelSuccess": {
+        "vi": "Đã hủy điện văn thành công",
+        "en": "Marked as cancelled successfully"
+      },
+      "cancelFailed": {
+        "vi": "Hủy điện văn thất bại",
+        "en": "Failed to cancel message"
+      },
+      "deleteConfirm": {
+        "vi": "Bạn có chắc chắn muốn xóa điện văn này? Hành động này không thể hoàn tác.",
+        "en": "Are you sure you want to delete this message? This action cannot be undone."
+      },
+      "deleteSuccess": {
+        "vi": "Xóa điện văn thành công",
+        "en": "Message deleted successfully"
+      },
+      "deleteFailed": {
+        "vi": "Xóa điện văn thất bại",
+        "en": "Failed to delete message"
+      },
+      "loading": {
+        "vi": "Đang tải danh sách...",
+        "en": "Loading messages..."
+      },
+      "noData": {
+        "vi": "Không tìm thấy điện văn",
+        "en": "No messages found"
       }
     }
 }

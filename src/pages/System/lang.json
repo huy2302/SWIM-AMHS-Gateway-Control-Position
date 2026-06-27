@@ -1,130 +1,144 @@
 {
-     "title": {
-      "vi": "Giám sát tài nguyên hệ thống",
-      "en": "System Resource Monitor"
-    },
-    "tabs": {
-      "cpu": {
-        "vi": "CPU",
-        "en": "CPU"
-      },
-      "memory": {
-        "vi": "Bộ nhớ",
-        "en": "Memory"
-      },
-      "mysql": {
-        "vi": "MySQL",
-        "en": "MySQL"
-      }
-    },
-    "charts": {
-      "cpu": {
-        "title": {
-          "vi": "Sử dụng CPU (%)",
-          "en": "CPU Usage (%)"
-        },
-        "legend": {
-          "process": {
-            "vi": "Process CPU Load",
-            "en": "Process CPU Load"
-          },
-          "system": {
-            "vi": "System CPU Load",
-            "en": "System CPU Load"
-          }
-        }
-      },
-      "memory": {
-        "title": {
-          "vi": "Sử dụng bộ nhớ Heap (MB)",
-          "en": "Console Heap Memory Usage (MB)"
-        },
-        "legend": {
-          "process": {
-            "vi": "Process Memory Used",
-            "en": "Process Memory Used"
-          },
-          "system": {
-            "vi": "System Memory Used",
-            "en": "System Memory Used"
-          }
-        }
-      },
-      "mysql": {
-        "connections": {
-          "title": {
-            "vi": "Kết nối MySQL",
-            "en": "MySQL Connections"
-          }
-        },
-        "cpu": {
-          "title": {
-            "vi": "Sử dụng CPU MySQL (%)",
-            "en": "MySQL CPU Usage (%)"
-          }
-        }
-      }
-    },
-    "info": {
-      "cpu": {
-        "information": {
-          "vi": "Thông tin CPU",
-          "en": "CPU Information"
-        },
-        "upTime": {
-          "vi": "Thời gian hoạt động",
-          "en": "Up Time"
-        },
-        "cores": {
-          "vi": "Lõi CPU",
-          "en": "CPU Cores"
-        },
-        "totalLoad": {
-          "vi": "Tổng tải hệ thống",
-          "en": "Total System Load"
-        },
-        "usedLoad": {
-          "vi": "Tải đã sử dụng",
-          "en": "Used load"
-        },
-        "coresFormat": {
-          "vi": "lõi / luồng",
-          "en": "cores / threads"
-        }
-      },
-      "memory": {
-        "inUseProcess": {
-          "vi": "Bộ nhớ Process đã dùng",
-          "en": "In use Process"
-        },
-        "inUseSystem": {
-          "vi": "Bộ nhớ hệ thống đã dùng",
-          "en": "In use System Memory"
-        },
-        "totalSystem": {
-          "vi": "Tổng bộ nhớ hệ thống",
-          "en": "Total System Memory"
-        }
-      }
-    },
-    "unit": {
-      "percent": {
-        "vi": "%",
-        "en": "%"
-      },
-      "mb": {
-        "vi": "MB",
-        "en": "MB"
-      }
-    },
-    "empty": {
+  "title": {
+    "vi": "Giám sát tài nguyên",
+    "en": "Resource Monitor"
+  },
+  "subtitle": {
+    "vi": "Giám sát hiệu năng hệ thống, tải tiến trình, bộ nhớ Heap và kết nối cơ sở dữ liệu.",
+    "en": "Live server resources, process loads, JVM heap statistics, and database connection metrics."
+  },
+  "refresh": {
+    "vi": "Chu kỳ làm mới: 2s",
+    "en": "Auto-refresh: 2s"
+  },
+  "charts": {
+    "cpu": {
       "title": {
-        "vi": "Không có dữ liệu",
-        "en": "No data available"
+        "vi": "Hiệu năng CPU",
+        "en": "CPU Utilization"
       },
-      "description": {
-        "vi": "Đang chờ dữ liệu từ hệ thống...",
-        "en": "Waiting for system data..."
+      "legend": {
+        "process": {
+          "vi": "CPU Tiến trình sử dụng",
+          "en": "Process CPU Load"
+        },
+        "system": {
+          "vi": "CPU Hệ thống sử dụng",
+          "en": "System CPU Load"
+        }
+      }
+    },
+    "memory": {
+      "title": {
+        "vi": "Phân bổ bộ nhớ",
+        "en": "Memory Allocation"
+      },
+      "legend": {
+        "process": {
+          "vi": "Bộ nhớ Tiến trình sử dụng",
+          "en": "Process Memory Used"
+        },
+        "system": {
+          "vi": "Bộ nhớ Hệ thống sử dụng",
+          "en": "System Memory Used"
+        }
+      }
+    },
+    "mysql": {
+      "connections": {
+        "title": {
+          "vi": "Kết nối Cơ sở dữ liệu",
+          "en": "Database Connections"
+        }
+      },
+      "cpu": {
+        "title": {
+          "vi": "CPU Cơ sở dữ liệu sử dụng",
+          "en": "Database CPU Usage"
+        }
       }
     }
+  },
+  "info": {
+    "cpu": {
+      "totalLoad": {
+        "vi": "Tải hệ thống",
+        "en": "Total System Load"
+      },
+      "processLoad": {
+        "vi": "Tải tiến trình",
+        "en": "Process Load"
+      },
+      "cpuInfo": {
+        "vi": "Thông tin CPU",
+        "en": "CPU Info"
+      },
+      "uptime": {
+        "vi": "Thời gian hoạt động",
+        "en": "System Uptime"
+      }
+    },
+    "memory": {
+      "processHeap": {
+        "vi": "Bộ nhớ tiến trình (Heap)",
+        "en": "Process Heap"
+      },
+      "systemUsed": {
+        "vi": "Hệ thống sử dụng",
+        "en": "System Used"
+      },
+      "totalRam": {
+        "vi": "Tổng RAM vật lý",
+        "en": "Total RAM"
+      }
+    },
+    "mysql": {
+      "activeConn": {
+        "vi": "Kết nối hoạt động",
+        "en": "Active Connections"
+      },
+      "status": {
+        "vi": "Trạng thái",
+        "en": "Status"
+      },
+      "dbCpuLoad": {
+        "vi": "Tải CPU CSDL",
+        "en": "Database CPU Load"
+      },
+      "pid": {
+        "vi": "Mã tiến trình (PID)",
+        "en": "Process ID"
+      }
+    }
+  },
+  "unit": {
+    "percent": {
+      "vi": "%",
+      "en": "%"
+    },
+    "mb": {
+      "vi": "MB",
+      "en": "MB"
+    }
+  },
+  "empty": {
+    "title": {
+      "vi": "Không có dữ liệu",
+      "en": "No data available"
+    },
+    "description": {
+      "vi": "Đang chờ dữ liệu từ hệ thống...",
+      "en": "Waiting for system data..."
+    }
+  },
+  "disks": {
+    "title": {
+      "vi": "Dung lượng Ổ đĩa & Phân vùng",
+      "en": "Disk Drives & Partitions"
+    },
+    "partition": {
+      "vi": "Phân vùng: ",
+      "en": "Partition: "
+    }
+  }
 }

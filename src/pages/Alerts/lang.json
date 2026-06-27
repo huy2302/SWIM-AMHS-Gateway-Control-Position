@@ -1,0 +1,152 @@
+{
+  "title": {
+    "vi": "Quản lý Cảnh báo",
+    "en": "Alerts Management"
+  },
+  "searchPlaceholder": {
+    "vi": "Tìm kiếm cảnh báo...",
+    "en": "Search alerts..."
+  },
+  "filterStatus": {
+    "ALL": {
+      "vi": "Tất cả",
+      "en": "All Alerts"
+    },
+    "ACTIVE": {
+      "vi": "Đang hoạt động",
+      "en": "Active"
+    },
+    "ACKNOWLEDGED": {
+      "vi": "Đã xác nhận",
+      "en": "Acknowledged"
+    },
+    "RESOLVED": {
+      "vi": "Đã xử lý xong",
+      "en": "Resolved"
+    }
+  },
+  "table": {
+    "time": {
+      "vi": "Thời gian phát sinh",
+      "en": "Time Raised"
+    },
+    "level": {
+      "vi": "Mức độ",
+      "en": "Severity"
+    },
+    "module": {
+      "vi": "Phân hệ phát sinh",
+      "en": "Module"
+    },
+    "message": {
+      "vi": "Nội dung cảnh báo",
+      "en": "Alert Message"
+    },
+    "ackBy": {
+      "vi": "Xác nhận bởi",
+      "en": "Ack By"
+    },
+    "resolvedAt": {
+      "vi": "Thời gian giải quyết",
+      "en": "Resolved Time"
+    },
+    "actions": {
+      "vi": "Thao tác",
+      "en": "Actions"
+    }
+  },
+  "severity": {
+    "CRITICAL": {
+      "vi": "Nghiêm trọng",
+      "en": "Critical"
+    },
+    "ERROR": {
+      "vi": "Lỗi",
+      "en": "Error"
+    },
+    "WARNING": {
+      "vi": "Cảnh báo",
+      "en": "Warning"
+    },
+    "WARN": {
+      "vi": "Cảnh báo",
+      "en": "Warning"
+    },
+    "INFO": {
+      "vi": "Thông tin",
+      "en": "Info"
+    }
+  },
+  "actions": {
+    "ack": {
+      "vi": "Xác nhận",
+      "en": "Acknowledge"
+    },
+    "resolve": {
+      "vi": "Đã giải quyết",
+      "en": "Resolve"
+    }
+  },
+  "messages": {
+    "loadError": {
+      "vi": "Không thể tải danh sách cảnh báo",
+      "en": "Failed to load alerts list"
+    },
+    "ackSuccess": {
+      "vi": "Xác nhận cảnh báo thành công",
+      "en": "Alert acknowledged successfully"
+    },
+    "ackFailed": {
+      "vi": "Xác nhận cảnh báo thất bại",
+      "en": "Failed to acknowledge alert"
+    },
+    "resolveSuccess": {
+      "vi": "Đã đánh dấu cảnh báo là đã giải quyết",
+      "en": "Alert marked as resolved successfully"
+    },
+    "resolveFailed": {
+      "vi": "Giải quyết cảnh báo thất bại",
+      "en": "Failed to resolve alert"
+    },
+    "bulkAckSuccess": {
+      "vi": "Đã xác nhận tất cả cảnh báo",
+      "en": "All alerts acknowledged successfully"
+    },
+    "bulkAckFailed": {
+      "vi": "Xác nhận hàng loạt thất bại",
+      "en": "Failed to bulk acknowledge alerts"
+    },
+    "bulkResolveSuccess": {
+      "vi": "Đã giải quyết tất cả cảnh báo",
+      "en": "All alerts resolved successfully"
+    },
+    "bulkResolveFailed": {
+      "vi": "Giải quyết hàng loạt thất bại",
+      "en": "Failed to bulk resolve alerts"
+    }
+  },
+  "buttons": {
+    "bulkAck": {
+      "vi": "Xác nhận tất cả",
+      "en": "Acknowledge All"
+    },
+    "bulkResolve": {
+      "vi": "Giải quyết tất cả",
+      "en": "Resolve All"
+    }
+  },
+  "state": {
+    "loading": {
+      "vi": "Đang tải danh sách cảnh báo...",
+      "en": "Loading alerts..."
+    },
+    "empty": {
+      "vi": "Không có cảnh báo hệ thống nào ở trạng thái này.",
+      "en": "No system alerts found in this state."
+    },
+    "resolved": {
+      "vi": "Đã xử lý",
+      "en": "Resolved"
+    }
+  }
+}

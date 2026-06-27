@@ -1,0 +1,40 @@
+{
+  "pagination": {
+    "page": {
+      "vi": "Trang",
+      "en": "Page"
+    },
+    "of": {
+      "vi": "trên",
+      "en": "of"
+    },
+    "items": {
+      "vi": "bản ghi",
+      "en": "items"
+    },
+    "rowsPerPage": {
+      "vi": "Số dòng mỗi trang:",
+      "en": "Rows per page:"
+    },
+    "previous": {
+      "vi": "Trước",
+      "en": "Previous"
+    },
+    "next": {
+      "vi": "Sau",
+      "en": "Next"
+    },
+    "routed": {
+      "vi": "Đã định tuyến",
+      "en": "Routed"
+    },
+    "unrouted": {
+      "vi": "Lỗi định tuyến",
+      "en": "Unrouted"
+    }
+  },
+  "noData": {
+    "vi": "Không có dữ liệu",
+    "en": "No data"
+  }
+}

@@ -25,7 +25,7 @@
         "en": "#"
       },
       "messageType": {
-        "vi": "Loại tin",
+        "vi": "Loại điện văn",
         "en": "Message Type"
       },
       "sendTopic": {
@@ -37,15 +37,15 @@
         "en": "Receive Topic"
       },
       "recipients": {
-        "vi": "Người nhận",
+        "vi": "Địa chỉ nhận",
         "en": "Recipients"
       },
       "originator": {
-        "vi": "Người gửi",
+        "vi": "Địa chỉ phát",
         "en": "Originator"
       },
       "priority": {
-        "vi": "Ưu tiên",
+        "vi": "Độ khẩn",
         "en": "Priority"
       },
       "active": {
@@ -185,7 +185,7 @@
         },
         "priority": {
           "label": {
-            "vi": "Ưu tiên (AMHS: SS=cao nhất, KK=thấp nhất)",
+            "vi": "Độ khẩn (AMHS: SS=cao nhất, KK=thấp nhất)",
             "en": "Priority (AMHS: SS=highest, KK=lowest)"
           },
           "options": {
@@ -245,7 +245,7 @@
         },
         "recipients": {
           "label": {
-            "vi": "Người nhận * (Danh sách AFTN address, cách nhau dấu cách)",
+            "vi": "Địa chỉ nhận * (Danh sách địa chỉ AFTN, phân cách bằng khoảng trắng)",
             "en": "Recipients * (List of AFTN addresses, space separated)"
           },
           "placeholder": {
@@ -255,7 +255,7 @@
         },
         "originator": {
           "label": {
-            "vi": "Người gửi (AFTN address)",
+            "vi": "Địa chỉ phát (Địa chỉ AFTN)",
             "en": "Originator (AFTN address)"
           },
           "placeholder": {
@@ -269,20 +269,50 @@
         },
         "priority": {
           "label": {
-            "vi": "Ưu tiên (SWIM: 0=cao nhất, 9=thấp nhất)",
+            "vi": "Độ khẩn (SWIM: 0=cao nhất, 9=thấp nhất)",
             "en": "Priority (SWIM: 0=highest, 9=lowest)"
           },
           "options": {
-            "0": "0 (SS/DD)",
-            "1": "1 (SS/DD)",
-            "2": "2 (FF)",
-            "3": "3 (FF)",
-            "4": "4 (GG)",
-            "5": "5 (GG)",
-            "6": "6 (GG)",
-            "7": "7 (KK)",
-            "8": "8 (KK)",
-            "9": "9 (KK)"
+            "0": {
+              "vi": "0 (SS/DD)",
+              "en": "0 (SS/DD)"
+            },
+            "1": {
+              "vi": "1 (SS/DD)",
+              "en": "1 (SS/DD)"
+            },
+            "2": {
+              "vi": "2 (FF)",
+              "en": "2 (FF)"
+            },
+            "3": {
+              "vi": "3 (FF)",
+              "en": "3 (FF)"
+            },
+            "4": {
+              "vi": "4 (GG)",
+              "en": "4 (GG)"
+            },
+            "5": {
+              "vi": "5 (GG)",
+              "en": "5 (GG)"
+            },
+            "6": {
+              "vi": "6 (GG)",
+              "en": "6 (GG)"
+            },
+            "7": {
+              "vi": "7 (KK)",
+              "en": "7 (KK)"
+            },
+            "8": {
+              "vi": "8 (KK)",
+              "en": "8 (KK)"
+            },
+            "9": {
+              "vi": "9 (KK)",
+              "en": "9 (KK)"
+            }
           }
         },
         "note": {
@@ -343,11 +373,26 @@
     },
     "priority": {
       "amhs": {
-        "ss": "SS (Cao nhất)",
-        "dd": "DD",
-        "ff": "FF (Bình thường)",
-        "gg": "GG",
-        "kk": "KK (Thấp nhất)"
+        "ss": {
+          "vi": "SS (Cao nhất)",
+          "en": "SS (Highest)"
+        },
+        "dd": {
+          "vi": "DD",
+          "en": "DD"
+        },
+        "ff": {
+          "vi": "FF (Bình thường)",
+          "en": "FF (Normal)"
+        },
+        "gg": {
+          "vi": "GG",
+          "en": "GG"
+        },
+        "kk": {
+          "vi": "KK (Thấp nhất)",
+          "en": "KK (Lowest)"
+        }
       }
     }
 }

@@ -19,6 +19,30 @@
     "vi": "Cập nhật lần cuối",
     "en": "Last updated"
   },
+  "notifications": {
+    "vi": "Thông báo",
+    "en": "Notifications"
+  },
+  "markAllRead": {
+    "vi": "Đánh dấu tất cả đã đọc",
+    "en": "Mark all read"
+  },
+  "seeAllHistory": {
+    "vi": "Xem tất cả lịch sử",
+    "en": "See all history"
+  },
+  "noNotifications": {
+    "vi": "Không có thông báo mới",
+    "en": "No notifications"
+  },
+  "noNotify": {
+    "vi": "Không có sự kiện nào",
+    "en": "No events found"
+  },
+  "loading": {
+    "vi": "Đang tải...",
+    "en": "Loading..."
+  },
 
   "health": {
     "title": {
@@ -53,11 +77,11 @@
 
   "amhsSent": {
     "title": {
-      "vi": "AMHS đã gửi",
-      "en": "AMHS Sent"
+      "vi": "Chiều gửi đi AMHS (SWIM → AMHS)",
+      "en": "Inbound to AMHS (SWIM → AMHS)"
     },
     "total": {
-      "vi": "Tổng",
+      "vi": "Tổng số",
       "en": "Total"
     },
     "pending": {
@@ -69,11 +93,11 @@
       "en": "Convert Success"
     },
     "publishSuccess": {
-      "vi": "Publish thành công",
-      "en": "Publish Success"
+      "vi": "Truyền phát thành công",
+      "en": "Sent Success"
     },
     "error": {
-      "vi": "Lỗi",
+      "vi": "Lỗi xử lý",
       "en": "Error"
     },
     "successRate": {
@@ -84,11 +108,11 @@
 
   "amqpSent": {
     "title": {
-      "vi": "AMQP đã gửi",
-      "en": "AMQP Sent"
+      "vi": "Chiều gửi đi SWIM (AMHS → SWIM)",
+      "en": "Outbound to SWIM (AMHS → SWIM)"
     },
     "total": {
-      "vi": "Tổng",
+      "vi": "Tổng số",
       "en": "Total"
     },
     "pending": {
@@ -100,15 +124,15 @@
       "en": "Convert Success"
     },
     "sentSuccess": {
-      "vi": "Gửi thành công",
+      "vi": "Truyền phát thành công",
       "en": "Sent Success"
     },
     "noRouting": {
-      "vi": "Không tìm thấy tuyến",
+      "vi": "Lỗi định tuyến",
       "en": "No Routing"
     },
     "error": {
-      "vi": "Lỗi",
+      "vi": "Lỗi xử lý",
       "en": "Error"
     }
   },
@@ -312,6 +336,94 @@
     "undefined": {
       "vi": "Không xác định",
       "en": "Undefined"
+    }
+  },
+  "channels": {
+    "title": {
+      "vi": "Trạng thái kết nối kênh",
+      "en": "Channel Connection Status"
+    },
+    "amqp": {
+      "vi": "Kênh AMQP (SWIM)",
+      "en": "AMQP Channels"
+    },
+    "amhs": {
+      "vi": "Kênh AMHS (X.400)",
+      "en": "AMHS/X.400 Channels"
+    },
+    "noConfig": {
+      "vi": "Chưa cấu hình kênh",
+      "en": "No channels configured"
+    },
+    "connected": {
+      "vi": "Kết nối",
+      "en": "Connected"
+    },
+    "disconnected": {
+      "vi": "Mất kết nối",
+      "en": "Disconnected"
+    },
+    "connectedCount": {
+      "vi": "kênh đang kết nối",
+      "en": "channels connected"
+    },
+    "disconnectedCount": {
+      "vi": "kênh mất kết nối",
+      "en": "channels disconnected"
+    }
+  },
+
+  "hero": {
+    "errors": {
+      "vi": "lỗi",
+      "en": "errors"
+    },
+    "unrouted": {
+      "vi": "chờ định tuyến",
+      "en": "awaiting routing"
+    }
+  },
+
+  "trafficCard": {
+    "swimToAmhs": {
+      "vi": "SWIM → AMHS (Luồng vào)",
+      "en": "SWIM → AMHS (Inbound)"
+    },
+    "amhsToSwim": {
+      "vi": "AMHS → SWIM (Luồng ra)",
+      "en": "AMHS → SWIM (Outbound)"
+    },
+    "messages": {
+      "vi": "điện văn",
+      "en": "messages"
+    },
+    "pending": {
+      "vi": "Đang chờ xử lý",
+      "en": "Pending"
+    },
+    "converted": {
+      "vi": "Chuyển đổi thành công",
+      "en": "Converted"
+    },
+    "convertFailed": {
+      "vi": "Lỗi chuyển đổi",
+      "en": "Conversion failed"
+    },
+    "unrouted": {
+      "vi": "Chờ định tuyến",
+      "en": "Awaiting routing"
+    },
+    "sent": {
+      "vi": "Đã gửi thành công",
+      "en": "Sent successfully"
+    },
+    "failed": {
+      "vi": "Lỗi xử lý",
+      "en": "Processing error"
+    },
+    "successRate": {
+      "vi": "Tỷ lệ gửi thành công",
+      "en": "Delivery success rate"
     }
   }
 }

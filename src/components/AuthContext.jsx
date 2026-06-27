@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Helper functions
-  const isAdmin = () => user?.role === 'admin';
+  const isAdmin = () => user?.role?.toLowerCase() === 'admin';
   const getUsername = () => user?.username;
   const getRole = () => user?.role;
 

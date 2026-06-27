@@ -5,8 +5,8 @@
     },
     "toolbar": {
       "clear": {
-        "vi": "Xóa",
-        "en": "Clear"
+        "vi": "Xóa Logs",
+        "en": "Clear Logs"
       },
       "copy": {
         "vi": "Sao chép",
@@ -21,8 +21,8 @@
         "en": "Update"
       },
       "searchPlaceholder": {
-        "vi": "Tìm kiếm Message ID...",
-        "en": "Search Message ID..."
+        "vi": "Tìm kiếm (ID, Nội dung, Nguồn gửi...)",
+        "en": "Search Log (ID, Content, Origin...)"
       }
     },
     "table": {
@@ -31,12 +31,20 @@
         "en": "#"
       },
       "time": {
-        "vi": "THỜI GIAN",
-        "en": "TIME"
+        "vi": "THỜI GIAN CHUYỂN DẪN",
+        "en": "CONVERTED TIME"
       },
       "dir": {
-        "vi": "HƯỚNG",
-        "en": "DIR"
+        "vi": "HƯỚNG CHUYỂN ĐỔI",
+        "en": "CONVERSION"
+      },
+      "mtsId": {
+        "vi": "MTS ID",
+        "en": "MTS ID"
+      },
+      "ipmId": {
+        "vi": "IPM ID",
+        "en": "IPM ID"
       },
       "msgId": {
         "vi": "MSG ID",
@@ -51,12 +59,12 @@
         "en": "PRIO"
       },
       "message": {
-        "vi": "TIN NHẮN",
-        "en": "MESSAGE"
+        "vi": "NỘI DUNG",
+        "en": "CONTENT"
       },
-      "topic": {
-        "vi": "TOPIC",
-        "en": "TOPIC"
+      "origin": {
+        "vi": "NGUỒN GỬI",
+        "en": "ORIGIN"
       },
       "status": {
         "vi": "TRẠNG THÁI",
@@ -64,53 +72,25 @@
       }
     },
     "status": {
+      "ok": {
+        "vi": "THÀNH CÔNG",
+        "en": "OK"
+      },
+      "error": {
+        "vi": "LỖI HỆ THỐNG",
+        "en": "ERROR"
+      },
+      "reject": {
+        "vi": "BỊ TỪ CHỐI",
+        "en": "REJECT"
+      },
+      "unrouted": {
+        "vi": "CHƯA ĐỊNH TUYẾN",
+        "en": "UNROUTED"
+      },
       "success": {
         "vi": "THÀNH CÔNG",
         "en": "SUCCESS"
-      },
-      "ackReceived": {
-        "vi": "ĐÃ NHẬN ACK",
-        "en": "ACK_RECEIVED"
-      },
-      "waitingAck": {
-        "vi": "ĐANG CHỜ ACK",
-        "en": "WAITING_ACK"
-      },
-      "sending": {
-        "vi": "ĐANG GỬI",
-        "en": "SENDING"
-      },
-      "validating": {
-        "vi": "ĐANG XÁC THỰC",
-        "en": "VALIDATING"
-      },
-      "routing": {
-        "vi": "ĐANG ĐỊNH TUYẾN",
-        "en": "ROUTING"
-      },
-      "transforming": {
-        "vi": "ĐANG CHUYỂN ĐỔI",
-        "en": "TRANSFORMING"
-      },
-      "routingFailed": {
-        "vi": "ĐỊNH TUYẾN THẤT BẠI",
-        "en": "ROUTING_FAILED"
-      },
-      "validationFailed": {
-        "vi": "XÁC THỰC THẤT BẠI",
-        "en": "VALIDATION_FAILED"
-      },
-      "transformationFailed": {
-        "vi": "CHUYỂN ĐỔI THẤT BẠI",
-        "en": "TRANSFORMATION_FAILED"
-      },
-      "sendFailed": {
-        "vi": "GỬI THẤT BẠI",
-        "en": "SEND_FAILED"
-      },
-      "ackTimeout": {
-        "vi": "HẾT THỜI GIAN CHỜ ACK",
-        "en": "ACK_TIMEOUT"
       },
       "failed": {
         "vi": "THẤT BẠI",
@@ -119,12 +99,12 @@
     },
     "direction": {
       "out": {
-        "vi": "RA",
-        "en": "OUT"
+        "vi": "RA (AMHS → SWIM)",
+        "en": "OUT (AMHS → SWIM)"
       },
       "in": {
-        "vi": "VÀO",
-        "en": "IN"
+        "vi": "VÀO (SWIM → AMHS)",
+        "en": "IN (SWIM → AMHS)"
       }
     },
     "priority": {
@@ -151,20 +131,72 @@
     },
     "preview": {
       "title": {
-        "vi": "Chi tiết nhật ký",
-        "en": "Log Detail"
+        "vi": "Chi tiết nhật ký chuyển đổi",
+        "en": "Conversion Log Detail"
       },
-      "messageId": {
-        "vi": "Message ID:",
-        "en": "Message ID:"
+      "mtsId": {
+        "vi": "MTS ID:",
+        "en": "MTS ID:"
       },
-      "payload": {
-        "vi": "Payload:",
-        "en": "Payload:"
+      "ipmId": {
+        "vi": "IPM ID:",
+        "en": "IPM ID:"
+      },
+      "amqpMessageId": {
+        "vi": "AMQP Message ID:",
+        "en": "AMQP Message ID:"
+      },
+      "convertedTime": {
+        "vi": "Thời gian chuyển:",
+        "en": "Converted Time:"
+      },
+      "status": {
+        "vi": "Trạng thái:",
+        "en": "Status:"
+      },
+      "direction": {
+        "vi": "Chiều chuyển đổi:",
+        "en": "Direction:"
+      },
+      "priority": {
+        "vi": "Độ ưu tiên:",
+        "en": "Priority:"
+      },
+      "origin": {
+        "vi": "Nguồn gửi:",
+        "en": "Origin:"
+      },
+      "subject": {
+        "vi": "Tiêu đề:",
+        "en": "Subject:"
+      },
+      "actionTaken": {
+        "vi": "Hành động xử lý:",
+        "en": "Action Taken:"
+      },
+      "nonDeliveryReason": {
+        "vi": "Lý do lỗi (Reason):",
+        "en": "NDR Reason:"
+      },
+      "nonDeliveryDiagnostic": {
+        "vi": "Lỗi chi tiết (Diagnostic):",
+        "en": "NDR Diagnostic:"
+      },
+      "supplementaryInfo": {
+        "vi": "Thông tin bổ sung:",
+        "en": "Supplementary Info:"
+      },
+      "remark": {
+        "vi": "Ghi chú:",
+        "en": "Remark:"
+      },
+      "content": {
+        "vi": "Nội dung chuyển đổi:",
+        "en": "Converted Content:"
       },
       "error": {
-        "vi": "Lỗi:",
-        "en": "Error:"
+        "vi": "Lỗi phát sinh:",
+        "en": "Error Details:"
       },
       "noData": {
         "vi": "Không có dữ liệu",
@@ -173,8 +205,8 @@
     },
     "toast": {
       "copied": {
-        "vi": "Đã sao chép vào clipboard!",
-        "en": "Copied to clipboard!"
+        "vi": "Đã sao chép chi tiết nhật ký vào clipboard!",
+        "en": "Copied log details to clipboard!"
       },
       "fetchFailed": {
         "vi": "Không thể tải dữ liệu nhật ký",

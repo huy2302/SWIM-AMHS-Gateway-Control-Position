@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://192.168.22.188:8180/api', // Đổi port nếu Spring Boot chạy port khác
+  baseURL: import.meta.env.VITE_API_URL || 'http://192.168.22.160:8180/api', // Đổi port nếu Spring Boot chạy port khác
   headers: {
     'Content-Type': 'application/json',
   },
@@ -25,8 +25,8 @@ export const authUtils = {
         ? Date.parse(authData.expiresAt)
         : authData.expiresAt
       : authData.token
-      ? parseJwtExpiry(authData.token)
-      : Date.now() + 3600 * 1000;
+        ? parseJwtExpiry(authData.token)
+        : Date.now() + 3600 * 1000;
 
     const savedAuth = {
       ...authData,
@@ -103,53 +103,36 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    console.error('❌ API Error:', error.config?.url, error.response?.status, error.response?.data);
+    console.error('❌ API Error:', originalRequest?.url, error.response?.status, error.response?.data);
+
+    const isAuthEndpoint =
+      originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/refresh');
+
+    if (isAuthEndpoint) {
+      return Promise.reject(error);
+    }
 
     // Nếu gặp lỗi 401 và chưa retry, thử refresh token
-    axiosClient.interceptors.response.use(
-      (response) => response.data,
-      async (error) => {
-        const originalRequest = error.config;
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-        const isAuthEndpoint =
-          originalRequest?.url?.includes('/auth/login') ||
-          originalRequest?.url?.includes('/auth/refresh');
+      try {
+        const refreshResponse = await axiosClient.post('/auth/refresh');
+        const auth = authUtils.getAuth();
 
-        if (isAuthEndpoint) {
-          return Promise.reject(error);
-        }
+        authUtils.saveAuth({
+          ...auth,
+          token: refreshResponse.token,
+        });
 
-        if (
-          error.response?.status === 401 &&
-          !originalRequest._retry
-        ) {
-          originalRequest._retry = true;
-
-          try {
-            const refreshResponse =
-              await axiosClient.post('/auth/refresh');
-
-            const auth = authUtils.getAuth();
-
-            authUtils.saveAuth({
-              ...auth,
-              token: refreshResponse.token,
-            });
-
-            originalRequest.headers.Authorization =
-              `Bearer ${refreshResponse.token}`;
-
-            return axiosClient(originalRequest);
-
-          } catch (refreshError) {
-            authUtils.removeAuth();
-            window.location.href = '/login';
-          }
-        }
-
-        return Promise.reject(error);
+        originalRequest.headers.Authorization = `Bearer ${refreshResponse.token}`;
+        return axiosClient(originalRequest);
+      } catch (refreshError) {
+        authUtils.removeAuth();
+        window.location.href = '/login';
       }
-    );
+    }
 
     return Promise.reject(error);
   }

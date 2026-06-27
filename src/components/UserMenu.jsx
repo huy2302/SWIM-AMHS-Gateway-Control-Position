@@ -46,7 +46,7 @@ const UserMenu = () => {
         <div className="hidden md:block text-left">
           <p className="text-sm font-medium">{user?.username || "User"}</p>
           <p className="text-xs text-gray-500">
-            {user?.role === "admin" ? "Quản trị viên" : "Người dùng"}
+            {user?.role?.toLowerCase() === "admin" ? "Quản trị viên" : "Người dùng"}
           </p>
         </div>
       </button>
@@ -62,7 +62,7 @@ const UserMenu = () => {
             <div className="px-4 py-3 border-b border-gray-100">
               <p className="text-sm font-semibold">{user?.username}</p>
               <p className="text-xs text-gray-500">
-                Vai trò: {user?.role === "admin" ? "Administrator" : "User"}
+                Vai trò: {user?.role?.toLowerCase() === "admin" ? "Administrator" : "User"}
               </p>
               {user?.expiresIn && (
                 <p className="text-xs text-gray-400 mt-1">
@@ -73,7 +73,8 @@ const UserMenu = () => {
 
             <button
               onClick={() => {
-                /* navigate to profile */ setIsOpen(false);
+                navigate("/settings", { state: { tab: "profile" } });
+                setIsOpen(false);
               }}
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
             >
@@ -83,7 +84,8 @@ const UserMenu = () => {
 
             <button
               onClick={() => {
-                /* navigate to settings */ setIsOpen(false);
+                navigate("/settings", { state: { tab: "security" } });
+                setIsOpen(false);
               }}
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
             >

@@ -4,7 +4,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import RoutingView from "./pages/Routing/Routing";
 import FullLogView from "./pages/Log/FullLogView";
 import MessageView from "./pages/Message/MessageView";
-import AdminView from "./pages/AdminView";
+import ConfigView from "./pages/Config/ConfigView";
 import SystemMonitorView from "./pages/System/SystemMonitorView";
 import Login from "./components/Login";
 // import NewGatewayDashboard from "./pages/NewGatewayDashboard";
@@ -18,9 +18,13 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { AuthProvider } from "./components/AuthContext";
-import SystemEvents from "./pages/SystemEventsView";
+import SystemEvents from "./pages/SystemEvents/SystemEventsView";
 import { authApi } from "./api/authApi";
 import LoginPage from "./pages/Login/LoginPage";
+import UserManagement from "./pages/User/UserManagement";
+import UnroutedQueue from "./pages/Unrouted/UnroutedQueue";
+import AlertsView from "./pages/Alerts/AlertsView";
+import Settings from "./pages/Settings/Settings";
 
 /**
  * Main App component that sets up routing for the Swim Monitor application.
@@ -62,16 +66,20 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
 
           <Route element={<RequireAuth />}>
-            <Route index element={<Navigate to="/monitor" replace />} />
-            <Route path="monitor" element={<Dashboard />} />
-            <Route path="dashboard" element={<Navigate to="/monitor" replace />} />
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="monitor" element={<Navigate to="/dashboard" replace />} />
             <Route path="accounts" element={<Account />} />
             <Route path="routing" element={<RoutingView />} />
             <Route path="log" element={<FullLogView />} />
             <Route path="messages" element={<MessageView />} />
-            <Route path="admin" element={<AdminView />} />
+            <Route path="config" element={<ConfigView />} />
             <Route path="system" element={<SystemMonitorView />} />
             <Route path="system-events" element={<SystemEvents />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="unrouted" element={<UnroutedQueue />} />
+            <Route path="alerts" element={<AlertsView />} />
+            <Route path="settings" element={<Settings />} />
             <Route path="login1" element={<LoginPage />} />
           </Route>
 

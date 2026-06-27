@@ -5,7 +5,7 @@ import gatewayApi from "@/api/gatewayApi";
 import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 
-export default function AdminView() {
+export default function ConfigView() {
   const [loading, setLoading] = useState(false);
   const [configs, setConfigs] = useState([]);
   const [editingConfigKey, setEditingConfigKey] = useState(null);

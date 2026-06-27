@@ -194,6 +194,152 @@ const gatewayApi = {
   postReadAllNotify: async (userId) => {
     return axiosClient.put(`/user-system-history/user/${userId}/read-all`);
   },
+
+  // --- 5. USER MANAGEMENT (Quản lý người dùng và vai trò) ---
+  getUsers: (params) => {
+    return axiosClient.get('/users', { params });
+  },
+
+  createUser: (data) => {
+    return axiosClient.post('/users', data);
+  },
+
+  updateUser: (id, data) => {
+    return axiosClient.put(`/users/${id}`, data);
+  },
+
+  deleteUser: (id) => {
+    return axiosClient.delete(`/users/${id}`);
+  },
+
+  activateUser: (id) => {
+    return axiosClient.put(`/users/${id}/activate`);
+  },
+
+  deactivateUser: (id) => {
+    return axiosClient.put(`/users/${id}/deactivate`);
+  },
+
+  getUserRoles: () => {
+    return axiosClient.get('/metadata/roles');
+  },
+
+  getMessageTypes: () => {
+    return axiosClient.get('/metadata/message-types');
+  },
+
+  // --- 6. UNROUTED QUEUE & STATISTICS (Quản lý hàng đợi định tuyến lỗi) ---
+  getUnroutedMessages: (params) => {
+    return axiosClient.get('/addressing/unrouted', { params });
+  },
+
+  manualRoute: (msgid, data) => {
+    return axiosClient.post(`/addressing/unrouted/${msgid}/route`, data);
+  },
+
+  rejectUnrouted: (msgid, data) => {
+    return axiosClient.post(`/addressing/unrouted/${msgid}/reject`, data);
+  },
+
+  batchRouteUnrouted: (data) => {
+    return axiosClient.post('/addressing/unrouted/batch-route', data);
+  },
+
+  getAddressingDistribution: (period) => {
+    return axiosClient.get('/addressing/stats/distribution', { params: { period } });
+  },
+
+  getAddressingSuccessRate: (period) => {
+    return axiosClient.get('/addressing/stats/success-rate', { params: { period } });
+  },
+
+  // --- 7. ALERTS MANAGEMENT (Quản lý cảnh báo lỗi) ---
+  getAlerts: () => {
+    return axiosClient.get('/alerts');
+  },
+
+  getAlertsByStatus: (status) => {
+    return axiosClient.get(`/alerts/status/${status}`);
+  },
+
+  acknowledgeAlert: (id) => {
+    return axiosClient.put(`/alerts/${id}/ack`);
+  },
+
+  resolveAlert: (id) => {
+    return axiosClient.put(`/alerts/${id}/resolve`);
+  },
+
+  bulkAcknowledgeAlerts: () => {
+    return axiosClient.put('/alerts/bulk-ack');
+  },
+
+  bulkResolveAlerts: () => {
+    return axiosClient.put('/alerts/bulk-resolve');
+  },
+
+  // --- 8. SYSTEM CONFIGURATION (Quản lý cấu hình cổng) ---
+  getConfigs: () => {
+    return axiosClient.get('/config');
+  },
+
+  getConfig: (key) => {
+    return axiosClient.get(`/config/${key}`);
+  },
+
+  updateConfig: (key, value) => {
+    return axiosClient.put(`/config/${key}`, { value });
+  },
+
+  // --- 9. MESSAGE OPERATIONS (Thao tác trên điện văn) ---
+  retryInboundMessage: (id) => {
+    return axiosClient.post(`/messages/inbound/${id}/retry`);
+  },
+
+  resolveInboundMessage: (id) => {
+    return axiosClient.post(`/messages/inbound/${id}/resolve`);
+  },
+
+  cancelInboundMessage: (id) => {
+    return axiosClient.post(`/messages/inbound/${id}/cancel`);
+  },
+
+  deleteInboundMessage: (id) => {
+    return axiosClient.delete(`/messages/inbound/${id}`);
+  },
+
+  retryOutboundMessage: (id) => {
+    return axiosClient.post(`/messages/outbound/${id}/retry`);
+  },
+
+  resolveOutboundMessage: (id) => {
+    return axiosClient.post(`/messages/outbound/${id}/resolve`);
+  },
+
+  cancelOutboundMessage: (id) => {
+    return axiosClient.post(`/messages/outbound/${id}/cancel`);
+  },
+
+  deleteOutboundMessage: (id) => {
+    return axiosClient.delete(`/messages/outbound/${id}`);
+  },
+
+  // --- 10. SYSTEM MAINTENANCE & DIAGNOSTICS (Bảo trì và chẩn đoán) ---
+  deleteOldData: () => {
+    return axiosClient.delete('/admin/data/old', { data: {} });
+  },
+
+  runMaintenance: () => {
+    return axiosClient.post('/admin/maintenance');
+  },
+
+  getDiagnostics: () => {
+    return axiosClient.post('/admin/diagnostic');
+  },
+
+  convertAddress: (address) => {
+    return axiosClient.post('/admin/address/convert', { address });
+  },
 };
 
 export default gatewayApi;

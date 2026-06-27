@@ -1,0 +1,152 @@
+{
+  "title": {
+    "vi": "Quản lý người dùng",
+    "en": "User Management"
+  },
+  "searchPlaceholder": {
+    "vi": "Tìm kiếm theo tên đăng nhập hoặc email...",
+    "en": "Search by username or email..."
+  },
+  "addUser": {
+    "vi": "Thêm người dùng",
+    "en": "Add User"
+  },
+  "editUser": {
+    "vi": "Sửa thông tin",
+    "en": "Edit User"
+  },
+  "table": {
+    "username": {
+      "vi": "Tên đăng nhập",
+      "en": "Username"
+    },
+    "fullName": {
+      "vi": "Họ và tên",
+      "en": "Full Name"
+    },
+    "email": {
+      "vi": "Email",
+      "en": "Email"
+    },
+    "role": {
+      "vi": "Vai trò",
+      "en": "Role"
+    },
+    "status": {
+      "vi": "Trạng thái",
+      "en": "Status"
+    },
+    "lastLogin": {
+      "vi": "Đăng nhập cuối",
+      "en": "Last Login"
+    },
+    "actions": {
+      "vi": "Thao tác",
+      "en": "Actions"
+    }
+  },
+  "status": {
+    "active": {
+      "vi": "Hoạt động",
+      "en": "Active"
+    },
+    "inactive": {
+      "vi": "Vô hiệu hóa",
+      "en": "Disabled"
+    }
+  },
+  "roles": {
+    "ADMIN": {
+      "vi": "Quản trị viên",
+      "en": "Administrator"
+    },
+    "OPERATOR": {
+      "vi": "Nhân viên vận hành",
+      "en": "Operator"
+    },
+    "USER": {
+      "vi": "Người dùng xem tin",
+      "en": "Viewer"
+    },
+    "admin": {
+      "vi": "Quản trị viên",
+      "en": "Administrator"
+    },
+    "operator": {
+      "vi": "Nhân viên vận hành",
+      "en": "Operator"
+    },
+    "user": {
+      "vi": "Người dùng xem tin",
+      "en": "Viewer"
+    }
+  },
+  "dialog": {
+    "username": {
+      "vi": "Tên đăng nhập",
+      "en": "Username"
+    },
+    "fullName": {
+      "vi": "Họ và tên",
+      "en": "Full Name"
+    },
+    "email": {
+      "vi": "Email",
+      "en": "Email"
+    },
+    "password": {
+      "vi": "Mật khẩu",
+      "en": "Password"
+    },
+    "passwordHelp": {
+      "vi": "Để trống nếu không muốn thay đổi mật khẩu",
+      "en": "Leave blank if you don't want to change password"
+    },
+    "role": {
+      "vi": "Vai trò",
+      "en": "Role"
+    },
+    "cancel": {
+      "vi": "Hủy",
+      "en": "Cancel"
+    },
+    "save": {
+      "vi": "Lưu",
+      "en": "Save"
+    }
+  },
+  "messages": {
+    "loadSuccess": {
+      "vi": "Tải danh sách người dùng thành công",
+      "en": "Users list loaded successfully"
+    },
+    "loadError": {
+      "vi": "Không thể tải danh sách người dùng",
+      "en": "Failed to load users list"
+    },
+    "createSuccess": {
+      "vi": "Đã thêm người dùng mới thành công",
+      "en": "New user created successfully"
+    },
+    "updateSuccess": {
+      "vi": "Đã cập nhật thông tin thành công",
+      "en": "User updated successfully"
+    },
+    "deleteSuccess": {
+      "vi": "Đã xóa người dùng thành công",
+      "en": "User deleted successfully"
+    },
+    "deleteConfirmTitle": {
+      "vi": "Xóa tài khoản người dùng?",
+      "en": "Delete user account?"
+    },
+    "deleteConfirmMsg": {
+      "vi": "Bạn có chắc muốn xóa tài khoản này không? Hành động này không thể hoàn tác.",
+      "en": "Are you sure you want to delete this account? This action cannot be undone."
+    },
+    "statusSuccess": {
+      "vi": "Đã thay đổi trạng thái hoạt động thành công",
+      "en": "User status updated successfully"
+    }
+  }
+}

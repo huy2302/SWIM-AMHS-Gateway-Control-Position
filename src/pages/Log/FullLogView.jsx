@@ -3,46 +3,103 @@ import {
   XCircle,
   Copy,
   RefreshCcw,
-  Calendar,
   Search,
-  Loader2
+  Loader2,
+  FileText
 } from "lucide-react";
-import {
-  Box,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  TextField,
-  IconButton,
-  Tooltip,
-  Chip,
-  Alert,
-  Snackbar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  CircularProgress,
-  useTheme,
-  alpha
-} from "@mui/material";
+import toast from "react-hot-toast";
 import DashboardLayout from "@/layout/DashboardLayout";
 import gatewayApi from "@/api/gatewayApi";
+import TablePagination from "@/components/TablePagination";
+import { t } from "@/i18n/translator";
+
+const getStatusStyle = (status) => {
+  if (!status) return "bg-slate-50 text-slate-600 border-slate-200/60";
+
+  switch (status.toUpperCase()) {
+    case "OK":
+    case "SUCCESS":
+    case "ACK_RECEIVED":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200/50";
+    case "WAITING_ACK":
+    case "SENDING":
+    case "VALIDATING":
+    case "ROUTING":
+    case "TRANSFORMING":
+      return "bg-sky-50 text-sky-700 border-sky-200/50";
+    case "UNROUTED":
+    case "ROUTING_FAILED":
+      return "bg-amber-50 text-amber-700 border-amber-200/50";
+    case "ERROR":
+    case "REJECT":
+    case "FAILED":
+    case "VALIDATION_FAILED":
+    case "TRANSFORMATION_FAILED":
+    case "SEND_FAILED":
+    case "ACK_TIMEOUT":
+      return "bg-rose-50 text-rose-700 border-rose-200/50";
+    default:
+      return "bg-slate-50 text-slate-600 border-slate-200/50";
+  }
+};
+
+const getStatusLabel = (status) => {
+  if (!status) return "-";
+  const statusKey = status.toLowerCase();
+  const label = t(`log.status.${statusKey}`);
+  return label !== `log.status.${statusKey}` ? label : status.toUpperCase();
+};
+
+const getPriorityStyle = (priority) => {
+  if (!priority) return "text-slate-400";
+  const p = priority.toUpperCase();
+  if (p.startsWith("SS")) return "text-rose-600 font-bold";
+  if (p.startsWith("DD")) return "text-amber-600 font-bold";
+  if (p.startsWith("FF")) return "text-yellow-600 font-bold";
+  if (p.startsWith("GG")) return "text-cyan-600 font-bold";
+  if (p.startsWith("KK")) return "text-slate-400 font-bold";
+  return "text-slate-500";
+};
+
+const getDirectionStyle = (dir) => {
+  if (dir === "OUT") return "text-sky-600 bg-sky-50 border-sky-100";
+  if (dir === "IN") return "text-purple-600 bg-purple-50 border-purple-100";
+  return "text-slate-500 bg-slate-50 border-slate-100";
+};
+
+const getDirectionLabel = (dir) => {
+  if (dir === "OUT") return t("log.direction.out");
+  if (dir === "IN") return t("log.direction.in");
+  return dir || "-";
+};
+
+const isErrorStatus = (status) => {
+  if (!status) return false;
+  const s = status.toUpperCase();
+  return [
+    'FAILED',
+    'ERROR',
+    'REJECT',
+    'VALIDATION_FAILED',
+    'ROUTING_FAILED',
+    'TRANSFORMATION_FAILED',
+    'SEND_FAILED',
+    'ACK_TIMEOUT'
+  ].includes(s);
+};
 
 const FullLogView = () => {
-  const theme = useTheme();
   const [logs, setLogs] = useState([]);
   const [selectedLog, setSelectedLog] = useState(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
-  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const pageSize = 15;
 
-  // Hàm lấy dữ liệu từ API
+  useEffect(() => {
+    setPage(0);
+  }, [searchTerm]);
+
   const fetchLogs = useCallback(async () => {
     try {
       setLoading(true);
@@ -50,11 +107,7 @@ const FullLogView = () => {
       setLogs(response?.content || []);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu log:", error);
-      setSnackbar({
-        open: true,
-        message: 'Failed to fetch logs',
-        severity: 'error'
-      });
+      toast.error(t("log.toast.fetchFailed"));
     } finally {
       setLoading(false);
     }
@@ -66,24 +119,28 @@ const FullLogView = () => {
     return () => clearInterval(interval);
   }, [fetchLogs]);
 
-  // Lọc dữ liệu
+  // Lọc dữ liệu theo trường thực tế của MessageConversionLog
   const filteredLogs = logs.filter(log => {
     if (!searchTerm) return true;
     
     const searchLower = searchTerm.toLowerCase();
     
-    // Tìm kiếm trên các field có sẵn
     return (
       log.amqpMessageId?.toLowerCase().includes(searchLower) ||
       log.ipmId?.toLowerCase().includes(searchLower) ||
       log.mtsId?.toLowerCase().includes(searchLower) ||
+      log.messageId?.toLowerCase().includes(searchLower) ||
       log.content?.toLowerCase().includes(searchLower) ||
-      log.raw_content?.toLowerCase().includes(searchLower) ||
       log.subject?.toLowerCase().includes(searchLower) ||
       log.type?.toLowerCase().includes(searchLower) ||
+      log.category?.toLowerCase().includes(searchLower) ||
       log.status?.toLowerCase().includes(searchLower) ||
       log.origin?.toLowerCase().includes(searchLower) ||
-      log.recipients?.toLowerCase().includes(searchLower) ||
+      log.actionTaken?.toLowerCase().includes(searchLower) ||
+      log.nonDeliveryReason?.toLowerCase().includes(searchLower) ||
+      log.nonDeliveryDiagnostic?.toLowerCase().includes(searchLower) ||
+      log.supplementaryInfo?.toLowerCase().includes(searchLower) ||
+      log.remark?.toLowerCase().includes(searchLower) ||
       log.referenceId?.toString().includes(searchLower) ||
       log.id?.toString().includes(searchLower)
     );
@@ -91,361 +148,335 @@ const FullLogView = () => {
 
   const handleCopy = () => {
     if (selectedLog) {
-      navigator.clipboard.writeText(
-        `${selectedLog.createdAt} [${selectedLog.status}] ${selectedLog.payload || selectedLog.messageId}`
-      );
-      setSnackbar({
-        open: true,
-        message: 'Copied to clipboard!',
-        severity: 'success'
-      });
+      const timeStr = selectedLog.convertedTime ? new Date(selectedLog.convertedTime).toLocaleString() : "";
+      const statusStr = selectedLog.status || "";
+      const messageId = selectedLog.messageId || selectedLog.mtsId || selectedLog.ipmId || selectedLog.amqpMessageId || "";
+      const dirStr = `${selectedLog.type || ""} (${selectedLog.category || ""})`;
+      
+      const copyParts = [
+        `ID: ${selectedLog.id}`,
+        `Time: ${timeStr}`,
+        `Direction: ${dirStr}`,
+        `Status: ${statusStr}`,
+        `MsgId/MtsId/IpmId: ${messageId}`,
+        `Origin: ${selectedLog.origin || ""}`,
+        `Action: ${selectedLog.actionTaken || ""}`
+      ];
+      if (selectedLog.nonDeliveryReason) {
+        copyParts.push(`Reason: ${selectedLog.nonDeliveryReason}`);
+      }
+      copyParts.push(`Content: ${selectedLog.content || ""}`);
+      
+      const copyText = copyParts.join(" | ");
+      navigator.clipboard.writeText(copyText);
+      toast.success(t("log.toast.copied"));
     }
   };
 
   const handleClear = () => {
     setLogs([]);
-    setSnackbar({
-      open: true,
-      message: 'Logs cleared',
-      severity: 'info'
-    });
-  };
-
-  const getStatusColor = (status, isSelected = false) => {
-    if (isSelected) return '#ffffff'; // Thay 'white' thành '#ffffff'
-    
-    const colors = {
-      'SUCCESS': '#4ade80',
-      'ACK_RECEIVED': '#4ade80',
-      'WAITING_ACK': '#60a5fa',
-      'SENDING': '#60a5fa',
-      'VALIDATING': '#60a5fa',
-      'ROUTING': '#60a5fa',
-      'TRANSFORMING': '#60a5fa',
-      'ROUTING_FAILED': '#fbbf24',
-      'VALIDATION_FAILED': '#f87171',
-      'TRANSFORMATION_FAILED': '#f87171',
-      'SEND_FAILED': '#f87171',
-      'ACK_TIMEOUT': '#f87171',
-      'FAILED': '#f87171',
-    };
-    return colors[status] || '#9ca3af'; // Màu mặc định thay vì 'white'
-  };
-
-  const getPriorityColor = (priority) => {
-    if (!priority) return '#9ca3af';
-    if (priority.startsWith('SS')) return '#ef4444';
-    if (priority.startsWith('DD')) return '#fb923c';
-    if (priority.startsWith('FF')) return '#facc15';
-    if (priority.startsWith('GG')) return '#22d3ee';
-    if (priority.startsWith('KK')) return '#9ca3af';
-    return '#ffffff';
-  };
-
-  const getDirectionColor = (dir) => {
-    switch (dir) {
-      case 'OUT': return '#60a5fa';
-      case 'IN': return '#a78bfa';
-      default: return '#9ca3af';
-    }
-  };
-
-  const isErrorStatus = (status) => {
-    return [
-      'FAILED',
-      'VALIDATION_FAILED',
-      'ROUTING_FAILED',
-      'TRANSFORMATION_FAILED',
-      'SEND_FAILED',
-      'ACK_TIMEOUT'
-    ].includes(status);
-  };
-
-  const getRowBackground = (status, isSelected) => {
-    if (isSelected && isErrorStatus(status)) {
-      return alpha('#ef4444', 0.6);
-    }
-    if (isSelected) {
-      return alpha('#3b82f6', 0.6);
-    }
-    if (isErrorStatus(status)) {
-      return alpha('#ef4444', 0.05);
-    }
-    return 'transparent';
+    setSelectedLog(null);
+    toast.success(t("log.toast.noLogs"));
   };
 
   return (
     <DashboardLayout>
-      <Box sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100vh',
-        bgcolor: '#f1f5f9'
-      }}>
+      <div className="flex flex-col gap-4">
         {/* TOOLBAR */}
-        <Box sx={{ 
-          bgcolor: '#F1F5F9', 
-          p: 2, 
-          borderBottom: '1px solid #1e293b',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Tooltip title="Clear logs">
-              <IconButton 
-                onClick={handleClear}
-                sx={{ 
-                  color: '#6b7077',
-                  '&:hover': { color: '#ef4444', bgcolor: alpha('#ef4444', 0.1) }
-                }}
-              >
-                <XCircle size={18} />
-              </IconButton>
-            </Tooltip>
+        <div className="flex flex-wrap justify-between items-center bg-white border border-slate-200/80 p-4 rounded-xl shadow-xs gap-4">
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={handleClear}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg shadow-xs transition-all duration-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 active:scale-95 cursor-pointer"
+            >
+              <XCircle size={15}/>
+              {t("log.toolbar.clear")}
+            </button>
+            <button 
+              onClick={handleCopy}
+              disabled={!selectedLog}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg shadow-xs transition-all duration-200 hover:bg-indigo-50 hover:text-indigo-600 hover:border-indigo-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-slate-600 disabled:hover:border-slate-200 cursor-pointer"
+            >
+              <Copy size={15}/>
+              {t("log.toolbar.copy")}
+            </button>
+            <button 
+              onClick={fetchLogs}
+              disabled={loading}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 rounded-lg shadow-xs transition-all duration-200 hover:bg-slate-50 hover:text-blue-600 active:scale-95 disabled:opacity-50 cursor-pointer"
+            >
+              {loading ? (
+                <Loader2 className="animate-spin text-blue-500" size={15}/>
+              ) : (
+                <RefreshCcw size={15}/>
+              )}
+              {t("log.toolbar.update")}
+            </button>
+          </div>
 
-            <Box sx={{ width: 1, height: 24, bgcolor: '#1e293b', mx: 2 }} />
-
-            <Tooltip title="Copy selected log">
-              <IconButton 
-                onClick={handleCopy}
-                // disabled={!selectedLog}
-                sx={{ 
-                  color: '#6b7077',
-                  '&:hover': { color: '#60a5fa', bgcolor: alpha('#3b82f6', 0.1) },
-                  '&.Mui-disabled': { opacity: 0.2 }
-                }}
-              >
-                <Copy size={18} />
-              </IconButton>
-            </Tooltip>
-
-            <Box sx={{ width: 1, height: 24, bgcolor: '#1e293b', mx: 2 }} />
-
-            <Tooltip title="Today's logs">
-              <IconButton sx={{ color: '#6b7077', '&:hover': { color: '#60a5fa' } }}>
-                <Calendar size={18} />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip title="Refresh logs">
-              <IconButton 
-                onClick={fetchLogs}
-                disabled={loading}
-                sx={{ 
-                  color: '#6b7077',
-                  '&:hover': { color: '#60a5fa' },
-                  '&.Mui-disabled': { opacity: 0.5 }
-                }}
-              >
-                {loading ? (
-                  <CircularProgress size={18} sx={{ color: '#60a5fa' }} />
-                ) : (
-                  <RefreshCcw size={18} />
-                )}
-              </IconButton>
-            </Tooltip>
-          </Box>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <TextField
-              size="small"
-              placeholder="Search Message ID..."
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={15} />
+            <input
+              type="text"
+              placeholder={t("log.toolbar.searchPlaceholder")}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  bgcolor: alpha('#c4c9d0', 0.3),
-                  color: '#000000',
-                  borderRadius: 1,
-                  '& fieldset': { borderColor: '#1e293b' },
-                  '&:hover fieldset': { borderColor: '#334155' },
-                  '&.Mui-focused fieldset': { borderColor: '#3b82f6' }
-                },
-                '& .MuiInputBase-input': {
-                  fontSize: '0.75rem',
-                  py: 0.75,
-                  width: '8rem',
-                  '&:focus': { width: '12rem' }
-                }
-              }}
-              InputProps={{
-                startAdornment: <Search size={14} style={{ color: '#64748b', marginRight: 8 }} />
-              }}
+              className="pl-9 pr-4 py-2 border border-slate-200 bg-slate-50/50 rounded-lg text-xs w-64 outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium text-slate-800"
             />
-          </Box>
-        </Box>
+          </div>
+        </div>
 
-        {/* TABLE */}
-        <Box sx={{ flex: 1, overflow: 'auto', bgcolor: '#f1f5f9', position: 'relative' }}>
-          <TableContainer component={Paper} sx={{ 
-            maxHeight: '100%', 
-            bgcolor: 'transparent',
-            boxShadow: 'none'
-          }}>
-            <Table stickyHeader sx={{ minWidth: 650 }}>
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>#</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>TIME</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>DIR</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>MTS ID</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>IPM ID</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>TYPE</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>PRIO</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>MESSAGE</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>ORIGIN</TableCell>
-                  <TableCell sx={{ bgcolor: 'white', fontWeight: 600, color: '#64748b', borderBottom: '1px solid #e2e8f0' }}>STATUS</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredLogs.map((log) => {
-                  const isSelected = selectedLog?.id === log.id;
-                  const bgColor = getRowBackground(log.processingStatus, isSelected);
-                  const textColor = isSelected ? 'white' : 'inherit';
-                  
-                  return (
-                    <TableRow
-                      key={log.id}
-                      onClick={() => setSelectedLog(log)}
-                      hover
-                      sx={{
-                        cursor: 'pointer',
-                        borderBottom: '1px solid #e2e8f0',
-                        bgcolor: bgColor,
-                        '&:hover': {
-                          bgcolor: isSelected ? bgColor : alpha('#cbd5e1', 0.5)
-                        },
-                        '& td': {
-                          color: textColor,
-                          fontSize: '0.6875rem'
-                        }
-                      }}
-                    >
-                      <TableCell>{log.id}</TableCell>
-                      <TableCell>{new Date(log?.createdTime).toLocaleString()}</TableCell>
-                      <TableCell sx={{ color: getDirectionColor(log.direction), fontWeight: 600 }}>
-                        {log.direction}
-                      </TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace' }}>{log.mtsId}</TableCell>
-                      <TableCell sx={{ fontFamily: 'monospace' }}>{log.ipmId}</TableCell>
-                      <TableCell>{log.type}</TableCell>
-                      <TableCell>
-                        <Typography sx={{ 
-                          color: getPriorityColor(log.amhs_priority),
-                          fontWeight: 'bold'
-                        }}>
-                          {`${log.amhs_priority || '-'} (${log.swim_priority ?? '-'})`}
-                        </Typography>
-                      </TableCell>
-                      <TableCell 
-                        sx={{ 
-                          maxWidth: 250, 
-                          overflow: 'hidden', 
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                        title={log.errorMessage}
-                      >
-                        {log.raw_content}
-                      </TableCell>
-                      <TableCell 
-                        sx={{ 
-                          maxWidth: 220, 
-                          overflow: 'hidden', 
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                        title={log.origin}
-                      >
-                        {log.origin || '-'}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={log.status}
-                          size="small"
-                          sx={{
-                            bgcolor: alpha(getStatusColor(log.status, isSelected), 0.15),
-                            color: getStatusColor(log.status, isSelected),
-                            fontWeight: 'bold',
-                            fontSize: '0.625rem',
-                            height: 20,
-                            '& .MuiChip-label': { px: 1 }
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-                {filteredLogs.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={9} align="center" sx={{ py: 8 }}>
-                      <Typography color="textSecondary">
-                        {loading ? 'Loading logs...' : 'No logs found'}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
+        {/* MAIN LAYOUT SPLIT */}
+        <div className="flex gap-4 items-start">
+          {/* TABLE CONTAINER */}
+          <div className="flex-1 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr className="bg-slate-50 text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.id")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.time")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.dir")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.mtsId")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.ipmId")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.type")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.prio")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.message")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.origin")}</th>
+                    <th className="px-4 py-3 font-semibold text-xs">{t("log.table.status")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredLogs.length === 0 ? (
+                    <tr>
+                      <td colSpan={10} className="text-center py-8 text-slate-400 font-medium">
+                        {loading ? 'Loading logs...' : t("log.empty.title")}
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredLogs.slice(page * pageSize, (page + 1) * pageSize).map((log) => {
+                      const isSelected = selectedLog?.id === log.id;
+                      const isError = isErrorStatus(log.status);
+                      
+                      return (
+                        <tr
+                          key={log.id}
+                          onClick={() => setSelectedLog(log)}
+                          className={`cursor-pointer transition-all duration-150 border-b border-slate-100 ${
+                            isSelected
+                              ? isError 
+                                ? "bg-rose-100 hover:bg-rose-200/70 text-slate-900" 
+                                : "bg-blue-50/90 text-slate-900 font-semibold ring-1 ring-blue-100/50"
+                              : isError
+                                ? "bg-rose-50/30 hover:bg-rose-50/80 text-rose-950"
+                                : "hover:bg-slate-50 text-slate-700"
+                          }`}
+                        >
+                          <td className="px-4 py-3 font-semibold text-slate-500">{log.id}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            {log.convertedTime ? new Date(log.convertedTime).toLocaleString() : ""}
+                          </td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${getDirectionStyle(log.category)}`}>
+                              {getDirectionLabel(log.category)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 font-mono text-[11px] truncate max-w-[120px]" title={log.mtsId}>
+                            {log.mtsId || "-"}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-[11px] truncate max-w-[120px]" title={log.ipmId}>
+                            {log.ipmId || "-"}
+                          </td>
+                          <td className="px-4 py-3 font-medium text-center">{log.type}</td>
+                          <td className="px-4 py-3 whitespace-nowrap">
+                            <span className={`${getPriorityStyle(log.priority)}`}>
+                              {log.priority || '-'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 max-w-[200px] truncate" title={log.content}>
+                            {log.content}
+                          </td>
+                          <td className="px-4 py-3 max-w-[150px] truncate font-medium text-slate-500" title={log.origin}>
+                            {log.origin || "-"}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusStyle(log.status)}`}>
+                              {getStatusLabel(log.status)}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+            <TablePagination
+              page={page}
+              totalPages={Math.ceil(filteredLogs.length / pageSize)}
+              onPageChange={setPage}
+              totalItems={filteredLogs.length}
+            />
+          </div>
+
+          {/* PREVIEW PANEL */}
+          {selectedLog && (
+            <div className="w-[480px] bg-white border border-slate-200 rounded-xl p-5 shadow-xs shrink-0 flex flex-col gap-4 self-start sticky top-4 max-h-[calc(100vh-140px)] overflow-y-auto custom-scrollbar">
+              <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <FileText className="text-indigo-600" size={16} />
+                  <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">{t("log.preview.title")}</h3>
+                </div>
+                <button 
+                  onClick={() => setSelectedLog(null)} 
+                  className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                >
+                  <XCircle size={18}/>
+                </button>
+              </div>
+              
+              <div className="flex flex-col gap-3 text-xs">
+                <div className="flex justify-between border-b border-slate-50 pb-2">
+                  <span className="font-semibold text-slate-400">Log ID:</span>
+                  <span className="font-mono text-slate-800 font-semibold text-right">#{selectedLog.id}</span>
+                </div>
+                
+                {selectedLog.referenceId && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">Reference ID:</span>
+                    <span className="font-mono text-slate-800 text-right">{selectedLog.referenceId}</span>
+                  </div>
                 )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
 
-        {/* PREVIEW PANEL */}
-        {selectedLog && (
-          <Box sx={{ 
-            bgcolor: '#0f172a', 
-            borderTop: '2px solid #3b82f6',
-            p: 2,
-            maxHeight: 200,
-            overflow: 'auto'
-          }}>
-            <Typography sx={{ 
-              fontSize: '0.625rem', 
-              fontWeight: 'bold', 
-              color: '#60a5fa',
-              textTransform: 'uppercase',
-              mb: 1
-            }}>
-              Log Detail
-            </Typography>
-            <Box sx={{ 
-              bgcolor: alpha('#000000', 0.4),
-              p: 1.5,
-              borderRadius: 1,
-              border: '1px solid #1e293b'
-            }}>
-              <Typography sx={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
-                <strong>Message ID:</strong> {selectedLog.messageId}
-              </Typography>
-              <Typography sx={{ fontSize: '0.75rem', color: '#cbd5e1', mt: 0.5 }}>
-                <strong>Payload:</strong> {selectedLog.payload}
-              </Typography>
-              {selectedLog.errorMessage && (
-                <Typography sx={{ fontSize: '0.75rem', color: '#f87171', mt: 0.5 }}>
-                  <strong>Error:</strong> {selectedLog.errorMessage}
-                </Typography>
-              )}
-            </Box>
-          </Box>
-        )}
+                {selectedLog.messageId && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">Message ID:</span>
+                    <span className="font-mono text-slate-800 text-right break-all max-w-[280px]" title={selectedLog.messageId}>
+                      {selectedLog.messageId}
+                    </span>
+                  </div>
+                )}
 
-        {/* SNACKBAR NOTIFICATION */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={3000}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Alert 
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
-            severity={snackbar.severity}
-            sx={{ width: '100%' }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      </Box>
+                {selectedLog.mtsId && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">{t("log.preview.mtsId")}</span>
+                    <span className="font-mono text-slate-800 text-right break-all max-w-[280px]" title={selectedLog.mtsId}>
+                      {selectedLog.mtsId}
+                    </span>
+                  </div>
+                )}
+
+                {selectedLog.ipmId && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">{t("log.preview.ipmId")}</span>
+                    <span className="font-mono text-slate-800 text-right break-all max-w-[280px]" title={selectedLog.ipmId}>
+                      {selectedLog.ipmId}
+                    </span>
+                  </div>
+                )}
+
+                {selectedLog.amqpMessageId && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">{t("log.preview.amqpMessageId")}</span>
+                    <span className="font-mono text-slate-800 text-right break-all max-w-[280px]" title={selectedLog.amqpMessageId}>
+                      {selectedLog.amqpMessageId}
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex justify-between border-b border-slate-50 pb-2">
+                  <span className="font-semibold text-slate-400">{t("log.preview.convertedTime")}</span>
+                  <span className="text-slate-800 font-medium">
+                    {selectedLog.convertedTime ? new Date(selectedLog.convertedTime).toLocaleString() : "-"}
+                  </span>
+                </div>
+
+                <div className="flex justify-between border-b border-slate-50 pb-2">
+                  <span className="font-semibold text-slate-400">{t("log.preview.status")}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${getStatusStyle(selectedLog.status)}`}>
+                    {getStatusLabel(selectedLog.status)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between border-b border-slate-50 pb-2">
+                  <span className="font-semibold text-slate-400">{t("log.preview.direction")}</span>
+                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold border ${getDirectionStyle(selectedLog.category)}`}>
+                    {selectedLog.type} ({getDirectionLabel(selectedLog.category)})
+                  </span>
+                </div>
+
+                <div className="flex justify-between border-b border-slate-50 pb-2">
+                  <span className="font-semibold text-slate-400">{t("log.preview.priority")}</span>
+                  <span className={`text-xs font-semibold ${getPriorityStyle(selectedLog.priority)}`}>
+                    {selectedLog.priority || '-'}
+                  </span>
+                </div>
+
+                <div className="flex justify-between border-b border-slate-50 pb-2">
+                  <span className="font-semibold text-slate-400">{t("log.preview.origin")}</span>
+                  <span className="text-slate-700 font-medium truncate max-w-[280px]" title={selectedLog.origin}>
+                    {selectedLog.origin || "-"}
+                  </span>
+                </div>
+
+                {selectedLog.subject && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">{t("log.preview.subject")}</span>
+                    <span className="text-slate-700 font-medium truncate max-w-[280px]" title={selectedLog.subject}>
+                      {selectedLog.subject}
+                    </span>
+                  </div>
+                )}
+
+                {selectedLog.actionTaken && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">{t("log.preview.actionTaken")}</span>
+                    <span className="text-slate-700 font-semibold">{selectedLog.actionTaken}</span>
+                  </div>
+                )}
+
+                {selectedLog.nonDeliveryReason && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-rose-500">{t("log.preview.nonDeliveryReason")}</span>
+                    <span className="text-rose-700 font-mono font-medium">{selectedLog.nonDeliveryReason}</span>
+                  </div>
+                )}
+
+                {selectedLog.nonDeliveryDiagnostic && (
+                  <div className="flex justify-between border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-rose-500">{t("log.preview.nonDeliveryDiagnostic")}</span>
+                    <span className="text-rose-700 font-mono font-medium">{selectedLog.nonDeliveryDiagnostic}</span>
+                  </div>
+                )}
+
+                {selectedLog.supplementaryInfo && (
+                  <div className="flex flex-col gap-1 border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">{t("log.preview.supplementaryInfo")}</span>
+                    <span className="text-slate-700 break-words">{selectedLog.supplementaryInfo}</span>
+                  </div>
+                )}
+
+                {selectedLog.remark && (
+                  <div className="flex flex-col gap-1 border-b border-slate-50 pb-2">
+                    <span className="font-semibold text-slate-400">{t("log.preview.remark")}</span>
+                    <span className="text-slate-700 break-words">{selectedLog.remark}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* MESSAGE CONTENT VIEW */}
+              <div className="flex flex-col gap-3.5 mt-1 pt-3 border-t border-slate-100">
+                <div>
+                  <span className="font-semibold text-slate-500 block mb-1.5 text-[11px]">{t("log.preview.content")}</span>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 font-mono text-[11px] text-slate-800 whitespace-pre-wrap max-h-48 overflow-y-auto custom-scrollbar">
+                    {selectedLog.content || "No content available"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </DashboardLayout>
   );
 };

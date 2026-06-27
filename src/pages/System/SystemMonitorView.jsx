@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  LineChart,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -9,13 +7,16 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  Legend
+  Legend,
+  BarChart,
+  Bar
 } from "recharts";
 import {
-  LayoutGrid,
+  LayoutGrid
 } from "lucide-react";
 import DashboardLayout from "@/layout/DashboardLayout";
 import { useSelector } from "react-redux";
+import { t } from "@/i18n/translator";
 
 const generateData = () =>
   [...Array(20)].map((_, i) => ({
@@ -46,9 +47,7 @@ const toChartPoint = (gatewayCp, mysql, prevTime) => {
 };
 
 const SystemMonitorView = () => {
-  const [activeTab, setActiveTab] = useState("CPU");
   const [data, setData] = useState(generateData());
-  const [refreshInterval, setRefreshInterval] = useState(2);
   const { GatewayProcess, Mysql } = useSelector((state) => state.system);
   
   useEffect(() => {
@@ -60,303 +59,221 @@ const SystemMonitorView = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col h-full bg-slate-100 text-slate-900 p-4 gap-4 overflow-y-auto">
-        {/* Grid Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_8fr] gap-4 flex-1">
-          {/* Tab Switcher */}
-          <div className="flex flex-col gap-2">
-            <button
-              onClick={() => setActiveTab("CPU")}
-              className={`flex flex-col items-start gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                activeTab === "CPU" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-              }`}
-            >
-              CPU
-              {GatewayProcess?.processCpuLoad >= 0 && (
-                <span className="text-[12px] text-green-500 font-light">
-                  {GatewayProcess?.processCpuLoad?.toFixed(2)}%
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("Memory")}
-              className={`flex flex-col items-start gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                activeTab === "Memory" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-              }`}
-            >
-              Memory
-              {GatewayProcess?.usedPhysicalMemoryMb >= 0 && (
-                <span className="text-[12px] text-green-500 font-light">
-                  {GatewayProcess?.usedPhysicalMemoryMb}/{GatewayProcess?.totalPhysicalMemoryMb} MB
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("MySQL")}
-              className={`flex flex-col items-start gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                activeTab === "MySQL" ? "bg-white text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
-              }`}
-            >
-              MySQL
-            </button>
-          </div>
-          <div>
-            {activeTab === "CPU" && (
-              <ChartCard title="CPU Usage (%)" color="#ef4444" unit="%" data={data} type={activeTab} card={GatewayProcess}>
-                <AreaChart data={data}>
-                  <defs>
-                    <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                    </linearGradient>
+      <div className="flex flex-col gap-6">
 
-                    <linearGradient id="colorSystem" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#1e293b"
-                    vertical={false}
-                  />
-                  <XAxis dataKey="time" hide />
-                  <YAxis
-                    stroke="#475569"
-                    fontSize={10} 
-                    unit="%" 
-                    domain={[0, 100]} 
-                    ticks={[0, 25, 50, 75, 100]} 
-                    allowDataOverflow={true} 
-                  />
-                  <Legend 
-                    verticalAlign="top" 
-                    align="right"
-                    iconType="circle"
-                    iconSize={10}
-                    wrapperStyle={{
-                      paddingBottom: "20px",
-                      fontSize: "12px",
-                      color: "#94a3b8"
-                    }}
-                    formatter={(value) => <span style={{ color: '#cbd5e1' }}>{value}</span>}
-                  />
-                  <Tooltip
-                    useTranslate3d={true}
-                    isAnimationActive={false}
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #d1d5db",
-                      color: "#0f172a",
-                      fontSize: "10px",
-                    }}
-                  />
-                  {/* Đường thứ nhất: Process CPU */}
-                  <Area
-                    type="monotone"
-                    dataKey="processCpuLoad"
-                    name="Process CPU Load"
-                    stroke="#ef4444"
-                    fillOpacity={1}
-                    fill="url(#colorCpu)"
-                    isAnimationActive={false}
-                  />
+        {/* First Row: CPU & Memory side-by-side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartCard title={t("systemMonitor.charts.cpu.title")} color="#ef4444" type="CPU" card={GatewayProcess}>
+            <AreaChart data={data}>
+              <defs>
+                <linearGradient id="colorCpu" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorSystem" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="time" hide />
+              <YAxis stroke="#94a3b8" fontSize={10} unit="%" domain={[0, 100]} />
+              <Legend verticalAlign="top" align="right" iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px", paddingBottom: "10px" }} />
+              <Tooltip contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} />
+              <Area type="monotone" dataKey="processCpuLoad" name={t("systemMonitor.charts.cpu.legend.process")} stroke="#ef4444" strokeWidth={2} fill="url(#colorCpu)" isAnimationActive={false} />
+              <Area type="monotone" dataKey="systemCpuLoad" name={t("systemMonitor.charts.cpu.legend.system")} stroke="#3b82f6" strokeWidth={2} fill="url(#colorSystem)" isAnimationActive={false} />
+            </AreaChart>
+          </ChartCard>
 
-                  {/* Đường thứ hai: System CPU */}
-                  <Area
-                    type="monotone"
-                    dataKey="systemCpuLoad"
-                    name="System CPU Load"
-                    stroke="#3b82f6"
-                    fill="url(#colorSystem)"
-                    fillOpacity={1}
-                    isAnimationActive={false}
-                    dot={false}
-                  />
-                </AreaChart>
-              </ChartCard>
-            )}
-
-            {activeTab === "Memory" && (
-              <ChartCard
-                title="Console Heap Memory Usage (MB)"
-                color="#eab308"
-                unit="MB"
-                data={data}
-                type={activeTab}
-                card={GatewayProcess}
-              >
-                <LineChart data={data}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    stroke="#cbd5e1"
-                    vertical={false}
-                  />
-                  <XAxis dataKey="time" hide />
-                  <YAxis 
-                    stroke="#64748b" 
-                    fontSize={10} 
-                    domain={[0, GatewayProcess?.totalPhysicalMemoryMb || 0]} 
-                    allowDataOverflow={true}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      border: "1px solid #d1d5db",
-                      color: "#0f172a",
-                      fontSize: "10px",
-                    }}
-                  />
-                  <Line
-                    type="stepAfter"
-                    dataKey="heapUsedMb"
-                    name="Process Memory Used"
-                    stroke="#eab308"
-                    dot={false}
-                    isAnimationActive={false}
-                    strokeWidth={2}
-                  />
-
-                  <Line
-                    type="stepAfter"
-                    dataKey="usedPhysicalMemoryMb"
-                    stroke="#3b34ff"
-                    name="System Memory Used"
-                    dot={false}
-                    isAnimationActive={false}
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ChartCard>
-            )}
-
-            {activeTab === "MySQL" && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <ChartCard
-                  title="MySQL Connections"
-                  color="#3b82f6"
-                  unit=""
-                  data={data}
-                  type={activeTab}
-                >
-                  <BarChartCustom data={data} dataKey="mysqlConnections" color="#3b82f6" />
-                </ChartCard>
-
-                <ChartCard
-                  title="MySQL CPU Usage (%)"
-                  color="#10b981"
-                  unit="%"
-                  data={data}
-                  type={activeTab}
-                >
-                  <BarChartCustom data={data} dataKey="mysqlCpu" color="#10b981" />
-                </ChartCard>
-              </div>
-            )}
-          </div>
+          <ChartCard title={t("systemMonitor.charts.memory.title")} color="#f59e0b" type="Memory" card={GatewayProcess}>
+            <AreaChart data={data}>
+              <defs>
+                <linearGradient id="colorHeap" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorSysMem" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="time" hide />
+              <YAxis stroke="#94a3b8" fontSize={10} domain={[0, GatewayProcess?.totalPhysicalMemoryMb || 16384]} />
+              <Legend verticalAlign="top" align="right" iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px", paddingBottom: "10px" }} />
+              <Tooltip contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} />
+              <Area type="monotone" dataKey="heapUsedMb" name={t("systemMonitor.charts.memory.legend.process")} stroke="#f59e0b" strokeWidth={2} fill="url(#colorHeap)" isAnimationActive={false} />
+              <Area type="monotone" dataKey="usedPhysicalMemoryMb" name={t("systemMonitor.charts.memory.legend.system")} stroke="#8b5cf6" strokeWidth={2} fill="url(#colorSysMem)" isAnimationActive={false} />
+            </AreaChart>
+          </ChartCard>
         </div>
+
+        {/* Second Row: MySQL Connections & CPU Load side-by-side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ChartCard title={t("systemMonitor.charts.mysql.connections.title")} color="#3b82f6" type="MySQL_Conn" card={Mysql}>
+            <BarChartCustom data={data} dataKey="mysqlConnections" color="#3b82f6" />
+          </ChartCard>
+
+          <ChartCard title={t("systemMonitor.charts.mysql.cpu.title")} color="#10b981" type="MySQL_CPU" card={Mysql}>
+            <AreaChart data={data}>
+              <defs>
+                <linearGradient id="colorMysqlCpu" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+              <XAxis dataKey="time" hide />
+              <YAxis stroke="#94a3b8" fontSize={10} unit="%" domain={[0, 100]} />
+              <Tooltip contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} />
+              <Area type="monotone" dataKey="mysqlCpu" name={t("systemMonitor.charts.mysql.cpu.title")} stroke="#10b981" strokeWidth={2} fill="url(#colorMysqlCpu)" isAnimationActive={false} />
+            </AreaChart>
+          </ChartCard>
+        </div>
+
+        {/* Third Row: Physical Disk space and partition info */}
+        {GatewayProcess?.disks && GatewayProcess.disks.length > 0 && (
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs">
+            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
+              {t("systemMonitor.disks.title")}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {GatewayProcess.disks.map((disk, idx) => (
+                <div key={idx} className="border border-slate-100 rounded-xl p-4 bg-slate-50/30">
+                  <div className="flex justify-between items-start mb-3 pb-2 border-b border-slate-100">
+                    <div>
+                      <p className="text-xs font-bold text-slate-700">{disk.model || disk.name}</p>
+                      <p className="text-[10px] text-slate-400 font-medium">Serial: {disk.serial || "N/A"} | Size: {(disk.sizeBytes / (1024 * 1024 * 1024)).toFixed(1)} GB</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    {disk.partitions && disk.partitions.map((part, pIdx) => (
+                      <div key={pIdx}>
+                        <div className="flex justify-between text-[11px] font-semibold text-slate-600 mb-1">
+                          <span>{t("systemMonitor.disks.partition")}{part.mountPoint}</span>
+                          <span>{part.usedPercent?.toFixed(1)}% ({((part.totalBytes - part.freeBytes) / (1024 * 1024 * 1024)).toFixed(1)} GB / {(part.totalBytes / (1024 * 1024 * 1024)).toFixed(1)} GB)</span>
+                        </div>
+                        <div className="w-full bg-slate-100 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              part.usedPercent > 90 ? "bg-rose-500" : part.usedPercent > 75 ? "bg-amber-500" : "bg-emerald-500"
+                            }`}
+                            style={{ width: `${Math.min(part.usedPercent, 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
 };
 
 // Component khung cho mỗi biểu đồ
-const ChartCard = ({ title, children, color, data, type, card }) => {
-  const upTimeSeconds = formatUptime(card?.jvmUptimeSeconds);
+const ChartCard = ({ title, children, color, type, card }) => {
+  const upTimeSeconds = formatUptime(card?.jvmUptimeSeconds || card?.serviceUptimeSec);
   
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col h-[600px] shadow-lg">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-[11px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+    <div className="bg-white border border-slate-200/80 rounded-2xl p-5 flex flex-col h-[420px] shadow-xs">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
           <div
-            className="w-2 h-2 rounded-full"
+            className="w-2.5 h-2.5 rounded-full"
             style={{ backgroundColor: color }}
           />
           {title}
         </h3>
-        <LayoutGrid size={14} className="text-slate-600" />
+        <LayoutGrid size={14} className="text-slate-400" />
       </div>
-      <div className="flex-1 w-full">
+      <div className="flex-1 w-full min-h-0">
         <ResponsiveContainer width="100%" height="100%">
           {children}
         </ResponsiveContainer>
       </div>
       {type === "CPU" ? (
-        <div className="grid grid-cols-2 gap-0 rounded-lg overflow-hidden">
-          {/* Ô 2: CPU Information */}
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">CPU Information</h3>
-            <p className="text-[18px]">{card?.cpuName}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 pt-4 border-t border-slate-100">
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.cpu.totalLoad")}</h4>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.systemCpuLoad ? `${card.systemCpuLoad.toFixed(2)}%` : "0.00%"}</p>
           </div>
-
-          {/* Ô 4: Up time */}
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Up Time</h3>
-            <p className="text-[24px] font-mono text-slate-200">{upTimeSeconds}</p>
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.cpu.processLoad")}</h4>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.processCpuLoad ? `${card.processCpuLoad.toFixed(2)}%` : "0.00%"}</p>
           </div>
-
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">CPU Cores</h3>
-            <p className="text-[18px]">{card?.physicalCores} cores / {card?.logicalCores} threads</p>
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.cpu.cpuInfo")}</h4>
+            <p className="text-xs font-semibold text-slate-700 mt-0.5 truncate" title={card?.cpuName}>{card?.cpuName || "N/A"}</p>
           </div>
-
-          {/* Ô 3: Total CPU Utilization */}
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Total System Load</h3>
-            <p className="text-[24px]">{card?.systemCpuLoad?.toFixed(2)}%</p>
-          </div>
-
-         
-
-           {/* Ô 1: Used load */}
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Used load</h3>
-            <p className="text-[24px]">{card?.processCpuLoad?.toFixed(2)}%</p>
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.cpu.uptime")}</h4>
+            <p className="text-xs font-mono font-bold text-indigo-600 mt-0.5">{upTimeSeconds}</p>
           </div>
         </div>
-      )
-      : type === "Memory" ? (
-        <div className="grid grid-cols-2 gap-0 rounded-lg overflow-hidden">
-          {/* Ô 1: Gateway Application */}
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">In use Process</h3>
-            <p className="text-[24px]">{card?.heapUsedMb} MB</p>
+      ) : type === "Memory" ? (
+        <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-slate-100">
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.memory.processHeap")}</h4>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.heapUsedMb || 0} MB</p>
           </div>
-
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">In use System Memory</h3>
-            <p className="text-[24px]">{card?.usedPhysicalMemoryMb} MB</p>
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.memory.systemUsed")}</h4>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.usedPhysicalMemoryMb || 0} MB</p>
           </div>
-
-          {/* Ô 3: Total System Memory */}
-          <div className="p-4">
-            <h3 className="text-[14px] uppercase tracking-wider text-slate-400 mb-1">Total System Memory</h3>
-            <p className="text-[24px]">{card?.totalPhysicalMemoryMb} MB</p>
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.memory.totalRam")}</h4>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.totalPhysicalMemoryMb || 0} MB</p>
           </div>
         </div>
-        )
-      :
-      null}
-      
+      ) : type === "MySQL_Conn" ? (
+        <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-100">
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.mysql.activeConn")}</h4>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.connections || 0}</p>
+          </div>
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.mysql.status")}</h4>
+            <p className="text-sm font-extrabold text-green-600 mt-0.5">Online</p>
+          </div>
+        </div>
+      ) : type === "MySQL_CPU" ? (
+        <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-100">
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.mysql.dbCpuLoad")}</h4>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.cpuPercent >= 0 ? `${card.cpuPercent.toFixed(2)}%` : "0.00%"}</p>
+          </div>
+          <div>
+            <h4 className="text-[9px] uppercase font-bold tracking-wider text-slate-400">{t("systemMonitor.info.mysql.pid")}</h4>
+            <p className="text-xs font-mono font-semibold text-slate-700 mt-0.5">{card?.pid || "N/A"}</p>
+          </div>
+        </div>
+      ) : null}
     </div>
-  )
+  );
 };
 
-// Component vẽ Bar chart đơn giản cho điện văn
+// Component vẽ Bar chart dùng Recharts
 const BarChartCustom = ({ data, dataKey, color }) => (
-  <div className="h-full w-full flex items-end gap-1 px-2">
-    {data.map((item, i) => (
-      <div
-        key={i}
-        className="flex-1 rounded-t-sm transition-all duration-500"
-        style={{
-          height: `${(item[dataKey] / 100) * 100}%`,
-          backgroundColor: color,
-          opacity: 0.6 + (i / 20) * 0.4,
-        }}
-      />
-    ))}
-  </div>
+  <BarChart data={data}>
+    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+    <XAxis dataKey="time" hide />
+    <YAxis stroke="#94a3b8" fontSize={10} />
+    <Tooltip
+      contentStyle={{
+        backgroundColor: "#ffffff",
+        border: "1px solid #e2e8f0",
+        borderRadius: "8px",
+        fontSize: "11px",
+        boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)"
+      }}
+    />
+    <Bar dataKey={dataKey} name="Connections" fill={color} radius={[4, 4, 0, 0]} isAnimationActive={false} />
+  </BarChart>
 );
 
 // Format Up time từ giây sang định dạng D:HH:MM:SS
@@ -378,6 +295,6 @@ const formatUptime = (seconds) => {
   const s = String(secs).padStart(2, "0");
 
   return `${days}:${h}:${m}:${s}`;
-}
+};
 
 export default SystemMonitorView;
