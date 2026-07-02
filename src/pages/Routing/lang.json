@@ -48,6 +48,10 @@
         "vi": "Độ khẩn",
         "en": "Priority"
       },
+      "note": {
+        "vi": "Ghi chú",
+        "en": "Note"
+      },
       "active": {
         "vi": "Trạng thái",
         "en": "Active"

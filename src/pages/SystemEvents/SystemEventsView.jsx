@@ -147,7 +147,7 @@ const SystemEvents = () => {
                   <th className="px-4 py-3 font-semibold text-xs">{t("systemEvents.table.severity")}</th>
                   <th className="px-4 py-3 font-semibold text-xs">{t("systemEvents.table.type")}</th>
                   <th className="px-4 py-3 font-semibold text-xs">{t("systemEvents.table.message")}</th>
-                  <th className="px-4 py-3 font-semibold text-xs">{t("systemEvents.table.createdBy")}</th>
+                  <th className="px-4 py-3 font-semibold text-xs">{t("systemEvents.table.description")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -190,7 +190,7 @@ const SystemEvents = () => {
                         {row.title}
                       </td>
                       <td className="px-4 py-3 font-medium text-slate-500">
-                        {row.createdBy}
+                        {row.description}
                       </td>
                     </tr>
                   ))

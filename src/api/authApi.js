@@ -67,6 +67,16 @@ export const authApi = {
     return authUtils.getAuth();
   },
 
+  verifyPassword: async (userId, password) => {
+    try {
+      const response = await axiosClient.post('/auth/verify-password', { userId, password });
+      return response?.success === true;
+    } catch (error) {
+      console.warn('Password verification failed:', error);
+      return false;
+    }
+  },
+
   // Kiểm tra đăng nhập
   isAuthenticated: () => {
     return authUtils.isAuthenticated();

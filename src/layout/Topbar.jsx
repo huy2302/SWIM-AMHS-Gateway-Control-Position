@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import { useSelector } from "react-redux";
-import { Bell, History, Check, ChevronRight, Clock, Info, TriangleAlert, AlertCircle } from "lucide-react";
+import { Bell, History, Check, ChevronRight, Clock, Info, TriangleAlert, AlertCircle, CheckCircle, Circle } from "lucide-react";
 import UserMenu from "../components/UserMenu";
 import { useSystemStore } from '@/hooks/systemStore';
 import { t } from "@/i18n/translator";
@@ -24,20 +24,6 @@ const titleMap = {
   config: "sidebar.menu.admin",
 };
 
-
-const getSeverityStyle = (severity) => {
-  switch (severity) {
-    case "INFO":
-      return "bg-blue-50 text-blue-700 border-blue-200/60";
-    case "WARN":
-      return "bg-amber-50 text-amber-800 border-amber-200/60";
-    case "ERROR":
-      return "bg-red-50 text-red-700 border-red-200/60";
-    default:
-      return "bg-slate-50 text-slate-600 border-slate-200/60";
-  }
-};
-
 const getSeverityIcon = (severity) => {
   switch (severity) {
     case "INFO":
@@ -51,45 +37,121 @@ const getSeverityIcon = (severity) => {
   }
 };
 
-const getSeverityIconBg = (severity) => {
+const getSeverityItemStyles = (severity) => {
   switch (severity) {
     case "INFO":
-      return "bg-blue-50 border-blue-100/40";
+      return {
+        borderLeft: 'border-l-blue-500',
+        bg: 'bg-blue-50/30 hover:bg-blue-100/30',
+        color: 'text-blue-700'
+      };
     case "WARN":
-      return "bg-amber-50 border-amber-100/40";
+      return {
+        borderLeft: 'border-l-amber-500',
+        bg: 'bg-amber-50/30 hover:bg-amber-100/30',
+        color: 'text-amber-800'
+      };
     case "ERROR":
-      return "bg-red-50 border-red-100/40";
+      return {
+        borderLeft: 'border-l-red-500',
+        bg: 'bg-red-50/30 hover:bg-red-100/30',
+        color: 'text-red-700'
+      };
     default:
-      return "bg-slate-50 border-slate-200/40";
+      return {
+        borderLeft: 'border-l-slate-400',
+        bg: 'bg-slate-50/30 hover:bg-slate-100/30',
+        color: 'text-slate-600'
+      };
+  }
+};
+
+const getSeverityBg = (severity) => {
+  switch (severity) {
+    case 'error':
+      return 'bg-red-50 border-red-200';
+    case 'warning':
+      return 'bg-yellow-50 border-yellow-200';
+    case 'success':
+      return 'bg-green-50 border-green-200';
+    case 'info':
+    default:
+      return 'bg-blue-50 border-blue-200';
   }
 };
 
 const formatRelativeTime = (timeString, lang) => {
   if (!timeString) return "";
+  
   const date = new Date(timeString);
   const now = new Date();
   const diffMs = now - date;
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
 
+  // Kiểm tra date hợp lệ
+  if (isNaN(date.getTime())) return "";
+
+  // Vừa xong (dưới 1 phút)
   if (diffMins < 1) {
     return lang === "vi" ? "Vừa xong" : "Just now";
   }
+
+  // Vài phút trước (dưới 1 giờ)
   if (diffMins < 60) {
     return lang === "vi" ? `${diffMins} phút trước` : `${diffMins}m ago`;
   }
-  if (diffHours < 24) {
-    if (date.getDate() === now.getDate()) {
-      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-      return lang === "vi" ? `Hôm nay lúc ${timeStr}` : `Today at ${timeStr}`;
-    }
+
+  // Hôm nay (dưới 24h và cùng ngày)
+  if (diffHours < 24 && date.getDate() === now.getDate()) {
+    const timeStr = date.toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: false 
+    });
+    return lang === "vi" ? `Hôm nay lúc ${timeStr}` : `Today at ${timeStr}`;
   }
 
-  const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+  // Hôm qua
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  if (date.getDate() === yesterday.getDate() && 
+      date.getMonth() === yesterday.getMonth() && 
+      date.getFullYear() === yesterday.getFullYear()) {
+    const timeStr = date.toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: false 
+    });
+    return lang === "vi" ? `Hôm qua lúc ${timeStr}` : `Yesterday at ${timeStr}`;
+  }
+
+  // Trong tuần (cách đây < 7 ngày)
+  if (diffDays < 7) {
+    const options = { weekday: 'short' };
+    const dayName = date.toLocaleDateString(lang === "vi" ? "vi-VN" : "en-US", options);
+    const timeStr = date.toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: false 
+    });
+    return lang === "vi" ? `${dayName} lúc ${timeStr}` : `${dayName} at ${timeStr}`;
+  }
+
+  // Cũ hơn: hiển thị ngày tháng
+  const options = { 
+    month: 'short', 
+    day: 'numeric',
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+    hour: '2-digit', 
+    minute: '2-digit', 
+    hour12: false 
+  };
+
+  console.log(date.toLocaleString(lang === "vi" ? "vi-VN" : "en-US", options))
   return date.toLocaleString(lang === "vi" ? "vi-VN" : "en-US", options);
 };
-
-
 
 export default function Topbar() {
   const location = useLocation();
@@ -168,20 +230,21 @@ export default function Topbar() {
       }
     }
 
-    setIsOpen(false);
+    // điều hướng đến đúng page dựa theo status của thông báo
+    // setIsOpen(false);
 
-    if (item.eventType?.startsWith("ROUTING")) {
-      navigate("/routing");
-    } else if (
-      item.eventType === "HIGH_CPU" ||
-      item.eventType === "HIGH_MEMORY" ||
-      item.eventType === "APPLICATION_START" ||
-      item.eventType === "APPLICATION_STOP"
-    ) {
-      navigate("/system");
-    } else {
-      navigate("/system-events");
-    }
+    // if (item.eventType?.startsWith("ROUTING")) {
+    //   navigate("/routing");
+    // } else if (
+    //   item.eventType === "HIGH_CPU" ||
+    //   item.eventType === "HIGH_MEMORY" ||
+    //   item.eventType === "APPLICATION_START" ||
+    //   item.eventType === "APPLICATION_STOP"
+    // ) {
+    //   navigate("/system");
+    // } else {
+    //   navigate("/system-events");
+    // }
   };
 
   const handleMarkAllAsRead = async () => {
@@ -286,7 +349,7 @@ export default function Topbar() {
               </div>
 
               {/* List */}
-              <div className="flex-1 max-h-[340px] overflow-y-auto notification-list-scroll py-2 bg-slate-50/20">
+              <div className="flex-1 p-2 max-h-[340px] overflow-y-auto notification-list-scroll py-2 bg-slate-50/20">
                 {loading ? (
                   <div className="flex flex-col items-center justify-center py-12 gap-2 text-slate-400">
                     <div className="w-5 h-5 border-2 border-slate-300 border-t-blue-600 rounded-full animate-spin" />
@@ -298,43 +361,64 @@ export default function Topbar() {
                     <span className="text-[11px] font-medium">{t("dashboard.noNotify")}</span>
                   </div>
                 ) : (
-                  notifications.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => handleMarkAsRead(item.id, item)}
-                      className={`flex gap-3 px-4 py-3 hover:bg-slate-100/40 active:bg-slate-150/30 transition-all cursor-pointer relative border-b border-slate-100/80 ${
-                        !item.isRead ? "bg-blue-50/10" : ""
-                      }`}
-                    >
-                      {/* Left: icon with unread indicator dot */}
-                      <div className="flex flex-col items-center justify-start pt-0.5 relative">
-                        <div className={`p-1.5 rounded-lg border flex items-center justify-center ${getSeverityIconBg(item.severity)}`}>
-                          {getSeverityIcon(item.severity)}
-                        </div>
-                        {!item.isRead && (
-                          <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-600 rounded-full ring-2 ring-white animate-pulse" />
-                        )}
-                      </div>
+                  notifications.map((item) => 
+                  {
+                    const itemStyles = getSeverityItemStyles(item.severity);
 
-                      {/* Right: text info */}
-                      <div className="flex-1 min-w-0 flex flex-col gap-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className={`text-[9px] font-extrabold tracking-wide uppercase px-1.5 py-0.5 rounded border ${getSeverityStyle(item.severity)}`}>
-                            {item.severity}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-medium group-hover:text-slate-500 transition-colors whitespace-nowrap flex items-center gap-1">
-                            <Clock size={11} className="text-slate-350" />
-                            {formatRelativeTime(item.createdTime, language)}
-                          </span>
+                    return (
+                      <div
+                        onClick={() => handleMarkAsRead(item.id, item)}
+                        className={`
+                          flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all
+                          hover:bg-gray-50 border border-transparent border-l-4 ${itemStyles.borderLeft} ${itemStyles.bg}
+                          ${!item.isRead ? 'bg-blue-50/30 border-blue-200/50' : ''}
+                        `}
+                      >
+                        {/* Left: Icon */}
+                        <div className="flex-shrink-0 pt-0.5">
+                          <div className={`
+                            w-8 h-8 rounded-full flex items-center justify-center
+                            ${getSeverityBg(item.severity)}
+                          `}>
+                            {getSeverityIcon(item.severity)}
+                          </div>
                         </div>
-                        <p className={`text-[11px] leading-relaxed break-words ${
-                          !item.isRead ? "text-slate-800 font-bold" : "text-slate-500 font-medium"
-                        }`}>
-                          {item.title}
-                        </p>
-                      </div>
-                    </div>
-                  ))
+
+                        {/* Right: Content */}
+                        <div className="flex-1 min-w-0">
+                          <p className={`text-[13px] leading-relaxed ${
+                            !item.isRead ? 'text-gray-900 font-semibold' : 'text-gray-600'
+                          }`}>
+                            {item.title}
+                          </p>
+                          
+                          <div className="flex items-center justify-between gap-2 mb-1">
+                            <div className="flex items-center gap-2">
+                              <span className={`text-[11px] ${itemStyles.color} font-semibold`}>
+                                {item.severity.toUpperCase()}
+                              </span>
+                              {!item.isRead && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded-full">
+                                  <Circle size={6} className="fill-blue-600" />
+                                  New
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[11px] text-gray-400 font-medium whitespace-nowrap">
+                              {formatRelativeTime(item.eventTime, language)}
+                            </span>
+                          </div>
+                          
+                          {/* Hiển thị subtitle nếu có */}
+                          {item.subtitle && (
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              {item.subtitle}
+                            </p>
+                          )}
+                        </div>
+                      </div>  
+                      )
+                    })
                 )}
               </div>
 

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, memo } from "react";
+import { createPortal } from "react-dom";
 import DashboardLayout from "@/layout/DashboardLayout";
 import { Search, X, Copy, Check, Loader2, MoreVertical, RotateCcw, CheckCircle, Ban, Trash2, SlidersHorizontal } from "lucide-react";
 import gatewayApi from "@/api/gatewayApi";
@@ -244,7 +245,6 @@ const MessageView = () => {
                     <option value="3">{t("messages.status.SENT")}</option>
                     <option value="4">{t("messages.status.FAILED")}</option>
                     <option value="5">{t("messages.status.UNROUTED")}</option>
-                    <option value="6">{t("messages.status.RESOLVED")}</option>
                     <option value="7">{t("messages.status.CANCELLED")}</option>
                   </>
                 ) : (
@@ -254,7 +254,6 @@ const MessageView = () => {
                     <option value="3">{t("messages.status.PUBLISHING")}</option>
                     <option value="4">{t("messages.status.PUBLISHED")}</option>
                     <option value="5">{t("messages.status.FAILED")}</option>
-                    <option value="6">{t("messages.status.RESOLVED")}</option>
                     <option value="7">{t("messages.status.CANCELLED")}</option>
                   </>
                 )}
@@ -608,183 +607,141 @@ const MessageView = () => {
         </span>
       </div>
 
-      {/* Modal Details */}
-      {modalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 backdrop-blur-xs p-4 animate-fade-in">
-          <div className="w-full max-w-6xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden animate-zoom-in">
-            {/* HEADER */}
-            <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
-                  {t("messages.modal.title")}
-                </span>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="text-lg font-extrabold text-slate-900">
-                    #{modalData.msgid}
-                  </span>
-                  {searchType === "AMQP" ? renderSwimStatus(modalData.status) : renderAmhsStatus(modalData.status)}
-                </div>
-              </div>
-              <button
-                onClick={() => setModalData(null)}
-                className="text-slate-400 hover:text-slate-600 transition cursor-pointer"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            {/* BODY */}
-            <div className="p-6 space-y-6 max-h-[70vh] overflow-y-scroll custom-scrollbar">
-              {/* INFO GRID */}
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-                <DetailBox
-                  label={t("messages.modal.fields.messageId")}
-                  value={modalData.messageId}
-                  onCopy={() => handleCopy(modalData.messageId)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.subject")}
-                  value={modalData.subject}
-                  onCopy={() => handleCopy(modalData.subject)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.origin")}
-                  value={modalData.origin}
-                  onCopy={() => handleCopy(modalData.origin)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.address")}
-                  value={modalData.address}
-                  onCopy={() => handleCopy(modalData.address)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.source")}
-                  value={modalData.source}
-                  onCopy={() => handleCopy(modalData.source)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.addressingSource")}
-                  value={modalData.addressingSource}
-                  onCopy={() => handleCopy(modalData.addressingSource)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.bodyType")}
-                  value={modalData.bodyType}
-                  onCopy={() => handleCopy(modalData.bodyType)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.contentType")}
-                  value={modalData.contentType}
-                  onCopy={() => handleCopy(modalData.contentType)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.cpa")}
-                  value={modalData.cpa}
-                  onCopy={() => handleCopy(modalData.cpa)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.priority")}
-                  value={modalData.priority}
-                  onCopy={() => handleCopy(modalData.priority)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.time")}
-                  value={modalData.time}
-                  onCopy={() => handleCopy(modalData.time)}
-                />
-                <DetailBox
-                  label={t("messages.modal.fields.errorType")}
-                  value={modalData.errorType || t("messages.modal.none")}
-                  onCopy={() => handleCopy(modalData.errorType || t("messages.modal.none"))}
-                />
-              </div>
-
-              {/* RAW MESSAGE */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    {t("messages.modal.sections.rawMessage")}
-                  </span>
-                  <button
-                    onClick={() => handleCopy(modalData.text)}
-                    className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer"
-                  >
-                    {t("messages.modal.buttons.copy")}
-                  </button>
-                </div>
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-inner overflow-y-auto custom-scrollbar">
-                  <pre className="text-slate-800 text-[12px] whitespace-pre-wrap font-mono leading-relaxed">
-                    {modalData.text}
-                  </pre>
-                </div>
-              </div>
-
-              {/* PAYLOAD */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    {t("messages.modal.sections.payload")}
-                  </span>
-                  <button
-                    onClick={() => handleCopy(modalData.payloadContent)}
-                    className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer"
-                  >
-                    {t("messages.modal.buttons.copy")}
-                  </button>
-                </div>
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-inner overflow-y-auto custom-scrollbar">
-                  <pre className="text-slate-800 text-[12px] whitespace-pre-wrap font-mono leading-relaxed">
-                    {modalData.payloadContent}
-                  </pre>
-                </div>
-              </div>
-
-              {/* AMQP PROPERTIES */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    {t("messages.modal.sections.amqpProperties")}
-                  </span>
-                  <button
-                    onClick={() => handleCopy(modalData.amqpProperties)}
-                    className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer"
-                  >
-                    {t("messages.modal.buttons.copy")}
-                  </button>
-                </div>
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-inner overflow-y-auto custom-scrollbar">
-                  <pre className="text-slate-850 text-[12px] whitespace-pre-wrap font-mono leading-relaxed">
-                    {modalData.amqpProperties}
-                  </pre>
-                </div>
-              </div>
-            </div>
-
-            {/* FOOTER */}
-            <div className="bg-slate-50 border-t border-slate-200 px-6 py-4 flex items-center justify-end gap-3">
-              <button
-                onClick={() => setModalData(null)}
-                className="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 transition cursor-pointer font-semibold active:scale-95"
-              >
-                {t("messages.modal.buttons.close")}
-              </button>
-              <button
-                onClick={() => handleCopy(`${modalData.text}\n\n${modalData.payloadContent}`)}
-                className="bg-indigo-600 hover:bg-indigo-500 transition text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 cursor-pointer active:scale-95 shadow-sm"
-              >
-                {isCopied ? <Check size={16} /> : <Copy size={16} />}
-                {isCopied ? t("messages.modal.buttons.copied") : t("messages.modal.buttons.copyAll")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <MessageDetailModal
+        modalData={modalData}
+        searchType={searchType}
+        isCopied={isCopied}
+        onClose={() => setModalData(null)}
+        onCopy={handleCopy}
+        t={t}
+      />
 
     </DashboardLayout>
   );
 };
 
-const DetailBox = ({ label, value, onCopy }) => (
+const MessageDetailModal = memo(({ modalData, searchType, onClose, onCopy, isCopied, t }) => {
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  if (!modalData) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/45 p-4 animate-fade-in">
+      <div className="w-full max-w-6xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden animate-zoom-in transform-gpu">
+        <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+              {t("messages.modal.title")}
+            </span>
+            <div className="flex items-center gap-3 mt-1">
+              <span className="text-lg font-extrabold text-slate-900">
+                #{modalData.msgid}
+              </span>
+              {searchType === "AMQP" ? renderSwimStatus(modalData.status) : renderAmhsStatus(modalData.status)}
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-slate-400 hover:text-slate-600 transition cursor-pointer"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            <DetailBox label={t("messages.modal.fields.messageId")} value={modalData.messageId} onCopy={() => onCopy(modalData.messageId)} />
+            <DetailBox label={t("messages.modal.fields.subject")} value={modalData.subject} onCopy={() => onCopy(modalData.subject)} />
+            <DetailBox label={t("messages.modal.fields.origin")} value={modalData.origin} onCopy={() => onCopy(modalData.origin)} />
+            <DetailBox label={t("messages.modal.fields.address")} value={modalData.address} onCopy={() => onCopy(modalData.address)} />
+            <DetailBox label={t("messages.modal.fields.source")} value={modalData.source} onCopy={() => onCopy(modalData.source)} />
+            <DetailBox label={t("messages.modal.fields.addressingSource")} value={modalData.addressingSource} onCopy={() => onCopy(modalData.addressingSource)} />
+            <DetailBox label={t("messages.modal.fields.bodyType")} value={modalData.bodyType} onCopy={() => onCopy(modalData.bodyType)} />
+            <DetailBox label={t("messages.modal.fields.contentType")} value={modalData.contentType} onCopy={() => onCopy(modalData.contentType)} />
+            <DetailBox label={t("messages.modal.fields.cpa")} value={modalData.cpa} onCopy={() => onCopy(modalData.cpa)} />
+            <DetailBox label={t("messages.modal.fields.priority")} value={modalData.priority} onCopy={() => onCopy(modalData.priority)} />
+            <DetailBox label={t("messages.modal.fields.time")} value={modalData.time} onCopy={() => onCopy(modalData.time)} />
+            <DetailBox label={t("messages.modal.fields.errorType")} value={modalData.errorType || t("messages.modal.none")} onCopy={() => onCopy(modalData.errorType || t("messages.modal.none"))} />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                {t("messages.modal.sections.rawMessage")}
+              </span>
+              <button onClick={() => onCopy(modalData.text)} className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer">
+                {t("messages.modal.buttons.copy")}
+              </button>
+            </div>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-inner overflow-y-auto custom-scrollbar">
+              <pre className="text-slate-800 text-[12px] whitespace-pre-wrap font-mono leading-relaxed">
+                {modalData.text}
+              </pre>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                {t("messages.modal.sections.payload")}
+              </span>
+              <button onClick={() => onCopy(modalData.payloadContent)} className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer">
+                {t("messages.modal.buttons.copy")}
+              </button>
+            </div>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-inner overflow-y-auto custom-scrollbar">
+              <pre className="text-slate-800 text-[12px] whitespace-pre-wrap font-mono leading-relaxed">
+                {modalData.payloadContent}
+              </pre>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                {t("messages.modal.sections.amqpProperties")}
+              </span>
+              <button onClick={() => onCopy(modalData.amqpProperties)} className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer">
+                {t("messages.modal.buttons.copy")}
+              </button>
+            </div>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-inner overflow-y-auto custom-scrollbar">
+              <pre className="text-slate-850 text-[12px] whitespace-pre-wrap font-mono leading-relaxed">
+                {modalData.amqpProperties}
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-slate-50 border-t border-slate-200 px-6 py-4 flex items-center justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-700 bg-white hover:bg-slate-50 transition cursor-pointer font-semibold active:scale-95"
+          >
+            {t("messages.modal.buttons.close")}
+          </button>
+          <button
+            onClick={() => onCopy(`${modalData.text}\n\n${modalData.payloadContent}`)}
+            className="bg-indigo-600 hover:bg-indigo-500 transition text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 cursor-pointer active:scale-95 shadow-sm"
+          >
+            {isCopied ? <Check size={16} /> : <Copy size={16} />}
+            {isCopied ? t("messages.modal.buttons.copied") : t("messages.modal.buttons.copyAll")}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+});
+
+const DetailBox = memo(({ label, value, onCopy }) => (
   <div className="flex flex-col gap-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl relative shadow-xs">
     <div className="flex justify-between items-center">
       <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{label}</span>
@@ -792,7 +749,7 @@ const DetailBox = ({ label, value, onCopy }) => (
     </div>
     <div className="text-slate-800 break-all text-[11px] font-mono font-medium mt-0.5">{value || "N/A"}</div>
   </div>
-);
+));
 
 const renderAmhsStatus = (status) => {
   const statusMap = {

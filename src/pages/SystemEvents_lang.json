@@ -23,6 +23,10 @@
     "createdBy": {
       "vi": "Người thực hiện",
       "en": "Created By"
+    },
+    "description": {
+      "vi": "Chi tiết",
+      "en": "Description"
     }
   },
   "status": {

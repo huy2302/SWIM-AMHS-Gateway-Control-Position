@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, memo } from "react";
+import { createPortal } from "react-dom";
 import DashboardLayout from "../../layout/DashboardLayout";
 import TablePagination from "@/components/TablePagination";
 import gatewayApi from "../../api/gatewayApi";
+import authApi from "../../api/authApi";
 import {
   Plus,
   Trash2,
@@ -166,6 +168,7 @@ const createS2ARule = () => ({
   filingTime: "CURRENT_TIME",
   active: true,
   description: "",
+  note: "",
   createdBy: "",
   createdAt: createTimestamp(),
   updatedAt: createTimestamp(),
@@ -185,24 +188,10 @@ const normalizeA2sApiRule = (rule) => ({
   prioritySwim: rule.prioritySwim ?? null,
   priorityAmhs: rule.priorityAmhs ?? null,
   active: rule.enabled ?? rule.active ?? false,
-  description: rule.description ?? "",
+  description: rule.note ?? rule.description ?? "",
+  note: rule.note ?? "",
   createdAt: rule.createdAt ?? rule.created_at ?? null,
   updatedAt: rule.updatedAt ?? rule.updated_at ?? null,
-});
-
-const denormalizeA2sRuleForApi = (rule) => ({
-  id: rule.id,
-  priority: rule.priority,
-  enabled: rule.active,
-  amhsOriginator: rule.originator,
-  amhsDestination: rule.destination,
-  amhsMsgType: rule.msgType,
-  messageType: rule.messageType ?? rule.msgType,
-  swimDomain: rule.domain,
-  swimTopic: rule.topic,
-  description: rule.description ?? "",
-  createdAt: rule.createdAt,
-  updatedAt: rule.updatedAt,
 });
 
 const normalizeS2aApiRule = (rule) => ({
@@ -224,25 +213,6 @@ const normalizeS2aApiRule = (rule) => ({
   createdBy: rule.createdBy ?? rule.created_by ?? "",
   createdAt: rule.createdAt ?? rule.created_at ?? null,
   updatedAt: rule.updatedAt ?? rule.updated_at ?? null,
-});
-
-const denormalizeS2aRuleForApi = (rule) => ({
-  id: rule.id,
-  enabled: rule.active,
-  swimTopic: rule.receiveTopic ?? rule.topic,
-  amhsTopic: rule.sendTopic,
-  swimDomain: rule.domain,
-  swimMessageType: rule.msgType,
-  amhsOriginator: rule.originator,
-  amhsDestination: rule.destination,
-  amhsPriorityIndicator: rule.priorityAmhs ?? null,
-  swimPriorityIndicator: rule.prioritySwim ?? null,
-  amhsFilingTimeMode: rule.filingTime,
-  recipients: rule.destination,
-  note: rule.description ?? rule.note ?? "",
-  createdBy: rule.createdBy,
-  createdAt: rule.createdAt,
-  updatedAt: rule.updatedAt,
 });
 
 const RoutingView = () => {
@@ -279,6 +249,7 @@ const RoutingView = () => {
 
     try {
       const { a2s, s2a } = await gatewayApi.getRoutings();
+      console.log("Fetched routing configs:", a2s);
       setA2sRules(Array.isArray(a2s) ? a2s.map(normalizeA2sApiRule) : []);
       setS2aRules(Array.isArray(s2a) ? s2a.map(normalizeS2aApiRule) : []);
     } catch (error) {
@@ -341,12 +312,21 @@ const RoutingView = () => {
     setDeleteError("");
   };
 
+  const user = JSON.parse(localStorage.getItem('user'));
+
   const handleConfirmDelete = async () => {
-    if (deletePassword !== "1") {
+    if (!deletePassword?.trim()) {
       setDeleteError(t("routing.modal.deleteError"));
       return;
     }
+
     try {
+      const isPasswordValid = await authApi.verifyPassword(user.userId, deletePassword);
+      if (!isPasswordValid) {
+        setDeleteError(t("routing.modal.deleteError"));
+        return;
+      }
+
       await gatewayApi.deleteRouting(deleteRule.id);
       if (activeTab === "A2S") {
         handleRemoveA2sRule(deleteRule.id);
@@ -666,6 +646,7 @@ const RoutingView = () => {
                     <>
                       <th className="p-3.5">{t("routing.table.messageType")}</th>
                       <th className="p-3.5">{t("routing.table.sendTopic")}</th>
+                      <th className="p-3.5">{t("routing.table.note")}</th>
                       <th className="p-3.5">{t("routing.table.priority")}</th>
                       <th className="p-3.5">{t("routing.table.active")}</th>
                     </>
@@ -673,7 +654,8 @@ const RoutingView = () => {
                     <>
                       <th className="p-3.5">{t("routing.table.receiveTopic")}</th>
                       <th className="p-3.5">{t("routing.table.recipients")}</th>
-                      <th className="p-3.5">{t("routing.table.originator")}</th>
+                      <th className="p-3.5">{t("routing.table.messageType")}</th>
+                      <th className="p-3.5">{t("routing.table.note")}</th>
                       <th className="p-3.5">{t("routing.table.priority")}</th>
                       <th className="p-3.5">{t("routing.table.active")}</th>
                     </>
@@ -692,6 +674,7 @@ const RoutingView = () => {
                       <td className="p-3.5 font-bold text-slate-900">{rule.id}</td>
                       <td className="p-3.5 text-slate-700">{rule.messageType || rule.msgType}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.sendTopic || rule.topic}</td>
+                      <td className="p-3.5 text-slate-600 max-w-[220px] truncate" title={rule.description || rule.note || ""}>{rule.description || rule.note || "-"}</td>
                       <td className="p-3.5 font-semibold text-indigo-650">{formatPriorityDisplay(rule, false)}</td>
                       <td className="p-3.5">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border ${
@@ -715,12 +698,13 @@ const RoutingView = () => {
                     <tr 
                       key={rule.id} 
                       className="hover:bg-slate-50/70 transition-colors cursor-pointer"
-                      onClick={() => handleEditRule(rule)}
+                      onDoubleClick={() => handleEditRule(rule)}
                     >
                       <td className="p-3.5 font-bold text-slate-900">{rule.id}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.receiveTopic}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.destination}</td>
-                      <td className="p-3.5 text-slate-700">{rule.originator}</td>
+                      <td className="p-3.5 text-slate-700">{rule.msgType || rule.messageFilter || "-"}</td>
+                      <td className="p-3.5 text-slate-600 max-w-[220px] truncate" title={rule.description || rule.note || ""}>{rule.description || rule.note || "-"}</td>
                       <td className="p-3.5 font-semibold text-indigo-650">{formatPriorityDisplay(rule, true)}</td>
                       <td className="p-3.5">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border ${
@@ -760,350 +744,433 @@ const RoutingView = () => {
         </div>
       </div>
 
-      {/* Rule Editor Modal */}
-      {editingRule && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200/50 flex flex-col">
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-slate-100 sticky top-0 bg-white z-10">
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
-                {t("routing.modal.editTitle")}{activeTab === "A2S" ? t("routing.tabs.a2s") : t("routing.tabs.s2a")}
-              </h3>
-              <button
-                onClick={handleCloseEdit}
-                className="text-slate-400 hover:text-slate-655 p-1 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
+      <RuleEditorModal
+        activeTab={activeTab}
+        editingRule={editingRule}
+        editFormData={editFormData}
+        msgTypeInput={msgTypeInput}
+        originatorError={originatorError}
+        setMsgTypeInput={setMsgTypeInput}
+        setOriginatorError={setOriginatorError}
+        handleCloseEdit={handleCloseEdit}
+        handleEditFormChange={handleEditFormChange}
+        handleA2sMsgTypeKeyDown={handleA2sMsgTypeKeyDown}
+        addA2sMsgType={addA2sMsgType}
+        removeA2sMsgType={removeA2sMsgType}
+        handleSaveEditRule={handleSaveEditRule}
+        t={t}
+      />
 
-            {/* Form */}
-            <div className="p-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
-              {activeTab === "A2S" ? (
-                // A2S (OUT) Form
-                <>
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.a2s.messageType.label")}
-                    </label>
-                    <div className="border border-slate-200 rounded-xl px-3.5 py-3 bg-slate-50/50">
-                      <div className="flex flex-wrap gap-1.5 mb-2">
-                        {(editFormData.msgTypeList || []).map((type) => (
-                          <span
-                            key={type}
-                            className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-indigo-200/50"
-                          >
-                            {type}
-                            <button
-                              type="button"
-                              onClick={() => removeA2sMsgType(type)}
-                              className="text-indigo-550 hover:text-indigo-900 font-extrabold cursor-pointer"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                      <div className="flex gap-2 items-center">
-                        <input
-                          type="text"
-                          list="a2s-msg-types"
-                          value={msgTypeInput}
-                          onChange={(e) => setMsgTypeInput(e.target.value)}
-                          onKeyDown={handleA2sMsgTypeKeyDown}
-                          placeholder={t("routing.form.a2s.messageType.placeholder")}
-                          className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => addA2sMsgType(msgTypeInput)}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 active:scale-95 transition-all cursor-pointer"
-                        >
-                          {t("routing.form.a2s.messageType.addButton")}
-                        </button>
-                      </div>
-                      <datalist id="a2s-msg-types">
-                        {A2S_MESSAGE_TYPES.map((type) => (
-                          <option key={type} value={type} />
-                        ))}
-                      </datalist>
-                      <p className="mt-1.5 text-[10px] text-slate-400 font-medium">
-                        {t("routing.form.a2s.messageType.hint")}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.a2s.sendTopic.label")}
-                    </label>
-                    <input
-                      type="text"
-                      value={editFormData.topic || ""}
-                      onChange={(e) => handleEditFormChange("topic", e.target.value)}
-                      placeholder={t("routing.form.a2s.sendTopic.placeholder")}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.a2s.priority.label")}
-                    </label>
-                    <select
-                      value={editFormData.priority || "FF"}
-                      onChange={(e) => handleEditFormChange("priority", e.target.value)}
-                      className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 cursor-pointer"
-                    >
-                      <option value="SS">{t("routing.form.a2s.priority.options.ss")}</option>
-                      <option value="DD">{t("routing.form.a2s.priority.options.dd")}</option>
-                      <option value="FF">{t("routing.form.a2s.priority.options.ff")}</option>
-                      <option value="GG">{t("routing.form.a2s.priority.options.gg")}</option>
-                      <option value="KK">{t("routing.form.a2s.priority.options.kk")}</option>
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.common.status.label")}
-                    </label>
-                    <div className="flex items-center space-x-6 text-xs text-slate-700 font-semibold bg-slate-50/50 p-2 border border-slate-100 rounded-lg w-fit">
-                      <label className="flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          name="status"
-                          checked={editFormData.active === true}
-                          onChange={() => handleEditFormChange("active", true)}
-                          className="mr-2 cursor-pointer"
-                        />
-                        {t("routing.form.common.status.active")}
-                      </label>
-                      <label className="flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          name="status"
-                          checked={editFormData.active === false}
-                          onChange={() => handleEditFormChange("active", false)}
-                          className="mr-2 cursor-pointer"
-                        />
-                        {t("routing.form.common.status.inactive")}
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.common.note.label")}
-                    </label>
-                    <textarea
-                      value={editFormData.note || ""}
-                      onChange={(e) => handleEditFormChange("note", e.target.value)}
-                      placeholder={t("routing.form.a2s.note.placeholder")}
-                      rows={3}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                    />
-                  </div>
-                </>
-              ) : (
-                // S2A (IN) Form
-                <>
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.s2a.receiveTopic.label")}
-                    </label>
-                    <input
-                      type="text"
-                      value={editFormData.receiveTopic || editFormData.topic || ""}
-                      onChange={(e) => handleEditFormChange("receiveTopic", e.target.value)}
-                      placeholder={t("routing.form.s2a.receiveTopic.placeholder")}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.s2a.messageFilter.label")}
-                    </label>
-                    <input
-                      type="text"
-                      value={editFormData.msgFilter || ""}
-                      onChange={(e) => handleEditFormChange("msgFilter", e.target.value)}
-                      placeholder={t("routing.form.s2a.messageFilter.placeholder")}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.s2a.recipients.label")}
-                    </label>
-                    <textarea
-                      value={editFormData.recipients || ""}
-                      onChange={(e) => handleEditFormChange("recipients", e.target.value)}
-                      placeholder={t("routing.form.s2a.recipients.placeholder")}
-                      rows={2}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.s2a.originator.label")}
-                    </label>
-                    <input
-                      type="text"
-                      value={editFormData.originator || ""}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        handleEditFormChange("originator", value);
-                        if (value && value.length !== 8) {
-                          setOriginatorError(t("routing.form.s2a.originator.error"));
-                        } else {
-                          setOriginatorError("");
-                        }
-                      }}
-                      placeholder={t("routing.form.s2a.originator.placeholder")}
-                      className={`w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 ${
-                        originatorError ? "border-red-500 focus:border-red-555 focus:ring-red-500/10" : "border-slate-200"
-                      }`}
-                    />
-                    {originatorError && (
-                      <p className="text-red-650 text-xxs mt-1 font-bold">{originatorError}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.s2a.priority.label")}
-                    </label>
-                    <select
-                      value={editFormData.prioritySwim || "Unset"}
-                      onChange={(e) => handleEditFormChange("prioritySwim", e.target.value)}
-                      className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 cursor-pointer"
-                    >
-                      {SWIM_PRIORITIES.map((p) => (
-                        <option key={p} value={p}>
-                          {t(`routing.form.s2a.priority.options.${p}`)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.common.status.label")}
-                    </label>
-                    <div className="flex items-center space-x-6 text-xs text-slate-700 font-semibold bg-slate-50/50 p-2 border border-slate-100 rounded-lg w-fit">
-                      <label className="flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          name="status"
-                          checked={editFormData.active === true}
-                          onChange={() => handleEditFormChange("active", true)}
-                          className="mr-2 cursor-pointer"
-                        />
-                        {t("routing.form.common.status.active")}
-                      </label>
-                      <label className="flex items-center cursor-pointer">
-                        <input
-                          type="radio"
-                          name="status"
-                          checked={editFormData.active === false}
-                          onChange={() => handleEditFormChange("active", false)}
-                          className="mr-2 cursor-pointer"
-                        />
-                        {t("routing.form.common.status.inactive")}
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                      {t("routing.form.common.note.label")}
-                    </label>
-                    <textarea
-                      value={editFormData.note || ""}
-                      onChange={(e) => handleEditFormChange("note", e.target.value)}
-                      placeholder={t("routing.form.s2a.note.placeholder")}
-                      rows={3}
-                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                <button
-                  onClick={handleCloseEdit}
-                  className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer"
-                >
-                  {t("routing.buttons.cancel")}
-                </button>
-                <button
-                  onClick={handleSaveEditRule}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-650 to-indigo-650 hover:from-blue-600 hover:to-indigo-600 text-white rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer shadow-sm hover:shadow"
-                >
-                  {t("routing.buttons.saveRule")}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {showDeleteModal && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm border border-slate-200/50 shadow-xl flex flex-col gap-4">
-            <div>
-              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">
-                {t("routing.modal.deleteTitle")}{deleteRule?.id}
-              </h3>
-              <p className="text-xs text-slate-500 font-medium">
-                {t("routing.modal.deleteMessage")}<br />
-                {t("routing.modal.topicLabel")}<strong>{getTopicName(deleteRule)}</strong> 
-              </p>
-            </div>
-            
-            <div className="space-y-1.5">
-              <label className="block text-xs font-bold text-slate-450 uppercase tracking-wider">
-                {t("routing.modal.passwordLabel")}
-              </label>
-              <input
-                type="password"
-                value={deletePassword}
-                onChange={(e) => setDeletePassword(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                placeholder={t("routing.modal.passwordPlaceholder")}
-              />
-              {deleteError && (
-                <p className="text-red-650 text-xxs font-bold">{deleteError}</p>
-              )}
-            </div>
-            
-            <div className="flex justify-end space-x-3 pt-2">
-              <button
-                onClick={handleCancelDelete}
-                className="px-4 py-2 border border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer"
-              >
-                {t("routing.buttons.cancel")}
-              </button>
-              <button
-                onClick={handleConfirmDelete}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer shadow-sm hover:shadow"
-              >
-                {t("routing.buttons.delete")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteConfirmModal
+        showDeleteModal={showDeleteModal}
+        deleteRule={deleteRule}
+        deletePassword={deletePassword}
+        deleteError={deleteError}
+        getTopicName={getTopicName}
+        setDeletePassword={setDeletePassword}
+        handleCancelDelete={handleCancelDelete}
+        handleConfirmDelete={handleConfirmDelete}
+        t={t}
+      />
     </DashboardLayout>
   );
 };
 
 // --- SUB-COMPONENTS ---
+
+const DeleteConfirmModal = memo(({
+  showDeleteModal,
+  deleteRule,
+  deletePassword,
+  deleteError,
+  getTopicName,
+  setDeletePassword,
+  handleCancelDelete,
+  handleConfirmDelete,
+  t,
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const frame = window.requestAnimationFrame(() => setIsVisible(true));
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  if (!showDeleteModal) return null;
+
+  return createPortal(
+    <div className={`fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-950/35 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+      <div className={`w-full max-w-sm rounded-2xl border border-slate-200/60 bg-white p-6 shadow-[0_10px_40px_rgba(15,23,42,0.16)] flex flex-col gap-4 will-change-transform ${isVisible ? "translate-y-0" : "translate-y-2"}`}>
+        <div>
+          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">
+            {t("routing.modal.deleteTitle")}{deleteRule?.id}
+          </h3>
+          <p className="text-xs text-slate-500 font-medium">
+            {t("routing.modal.deleteMessage")}<br />
+            {t("routing.modal.topicLabel")}<strong>{getTopicName(deleteRule)}</strong>
+          </p>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block text-xs font-bold text-slate-450 uppercase tracking-wider">
+            {t("routing.modal.passwordLabel")}
+          </label>
+          <input
+            type="password"
+            value={deletePassword}
+            onChange={(e) => setDeletePassword(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+            placeholder={t("routing.modal.passwordPlaceholder")}
+          />
+          {deleteError && (
+            <p className="text-red-650 text-xxs font-bold">{deleteError}</p>
+          )}
+        </div>
+
+        <div className="flex justify-end space-x-3 pt-2">
+          <button
+            onClick={handleCancelDelete}
+            className="px-4 py-2 border border-slate-200 text-slate-650 hover:bg-slate-50 rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer"
+          >
+            {t("routing.buttons.cancel")}
+          </button>
+          <button
+            onClick={handleConfirmDelete}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer shadow-sm hover:shadow"
+          >
+            {t("routing.buttons.delete")}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+});
+
+const RuleEditorModal = memo(({
+  activeTab,
+  editingRule,
+  editFormData,
+  msgTypeInput,
+  originatorError,
+  setMsgTypeInput,
+  setOriginatorError,
+  handleCloseEdit,
+  handleEditFormChange,
+  handleA2sMsgTypeKeyDown,
+  addA2sMsgType,
+  removeA2sMsgType,
+  handleSaveEditRule,
+  t,
+}) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const frame = window.requestAnimationFrame(() => setIsVisible(true));
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  if (!editingRule) return null;
+
+  return createPortal(
+    <div className={`fixed inset-0 bg-slate-950/35 flex items-center justify-center z-[60] p-4 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+      <div className={`bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200/50 flex flex-col transform-gpu will-change-transform ${isVisible ? "translate-y-0 scale-100" : "translate-y-2 scale-[0.985]"}`}>
+        <div className="flex items-center justify-between p-4 border-b border-slate-100 sticky top-0 bg-white z-10">
+          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
+            {t("routing.modal.editTitle")}{activeTab === "A2S" ? t("routing.tabs.a2s") : t("routing.tabs.s2a")}
+          </h3>
+          <button
+            onClick={handleCloseEdit}
+            className="text-slate-400 hover:text-slate-655 p-1 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="p-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
+          {activeTab === "A2S" ? (
+            <>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.a2s.messageType.label")}
+                </label>
+                <div className="border border-slate-200 rounded-xl px-3.5 py-3 bg-slate-50/50">
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {(editFormData.msgTypeList || []).map((type) => (
+                      <span
+                        key={type}
+                        className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-indigo-200/50"
+                      >
+                        {type}
+                        <button
+                          type="button"
+                          onClick={() => removeA2sMsgType(type)}
+                          className="text-indigo-550 hover:text-indigo-900 font-extrabold cursor-pointer"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      list="a2s-msg-types"
+                      value={msgTypeInput}
+                      onChange={(e) => setMsgTypeInput(e.target.value)}
+                      onKeyDown={handleA2sMsgTypeKeyDown}
+                      placeholder={t("routing.form.a2s.messageType.placeholder")}
+                      className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => addA2sMsgType(msgTypeInput)}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 active:scale-95 transition-all cursor-pointer"
+                    >
+                      {t("routing.form.a2s.messageType.addButton")}
+                    </button>
+                  </div>
+                  <datalist id="a2s-msg-types">
+                    {A2S_MESSAGE_TYPES.map((type) => (
+                      <option key={type} value={type} />
+                    ))}
+                  </datalist>
+                  <p className="mt-1.5 text-[10px] text-slate-400 font-medium">
+                    {t("routing.form.a2s.messageType.hint")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.a2s.sendTopic.label")}
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.topic || ""}
+                  onChange={(e) => handleEditFormChange("topic", e.target.value)}
+                  placeholder={t("routing.form.a2s.sendTopic.placeholder")}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.a2s.priority.label")}
+                </label>
+                <select
+                  value={editFormData.priority || "FF"}
+                  onChange={(e) => handleEditFormChange("priority", e.target.value)}
+                  className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 cursor-pointer"
+                >
+                  <option value="SS">{t("routing.form.a2s.priority.options.ss")}</option>
+                  <option value="DD">{t("routing.form.a2s.priority.options.dd")}</option>
+                  <option value="FF">{t("routing.form.a2s.priority.options.ff")}</option>
+                  <option value="GG">{t("routing.form.a2s.priority.options.gg")}</option>
+                  <option value="KK">{t("routing.form.a2s.priority.options.kk")}</option>
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.common.status.label")}
+                </label>
+                <div className="flex items-center space-x-6 text-xs text-slate-700 font-semibold bg-slate-50/50 p-2 border border-slate-100 rounded-lg w-fit">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={editFormData.active === true}
+                      onChange={() => handleEditFormChange("active", true)}
+                      className="mr-2 cursor-pointer"
+                    />
+                    {t("routing.form.common.status.active")}
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={editFormData.active === false}
+                      onChange={() => handleEditFormChange("active", false)}
+                      className="mr-2 cursor-pointer"
+                    />
+                    {t("routing.form.common.status.inactive")}
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.common.note.label")}
+                </label>
+                <textarea
+                  value={editFormData.note || ""}
+                  onChange={(e) => handleEditFormChange("note", e.target.value)}
+                  placeholder={t("routing.form.a2s.note.placeholder")}
+                  rows={3}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.s2a.receiveTopic.label")}
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.receiveTopic || editFormData.topic || ""}
+                  onChange={(e) => handleEditFormChange("receiveTopic", e.target.value)}
+                  placeholder={t("routing.form.s2a.receiveTopic.placeholder")}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.s2a.messageFilter.label")}
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.msgFilter || ""}
+                  onChange={(e) => handleEditFormChange("msgFilter", e.target.value)}
+                  placeholder={t("routing.form.s2a.messageFilter.placeholder")}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.s2a.recipients.label")}
+                </label>
+                <textarea
+                  value={editFormData.recipients || ""}
+                  onChange={(e) => handleEditFormChange("recipients", e.target.value)}
+                  placeholder={t("routing.form.s2a.recipients.placeholder")}
+                  rows={2}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.s2a.originator.label")}
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.originator || ""}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    handleEditFormChange("originator", value);
+                    if (value && value.length !== 8) {
+                      setOriginatorError(t("routing.form.s2a.originator.error"));
+                    } else {
+                      setOriginatorError("");
+                    }
+                  }}
+                  placeholder={t("routing.form.s2a.originator.placeholder")}
+                  className={`w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 ${
+                    originatorError ? "border-red-500 focus:border-red-555 focus:ring-red-500/10" : "border-slate-200"
+                  }`}
+                />
+                {originatorError && (
+                  <p className="text-red-650 text-xxs mt-1 font-bold">{originatorError}</p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.s2a.priority.label")}
+                </label>
+                <select
+                  value={editFormData.prioritySwim || "Unset"}
+                  onChange={(e) => handleEditFormChange("prioritySwim", e.target.value)}
+                  className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 cursor-pointer"
+                >
+                  {SWIM_PRIORITIES.map((p) => (
+                    <option key={p} value={p}>
+                      {t(`routing.form.s2a.priority.options.${p}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.common.status.label")}
+                </label>
+                <div className="flex items-center space-x-6 text-xs text-slate-700 font-semibold bg-slate-50/50 p-2 border border-slate-100 rounded-lg w-fit">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={editFormData.active === true}
+                      onChange={() => handleEditFormChange("active", true)}
+                      className="mr-2 cursor-pointer"
+                    />
+                    {t("routing.form.common.status.active")}
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="status"
+                      checked={editFormData.active === false}
+                      onChange={() => handleEditFormChange("active", false)}
+                      className="mr-2 cursor-pointer"
+                    />
+                    {t("routing.form.common.status.inactive")}
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                  {t("routing.form.common.note.label")}
+                </label>
+                <textarea
+                  value={editFormData.note || ""}
+                  onChange={(e) => handleEditFormChange("note", e.target.value)}
+                  placeholder={t("routing.form.s2a.note.placeholder")}
+                  rows={3}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                />
+              </div>
+            </>
+          )}
+
+          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+            <button
+              onClick={handleCloseEdit}
+              className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer"
+            >
+              {t("routing.buttons.cancel")}
+            </button>
+            <button
+              onClick={handleSaveEditRule}
+              className="px-4 text-slate-600 py-2 bg-gradient-to-r from-blue-650 to-indigo-650 hover:bg-blue-300 text-white rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer shadow-sm hover:shadow"
+            >
+              {t("routing.buttons.saveRule")}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+});
 
 export default RoutingView;
