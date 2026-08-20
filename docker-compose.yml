@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: gateway-fe
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     # Nginx serves the app on port 80, but we want to access it on port 3000
     ports:
       - "3000:80"

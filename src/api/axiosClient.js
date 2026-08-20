@@ -4,8 +4,7 @@ import { useLanguageStore } from '../store/languageStore';
 
 const getBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-  return `http://${host}:8180/api`;
+  return '/api';
 };
 
 const axiosClient = axios.create({
