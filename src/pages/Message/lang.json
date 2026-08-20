@@ -96,6 +96,10 @@
       "vi": "Unrouted",
       "en": "Unrouted"
     },
+    "TRANSFORMED": {
+      "vi": "Transformed",
+      "en": "Transformed"
+    },
     "DELIVERED": {
       "vi": "Delivered",
       "en": "Delivered"
@@ -107,6 +111,10 @@
     "FAILED": {
       "vi": "Failed",
       "en": "Failed"
+    },
+    "RESOLVED": {
+      "vi": "Resolved",
+      "en": "Resolved"
     },
     "CANCELLED": {
       "vi": "Cancelled",

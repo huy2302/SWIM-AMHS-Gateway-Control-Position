@@ -254,17 +254,22 @@ const MessageView = () => {
                 {searchType === "AMQP" ? (
                   <>
                     <option value="0">{t("messages.status.PENDING")}</option>
-                    <option value="2">{t("messages.status.UNROUTED")}</option>
+                    <option value="1">{t("messages.status.UNROUTED")}</option>
+                    <option value="2">{t("messages.status.TRANSFORMED")}</option>
                     <option value="3">{t("messages.status.DELIVERED")}</option>
-                    <option value="1">{t("messages.status.FAILED")}</option>
-                    <option value="4">{t("messages.status.CANCELLED")}</option>
+                    <option value="4">{t("messages.status.FAILED")}</option>
+                    <option value="5">{t("messages.status.RESOLVED")}</option>
+                    <option value="6">{t("messages.status.CANCELLED")}</option>
                   </>
                 ) : (
                   <>
                     <option value="0">{t("messages.status.PENDING")}</option>
-                    <option value="1">{t("messages.status.PUBLISHED")}</option>
-                    <option value="2">{t("messages.status.FAILED")}</option>
-                    <option value="3">{t("messages.status.CANCELLED")}</option>
+                    <option value="1">{t("messages.status.TRANSFORMED")}</option>
+                    <option value="2">{t("messages.status.PUBLISHED")}</option>
+                    <option value="3">{t("messages.status.FAILED")}</option>
+                    <option value="4">{t("messages.status.UNROUTED")}</option>
+                    <option value="5">{t("messages.status.RESOLVED")}</option>
+                    <option value="6">{t("messages.status.CANCELLED")}</option>
                   </>
                 )}
               </select>
@@ -608,12 +613,15 @@ const MessageView = () => {
 const renderAmhsStatus = (status) => {
   const statusMap = {
     0: { label: 'PENDING', className: 'bg-amber-50 text-amber-700 border border-amber-200' },
-    1: { label: 'PUBLISHED', className: 'bg-green-50 text-green-700 border border-green-200' },
-    2: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
-    3: { label: 'CANCELLED', className: 'bg-slate-50 text-slate-700 border border-slate-200' },
+    1: { label: 'TRANSFORMED', className: 'bg-blue-50 text-blue-700 border border-blue-200' },
+    2: { label: 'PUBLISHED', className: 'bg-green-50 text-green-700 border border-green-200' },
+    3: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
+    4: { label: 'UNROUTED', className: 'bg-purple-50 text-purple-700 border border-purple-200' },
+    5: { label: 'RESOLVED', className: 'bg-teal-50 text-teal-700 border border-teal-200' },
+    6: { label: 'CANCELLED', className: 'bg-slate-50 text-slate-700 border border-slate-200' },
   };
 
-  const current = statusMap[status] || { label: 'PUBLISHED', className: 'bg-green-50 text-green-700 border border-green-200' };
+  const current = statusMap[status] || { label: 'UNKNOWN', className: 'bg-slate-50 text-slate-700 border border-slate-200' };
 
   return (
     <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${current.className}`}>
@@ -625,10 +633,12 @@ const renderAmhsStatus = (status) => {
 const renderSwimStatus = (status) => {
   const statusMap = {
     0: { label: 'PENDING', className: 'bg-amber-50 text-amber-700 border border-amber-200' },
-    1: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
-    2: { label: 'UNROUTED', className: 'bg-purple-50 text-purple-700 border border-purple-200' },
+    1: { label: 'UNROUTED', className: 'bg-purple-50 text-purple-700 border border-purple-200' },
+    2: { label: 'TRANSFORMED', className: 'bg-blue-50 text-blue-700 border border-blue-200' },
     3: { label: 'DELIVERED', className: 'bg-green-50 text-green-700 border border-green-200' },
-    4: { label: 'CANCELLED', className: 'bg-slate-50 text-slate-700 border border-slate-200' },
+    4: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
+    5: { label: 'RESOLVED', className: 'bg-teal-50 text-teal-700 border border-teal-200' },
+    6: { label: 'CANCELLED', className: 'bg-slate-50 text-slate-700 border border-slate-200' },
   };
 
   const current = statusMap[status] || { label: 'UNKNOWN', className: 'bg-slate-50 text-slate-700 border border-slate-200' };
