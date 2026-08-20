@@ -50,11 +50,29 @@ export const authUtils = {
 
   getAuth: () => {
     const authData = localStorage.getItem('auth');
-    return authData ? JSON.parse(authData) : null;
+    if (authData) {
+      try {
+        const parsed = JSON.parse(authData);
+        if (parsed?.token) return parsed;
+      } catch (e) {}
+    }
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    if (token) {
+      try {
+        const user = userStr ? JSON.parse(userStr) : null;
+        return { token, user };
+      } catch (e) {
+        return { token, user: null };
+      }
+    }
+    return null;
   },
 
   removeAuth: () => {
     localStorage.removeItem('auth');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   },
 
   isAuthenticated: () => {
