@@ -80,7 +80,7 @@ export const LOG_TEMPLATES = [
   },
   {
     level: "INFO",
-    message: "Mapping Field 15 (Route) to FIXM 4.2: [VVB - PANTO - ADOSI]",
+    message: "Routing message: [VVB - PANTO - ADOSI]",
   },
   {
     level: "SUCCESS",

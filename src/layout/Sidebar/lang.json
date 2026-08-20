@@ -15,20 +15,20 @@
   },
   "sections": {
     "monitoring": {
-      "vi": "GIÁM SÁT",
-      "en": "MONITOR"
+      "vi": "Giám Sát",
+      "en": "Monitor"
     },
     "traffic": {
-      "vi": "ĐIỆN VĂN",
-      "en": "TRAFFIC"
+      "vi": "Điện Văn",
+      "en": "Traffic"
     },
     "logs": {
-      "vi": "NHẬT KÝ",
-      "en": "LOGS"
+      "vi": "Nhật Ký",
+      "en": "Logs"
     },
     "admin": {
-      "vi": "QUẢN TRỊ",
-      "en": "ADMIN"
+      "vi": "Quản Trị",
+      "en": "Admin"
     }
   },
   "menu": {
@@ -82,11 +82,11 @@
       "vi": "Tài nguyên",
       "en": "System Status"
     },
-     "cpu": {
+    "cpu": {
       "vi": "CPU đã dùng",
       "en": "CPU Usage"
     },
-     "ram": {
+    "ram": {
       "vi": "RAM đã dùng",
       "en": "Memory Usage"
     }

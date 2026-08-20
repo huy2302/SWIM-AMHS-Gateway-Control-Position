@@ -79,6 +79,10 @@
     "user": {
       "vi": "Người dùng xem tin",
       "en": "Viewer"
+    },
+    "viewer": {
+      "vi": "Người dùng xem tin",
+      "en": "Viewer"
     }
   },
   "dialog": {

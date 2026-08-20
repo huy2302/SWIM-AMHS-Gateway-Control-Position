@@ -43,8 +43,9 @@ const SystemEvents = () => {
         userId: user?.userId || 1
       });
 
-      setRows(response?.histories?.content || []);
-      setRowCount(response?.histories?.totalElements || 0);
+      const historiesData = response?.histories;
+      setRows(historiesData?.items || historiesData?.content || []);
+      setRowCount(historiesData?.totalItems ?? historiesData?.totalElements ?? 0);
     } catch (error) {
       console.error("Load system events failed", error);
     } finally {
@@ -127,7 +128,7 @@ const SystemEvents = () => {
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
           {/* Card Header */}
           <div className="px-5 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+            <span className="text-xs font-bold text-slate-700 tracking-wider">
               {t("sidebar.menu.systemHistory")}
             </span>
             <button 
@@ -142,7 +143,7 @@ const SystemEvents = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                <tr className="bg-slate-50 text-slate-500 tracking-wider border-b border-slate-200">
                   <th className="px-4 py-3 font-semibold text-xs">{t("systemEvents.table.time")}</th>
                   <th className="px-4 py-3 font-semibold text-xs">{t("systemEvents.table.severity")}</th>
                   <th className="px-4 py-3 font-semibold text-xs">{t("systemEvents.table.type")}</th>
@@ -217,7 +218,7 @@ const SystemEvents = () => {
           fullWidth
         >
           <DialogTitle>
-            <span className="text-sm font-bold text-slate-800 uppercase tracking-wider">{t("systemEvents.dialog.title")}</span>
+            <span className="text-sm font-bold text-slate-800 tracking-wider">{t("systemEvents.dialog.title")}</span>
           </DialogTitle>
 
           <DialogContent>

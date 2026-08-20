@@ -29,34 +29,14 @@ const createA2SRule = () => ({
   destination: "",
   msgType: "FPL",
   messageType: "FPL",
+  detectPattern: "",
   domain: "FIXM",
   topic: "",
-  topicAuto: true,
-  priority: 1,
+  priority: 100,
   active: true,
   createdAt: createTimestamp(),
   updatedAt: createTimestamp(),
 });
-
-const MSG_TYPE_TO_EVENT = {
-  // FIXM (Flight)
-  FPL: "flight.plan",
-  DEP: "flight.departure",
-  ARR: "flight.arrival",
-  DLA: "flight.delay",
-  CNL: "flight.cancel",
-  CHG: "flight.change",
-
-  // IWXXM (Weather)
-  METAR: "metar",
-  SPECI: "speci",
-  TAF: "taf",
-  SIGMET: "sigmet",
-  AIRMET: "airmet",
-
-  // AIXM (Aeronautical info)
-  NOTAM: "notam",
-};
 
 const A2S_MESSAGE_TYPES = [
   "METAR",
@@ -73,87 +53,6 @@ const A2S_MESSAGE_TYPES = [
   "NOTAM",
 ];
 
-// AMHS Priority levels: SS, DD, FF, GG, KK
-const AMHS_PRIORITIES = {
-  SS: "SS",
-  DD: "DD",
-  FF: "FF",
-  GG: "GG",
-  KK: "KK",
-};
-
-// SWIM Priority levels: 0-9
-const SWIM_PRIORITIES = Array.from({ length: 10 }, (_, i) => i.toString());
-
-// Convert AMHS priority to SWIM priority
-const amhsToSwimPriority = (amhsPriority) => {
-  const mapping = {
-    SS: "0",
-    DD: "1",
-    FF: "3",
-    GG: "5",
-    KK: "7",
-  };
-  return mapping[amhsPriority?.toUpperCase()] || "3";
-};
-
-// Convert SWIM priority to AMHS priority
-const swimToAmhsPriority = (swimPriority) => {
-  const num = parseInt(swimPriority) || 0;
-  if (num <= 1) return "DD";
-  if (num <= 3) return "FF";
-  if (num <= 6) return "GG";
-  if (num <= 9) return "KK";
-  return "FF";
-};
-
-const buildA2sTopicFromRule = (rule) => {
-  if (!rule.domain) return "";
-
-  const domain = rule.domain.toLowerCase().trim();
-  const msgTypeString = (rule.msgType || "").toUpperCase().trim();
-  const msgType = msgTypeString.split(",")[0].trim();
-
-  // tìm event từ bảng mapping
-  const event = MSG_TYPE_TO_EVENT[msgType];
-
-  // nếu chưa có mapping → fallback generic
-  const finalEvent = event || "message";
-
-  return `${domain}.${finalEvent}`;
-};
-
-const formatPriorityDisplay = (rule, isS2A) => {
-  if (isS2A) {
-    // S2A uses SWIM rule (0-9), show with AMHS equivalent
-    return `${rule.prioritySwim} (${rule.priorityAmhs})`;
-  } else {
-    // A2S uses AMHS rule (SS/DD/FF/GG/KK)
-    return `${rule.priorityAmhs} (${rule.prioritySwim})`;
-  }
-};
-
-// Map AMHS priority to SWIM priority value
-const getSwimPriorityFromAmhs = (amhsPriority) => {
-  const mapping = {
-    SS: 0,
-    DD: 1,
-    FF: 3,
-    GG: 5,
-    KK: 7,
-  };
-  return mapping[amhsPriority?.toUpperCase()] ?? 3;
-};
-
-// Map SWIM priority to AMHS priority
-const getAmhsPriorityFromSwim = (swimPriority) => {
-  const num = parseInt(swimPriority) || 0;
-  if (num <= 1) return "DD";
-  if (num <= 3) return "FF";
-  if (num <= 6) return "GG";
-  if (num <= 9) return "KK";
-  return "FF";
-};
 
 const createS2ARule = () => ({
   id: `s2a-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
@@ -164,7 +63,7 @@ const createS2ARule = () => ({
   msgType: "",
   originator: "",
   destination: "",
-  priority: "FF",
+  priority: 100,
   filingTime: "CURRENT_TIME",
   active: true,
   description: "",
@@ -181,12 +80,11 @@ const normalizeA2sApiRule = (rule) => ({
   destination: rule.amhsDestination ?? rule.destination ?? "",
   msgType: rule.messageType ?? rule.amhsMsgType ?? rule.msgType ?? "",
   messageType: rule.messageType ?? rule.amhsMsgType ?? rule.msgType ?? "",
+  detectPattern: rule.detectPattern ?? rule.detect_pattern ?? "",
   domain: rule.swimDomain ?? rule.domain ?? "",
   topic: rule.sendTopic ?? rule.swimTopic ?? rule.topic ?? "",
   sendTopic: rule.sendTopic ?? rule.swimTopic ?? rule.topic ?? "",
-  topicAuto: true,
-  prioritySwim: rule.prioritySwim ?? null,
-  priorityAmhs: rule.priorityAmhs ?? null,
+  priority: rule.priority ?? 100,
   active: rule.enabled ?? rule.active ?? false,
   description: rule.note ?? rule.description ?? "",
   note: rule.note ?? "",
@@ -201,12 +99,10 @@ const normalizeS2aApiRule = (rule) => ({
   receiveTopic: rule.receiveTopic ?? rule.swimTopic ?? rule.topic ?? "",
   sendTopic: rule.sendTopic ?? rule.amhsTopic ?? "",
   domain: rule.swimDomain ?? rule.domain ?? "",
-  messageFilter: rule.messageFilter ?? "",
   msgType: rule.messageType ?? rule.msgType ?? "",
   originator: rule.amhsOriginator ?? rule.originator ?? "",
   destination: rule.recipients ?? rule.amhsDestination ?? rule.destination ?? "",
-  priorityAmhs: rule.priorityAmhs ?? null,
-  prioritySwim: rule.prioritySwim ?? null,
+  priority: rule.priority ?? 100,
   filingTime: rule.amhsFilingTimeMode ?? rule.filingTime ?? "CURRENT_TIME",
   active: rule.enabled ?? rule.active ?? false,
   description: rule.note ?? rule.description ?? "",
@@ -216,7 +112,7 @@ const normalizeS2aApiRule = (rule) => ({
 });
 
 const RoutingView = () => {
-  const [activeTab, setActiveTab] = useState("S2A"); // S2A (SWIM to AMHS) là quan trọng hơn
+  const [activeTab, setActiveTab] = useState("A2S"); // S2A (SWIM to AMHS) là quan trọng hơn
   const [a2sRules, setA2sRules] = useState([]);
   const [s2aRules, setS2aRules] = useState([]);
   const [loadingRoutes, setLoadingRoutes] = useState(false);
@@ -273,28 +169,6 @@ const RoutingView = () => {
       setS2aRules((prev) => [newRule, ...prev]);
     }
     handleEditRule(newRule); // Tự động mở edit mode cho rule mới
-  };
-
-  const handleChangeA2sRule = (id, field, value) => {
-    setA2sRules((prev) =>
-      prev.map((rule) => {
-        if (rule.id !== id) return rule;
-
-        const updated = { ...rule, [field]: value, updatedAt: createTimestamp() };
-        if ((field === "destination" || field === "msgType") && updated.topicAuto) {
-          updated.topic = buildA2sTopicFromRule(updated);
-        }
-        return updated;
-      })
-    );
-  };
-
-  const handleChangeS2aRule = (id, field, value) => {
-    setS2aRules((prev) =>
-      prev.map((rule) =>
-        rule.id === id ? { ...rule, [field]: value, updatedAt: createTimestamp() } : rule
-      )
-    );
   };
 
   const handleRemoveA2sRule = (id) => {
@@ -372,9 +246,9 @@ const RoutingView = () => {
           .split(",")
           .map((item) => item.trim())
           .filter(Boolean),
+        detectPattern: rule.detectPattern || rule.detect_pattern || "",
         topic: rule.topic || "",
-        priorityAmhs: rule.priorityAmhs || "", // A2S uses AMHS priority (SS/DD/FF/GG/KK)
-        prioritySwim: rule.prioritySwim?.toString() || "", // A2S uses AMHS priority (SS/DD/FF/GG/KK)
+        priority: rule.priority ?? 100,
         active: rule.active ?? true,
         note: rule.description || "",
       });
@@ -383,14 +257,10 @@ const RoutingView = () => {
       setEditFormData({
         id: rule.id,
         direction: "IN",
-        topic: rule.topic || "",
         receiveTopic: rule.receiveTopic || rule.topic || "",
-        sendTopic: rule.sendTopic || "",
-        msgFilter: rule.msgType || "",
         recipients: rule.destination || "",
         originator: rule.originator || "",
-        priorityAmhs: rule.priorityAmhs || "", // S2A uses SWIM priority (0-9)
-        prioritySwim: rule.prioritySwim?.toString() || "", // S2A uses SWIM priority (0-9)
+        priority: rule.priority ?? 100,
         active: rule.active ?? true,
         note: rule.description || "",
       });
@@ -398,6 +268,16 @@ const RoutingView = () => {
   };
 
   const handleCloseEdit = () => {
+    // Rule mới thêm (handleAddNewRule) đã được chèn thẳng vào a2sRules/s2aRules để mở edit mode
+    // ngay lập tức — nếu người dùng huỷ trước khi lưu, phải gỡ nó ra, nếu không sẽ để lại 1 dòng
+    // rỗng "ma" trên bảng (chưa từng tồn tại ở BE) cho tới khi F5.
+    if (editingRule && !Number.isFinite(editingRule.id)) {
+      if (activeTab === "A2S") {
+        handleRemoveA2sRule(editingRule.id);
+      } else {
+        handleRemoveS2aRule(editingRule.id);
+      }
+    }
     setEditingRule(null);
     setEditFormData({});
     setMsgTypeInput("");
@@ -483,45 +363,43 @@ const RoutingView = () => {
   const handleSaveEditRule = async () => {
     if (!editingRule) return;
 
-    const updatedData = { ...editFormData, updatedAt: createTimestamp() };
-
-    const msgTypeValue = Array.isArray(updatedData.msgTypeList)
-      ? updatedData.msgTypeList.join(",")
-      : updatedData.msgType;
+    // Chỉ gửi đúng field thật mà form hiện có UI cho sửa (PUT/POST đều optional-field,
+    // field nào không có UI thì bỏ qua để không ghi đè giá trị đang có trên BE bằng dữ liệu cũ/rỗng).
+    const payload = {
+      direction: editFormData.direction,
+      active: editFormData.active,
+      note: editFormData.note || "",
+      priority: Number(editFormData.priority) || 100,
+    };
 
     if (activeTab === "A2S") {
-      // A2S uses AMHS priority (SS/DD/FF/GG/KK)
-      handleChangeA2sRule(editingRule.id, "msgType", msgTypeValue);
-      handleChangeA2sRule(editingRule.id, "messageType", msgTypeValue);
-      handleChangeA2sRule(editingRule.id, "topic", updatedData.topic);
-      handleChangeA2sRule(editingRule.id, "priority", updatedData.priority); // Store as AMHS priority
-      handleChangeA2sRule(editingRule.id, "active", updatedData.active);
-      handleChangeA2sRule(editingRule.id, "description", updatedData.note);
+      payload.messageType = (editFormData.msgTypeList || []).join(",");
+      payload.detectPattern = editFormData.detectPattern || "";
+      payload.sendTopic = editFormData.topic || "";
     } else {
-      // S2A uses SWIM priority (0-9)
-      handleChangeS2aRule(editingRule.id, "receiveTopic", updatedData.receiveTopic ?? updatedData.topic);
-      handleChangeS2aRule(editingRule.id, "topic", updatedData.receiveTopic ?? updatedData.topic);
-      handleChangeS2aRule(editingRule.id, "sendTopic", updatedData.sendTopic);
-      handleChangeS2aRule(editingRule.id, "msgType", updatedData.msgFilter);
-      handleChangeS2aRule(editingRule.id, "destination", updatedData.recipients);
-      handleChangeS2aRule(editingRule.id, "originator", updatedData.originator);
-      handleChangeS2aRule(editingRule.id, "prioritySwim", updatedData.prioritySwim); // Store as SWIM priority
-      handleChangeS2aRule(editingRule.id, "priorityAmhs", updatedData.priorityAmhs); // Store as AMHS priority
-      handleChangeS2aRule(editingRule.id, "active", updatedData.active);
-      handleChangeS2aRule(editingRule.id, "description", updatedData.note);
+      payload.receiveTopic = editFormData.receiveTopic || "";
+      payload.recipients = editFormData.recipients || "";
+      payload.originator = editFormData.originator || "";
     }
 
     try {
-      if (Number.isFinite(updatedData.id)) {
-        await gatewayApi.updateRouting(updatedData.id, updatedData);
+      if (Number.isFinite(editFormData.id)) {
+        await gatewayApi.updateRouting(editFormData.id, payload);
       } else {
-        await gatewayApi.createRouting(updatedData);
+        await gatewayApi.createRouting(payload);
       }
 
       showSuccessToast(t("routing.toast.saveSuccess"), toast);
       setStatusMessage(`✓ Rule ${editingRule.id} ${t("routing.toast.saveSuccess")}`);
       setStatusType("success");
-      handleCloseEdit();
+      // Đóng edit mode trực tiếp (không qua handleCloseEdit) vì rule đã lưu thành công,
+      // không còn là draft cần dọn nữa.
+      setEditingRule(null);
+      setEditFormData({});
+      setMsgTypeInput("");
+      // Refetch từ BE thay vì tin state local: rule mới tạo đang mang id giả (client-generated),
+      // nếu không đồng bộ lại, sửa/xoá tiếp rule đó ngay sau khi tạo sẽ gọi API bằng id sai.
+      await fetchRoutingConfigs();
     } catch (error) {
       showErrorToast(`${t("routing.toast.saveFailed")}${error.message || t("routing.toast.saveFailed")}`, toast);
       console.error("Error when save rule:", error);
@@ -587,7 +465,7 @@ const RoutingView = () => {
         <div className="bg-white border border-slate-200/80 rounded-xl overflow-hidden shadow-xs flex flex-col">
           {/* Header & Filters row */}
           <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <h2 className="text-xs font-bold text-slate-650 uppercase tracking-wider">
+            <h2 className="text-xs font-bold text-slate-650 tracking-wider">
               {activeTab === "A2S" ? t("routing.title.a2s") : t("routing.title.s2a")}
             </h2>
 
@@ -639,12 +517,13 @@ const RoutingView = () => {
           {/* Table */}
           <SimpleBar autoHide={false} style={{ height: '62vh', paddingRight: '5px' }}>
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold uppercase tracking-wider">
+              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold tracking-wider">
                 <tr>
                   <th className="p-3.5">{t("routing.table.id")}</th>
                   {activeTab === "A2S" ? (
                     <>
                       <th className="p-3.5">{t("routing.table.messageType")}</th>
+                      <th className="p-3.5">{t("routing.table.detectPattern")}</th>
                       <th className="p-3.5">{t("routing.table.sendTopic")}</th>
                       <th className="p-3.5">{t("routing.table.note")}</th>
                       <th className="p-3.5">{t("routing.table.priority")}</th>
@@ -673,9 +552,10 @@ const RoutingView = () => {
                     >
                       <td className="p-3.5 font-bold text-slate-900">{rule.id}</td>
                       <td className="p-3.5 text-slate-700">{rule.messageType || rule.msgType}</td>
+                      <td className="p-3.5 text-slate-600 font-mono font-bold text-indigo-600">{rule.detectPattern || "-"}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.sendTopic || rule.topic}</td>
                       <td className="p-3.5 text-slate-600 max-w-[220px] truncate" title={rule.description || rule.note || ""}>{rule.description || rule.note || "-"}</td>
-                      <td className="p-3.5 font-semibold text-indigo-650">{formatPriorityDisplay(rule, false)}</td>
+                      <td className="p-3.5 font-semibold text-indigo-650">{rule.priority ?? 100}</td>
                       <td className="p-3.5">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                           rule.active ? 'bg-green-50 text-green-700 border-green-200/60' : 'bg-slate-50 text-slate-500 border-slate-200/80'
@@ -703,9 +583,9 @@ const RoutingView = () => {
                       <td className="p-3.5 font-bold text-slate-900">{rule.id}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.receiveTopic}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.destination}</td>
-                      <td className="p-3.5 text-slate-700">{rule.msgType || rule.messageFilter || "-"}</td>
+                      <td className="p-3.5 text-slate-700">{rule.msgType || "-"}</td>
                       <td className="p-3.5 text-slate-600 max-w-[220px] truncate" title={rule.description || rule.note || ""}>{rule.description || rule.note || "-"}</td>
-                      <td className="p-3.5 font-semibold text-indigo-650">{formatPriorityDisplay(rule, true)}</td>
+                      <td className="p-3.5 font-semibold text-indigo-650">{rule.priority ?? 100}</td>
                       <td className="p-3.5">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                           rule.active ? 'bg-green-50 text-green-700 border-green-200/60' : 'bg-slate-50 text-slate-500 border-slate-200/80'
@@ -805,10 +685,10 @@ const DeleteConfirmModal = memo(({
   if (!showDeleteModal) return null;
 
   return createPortal(
-    <div className={`fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-950/35 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+    <div className={`fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs ${isVisible ? "opacity-100" : "opacity-0"}`}>
       <div className={`w-full max-w-sm rounded-2xl border border-slate-200/60 bg-white p-6 shadow-[0_10px_40px_rgba(15,23,42,0.16)] flex flex-col gap-4 will-change-transform ${isVisible ? "translate-y-0" : "translate-y-2"}`}>
         <div>
-          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-2">
+          <h3 className="text-sm font-bold text-slate-800 tracking-wider mb-2">
             {t("routing.modal.deleteTitle")}{deleteRule?.id}
           </h3>
           <p className="text-xs text-slate-500 font-medium">
@@ -818,7 +698,7 @@ const DeleteConfirmModal = memo(({
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-bold text-slate-450 uppercase tracking-wider">
+          <label className="block text-xs font-bold text-slate-450 tracking-wider">
             {t("routing.modal.passwordLabel")}
           </label>
           <input
@@ -884,41 +764,47 @@ const RuleEditorModal = memo(({
 
   if (!editingRule) return null;
 
+  const isEdit = Number.isFinite(editFormData.id);
+
   return createPortal(
-    <div className={`fixed inset-0 bg-slate-950/35 flex items-center justify-center z-[60] p-4 ${isVisible ? "opacity-100" : "opacity-0"}`}>
-      <div className={`bg-white rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-xl border border-slate-200/50 flex flex-col transform-gpu will-change-transform ${isVisible ? "translate-y-0 scale-100" : "translate-y-2 scale-[0.985]"}`}>
-        <div className="flex items-center justify-between p-4 border-b border-slate-100 sticky top-0 bg-white z-10">
-          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
-            {t("routing.modal.editTitle")}{activeTab === "A2S" ? t("routing.tabs.a2s") : t("routing.tabs.s2a")}
+    <div className={`fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-[60] p-4 transition-opacity duration-200 ${isVisible ? "opacity-100" : "opacity-0"}`}>
+      <div className={`bg-white rounded-2xl w-full max-w-lg max-h-[90vh] shadow-xl border border-slate-200 flex flex-col transition-all duration-200 overflow-hidden ${isVisible ? "translate-y-0 scale-100" : "translate-y-2 scale-[0.99]"}`}>
+        
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-white sticky top-0 z-10">
+          <h3 className="text-xs font-bold text-slate-800 tracking-wider flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-indigo-600" />
+            {isEdit ? t("routing.modal.editTitle") : t("routing.buttons.addRule")} - {activeTab === "A2S" ? "OUT (AMHS → SWIM)" : "IN (SWIM → AMHS)"}
           </h3>
           <button
             onClick={handleCloseEdit}
-            className="text-slate-400 hover:text-slate-655 p-1 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-50 transition cursor-pointer"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
-        <div className="p-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
+        {/* Form Body */}
+        <div className="p-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar text-xs">
           {activeTab === "A2S" ? (
             <>
+              {/* Message Type */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.a2s.messageType.label")}
+                <label className="block font-bold text-slate-600 tracking-wider">
+                  {t("routing.form.a2s.messageType.label")} *
                 </label>
-                <div className="border border-slate-200 rounded-xl px-3.5 py-3 bg-slate-50/50">
+                <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {(editFormData.msgTypeList || []).map((type) => (
                       <span
                         key={type}
-                        className="inline-flex items-center gap-1.5 bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-indigo-200/50"
+                        className="inline-flex items-center gap-1.5 bg-white text-indigo-700 font-bold px-2 py-0.5 rounded-md border border-slate-200 shadow-2xs"
                       >
                         {type}
                         <button
                           type="button"
                           onClick={() => removeA2sMsgType(type)}
-                          className="text-indigo-550 hover:text-indigo-900 font-extrabold cursor-pointer"
+                          className="text-slate-400 hover:text-red-600 font-bold cursor-pointer"
                         >
                           ×
                         </button>
@@ -933,12 +819,12 @@ const RuleEditorModal = memo(({
                       onChange={(e) => setMsgTypeInput(e.target.value)}
                       onKeyDown={handleA2sMsgTypeKeyDown}
                       placeholder={t("routing.form.a2s.messageType.placeholder")}
-                      className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                      className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                     />
                     <button
                       type="button"
                       onClick={() => addA2sMsgType(msgTypeInput)}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-bold hover:bg-indigo-700 active:scale-95 transition-all cursor-pointer"
+                      className="px-3.5 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition cursor-pointer"
                     >
                       {t("routing.form.a2s.messageType.addButton")}
                     </button>
@@ -948,224 +834,215 @@ const RuleEditorModal = memo(({
                       <option key={type} value={type} />
                     ))}
                   </datalist>
-                  <p className="mt-1.5 text-[10px] text-slate-400 font-medium">
-                    {t("routing.form.a2s.messageType.hint")}
-                  </p>
                 </div>
               </div>
 
+              {/* Detect Pattern */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.a2s.sendTopic.label")}
+                <label className="block font-bold text-slate-600 tracking-wider">
+                  Detect Pattern *
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.detectPattern || ""}
+                  onChange={(e) => handleEditFormChange("detectPattern", e.target.value)}
+                  placeholder="e.g. METAR  or SA  or TAF "
+                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono font-medium outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
+                />
+                
+              </div>
+
+              {/* Send Topic */}
+              <div className="space-y-1.5">
+                <label className="block font-bold text-slate-600 tracking-wider">
+                  {t("routing.form.a2s.sendTopic.label")} *
                 </label>
                 <input
                   type="text"
                   value={editFormData.topic || ""}
                   onChange={(e) => handleEditFormChange("topic", e.target.value)}
                   placeholder={t("routing.form.a2s.sendTopic.placeholder")}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.a2s.priority.label")}
-                </label>
-                <select
-                  value={editFormData.priority || "FF"}
-                  onChange={(e) => handleEditFormChange("priority", e.target.value)}
-                  className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 cursor-pointer"
-                >
-                  <option value="SS">{t("routing.form.a2s.priority.options.ss")}</option>
-                  <option value="DD">{t("routing.form.a2s.priority.options.dd")}</option>
-                  <option value="FF">{t("routing.form.a2s.priority.options.ff")}</option>
-                  <option value="GG">{t("routing.form.a2s.priority.options.gg")}</option>
-                  <option value="KK">{t("routing.form.a2s.priority.options.kk")}</option>
-                </select>
-              </div>
+              {/* Priority & Status */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="block font-bold text-slate-600 tracking-wider">
+                    {t("routing.form.a2s.priority.label")}
+                  </label>
+                  <input
+                    type="number"
+                    value={editFormData.priority ?? 100}
+                    onChange={(e) => handleEditFormChange("priority", e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.common.status.label")}
-                </label>
-                <div className="flex items-center space-x-6 text-xs text-slate-700 font-semibold bg-slate-50/50 p-2 border border-slate-100 rounded-lg w-fit">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="status"
-                      checked={editFormData.active === true}
-                      onChange={() => handleEditFormChange("active", true)}
-                      className="mr-2 cursor-pointer"
-                    />
-                    {t("routing.form.common.status.active")}
+                <div className="space-y-1.5">
+                  <label className="block font-bold text-slate-600 tracking-wider">
+                    {t("routing.form.common.status.label")}
                   </label>
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="status"
-                      checked={editFormData.active === false}
-                      onChange={() => handleEditFormChange("active", false)}
-                      className="mr-2 cursor-pointer"
-                    />
-                    {t("routing.form.common.status.inactive")}
-                  </label>
+                  <div className="flex items-center space-x-4 p-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                    <label className="flex items-center cursor-pointer font-medium text-slate-700">
+                      <input
+                        type="radio"
+                        name="status-a2s"
+                        checked={editFormData.active === true}
+                        onChange={() => handleEditFormChange("active", true)}
+                        className="mr-1.5 cursor-pointer accent-indigo-600"
+                      />
+                      {t("routing.form.common.status.active")}
+                    </label>
+                    <label className="flex items-center cursor-pointer font-medium text-slate-700">
+                      <input
+                        type="radio"
+                        name="status-a2s"
+                        checked={editFormData.active === false}
+                        onChange={() => handleEditFormChange("active", false)}
+                        className="mr-1.5 cursor-pointer accent-slate-500"
+                      />
+                      {t("routing.form.common.status.inactive")}
+                    </label>
+                  </div>
                 </div>
               </div>
 
+              {/* Note */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <label className="block font-bold text-slate-600 tracking-wider">
                   {t("routing.form.common.note.label")}
                 </label>
                 <textarea
                   value={editFormData.note || ""}
                   onChange={(e) => handleEditFormChange("note", e.target.value)}
                   placeholder={t("routing.form.a2s.note.placeholder")}
-                  rows={3}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                  rows={2}
+                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                 />
               </div>
             </>
           ) : (
             <>
+              {/* S2A Form */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.s2a.receiveTopic.label")}
+                <label className="block font-bold text-slate-600 tracking-wider">
+                  {t("routing.form.s2a.receiveTopic.label")} *
                 </label>
                 <input
                   type="text"
                   value={editFormData.receiveTopic || editFormData.topic || ""}
                   onChange={(e) => handleEditFormChange("receiveTopic", e.target.value)}
                   placeholder={t("routing.form.s2a.receiveTopic.placeholder")}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.s2a.messageFilter.label")}
+                <label className="block font-bold text-slate-600 tracking-wider">
+                  {t("routing.form.s2a.recipients.label")} *
                 </label>
                 <input
                   type="text"
-                  value={editFormData.msgFilter || ""}
-                  onChange={(e) => handleEditFormChange("msgFilter", e.target.value)}
-                  placeholder={t("routing.form.s2a.messageFilter.placeholder")}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.s2a.recipients.label")}
-                </label>
-                <textarea
-                  value={editFormData.recipients || ""}
+                  value={editFormData.recipients || editFormData.destination || ""}
                   onChange={(e) => handleEditFormChange("recipients", e.target.value)}
                   placeholder={t("routing.form.s2a.recipients.placeholder")}
-                  rows={2}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <label className="block font-bold text-slate-600 tracking-wider">
                   {t("routing.form.s2a.originator.label")}
                 </label>
                 <input
                   type="text"
                   value={editFormData.originator || ""}
                   onChange={(e) => {
-                    const value = e.target.value;
-                    handleEditFormChange("originator", value);
-                    if (value && value.length !== 8) {
-                      setOriginatorError(t("routing.form.s2a.originator.error"));
-                    } else {
-                      setOriginatorError("");
-                    }
+                    handleEditFormChange("originator", e.target.value);
+                    setOriginatorError("");
                   }}
                   placeholder={t("routing.form.s2a.originator.placeholder")}
-                  className={`w-full px-3 py-2 bg-slate-50 border rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900 ${
-                    originatorError ? "border-red-500 focus:border-red-555 focus:ring-red-500/10" : "border-slate-200"
-                  }`}
+                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                 />
                 {originatorError && (
-                  <p className="text-red-650 text-xxs mt-1 font-bold">{originatorError}</p>
+                  <p className="text-red-500 text-xxs font-bold">{originatorError}</p>
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.s2a.priority.label")}
-                </label>
-                <select
-                  value={editFormData.prioritySwim || "Unset"}
-                  onChange={(e) => handleEditFormChange("prioritySwim", e.target.value)}
-                  className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 cursor-pointer"
-                >
-                  {SWIM_PRIORITIES.map((p) => (
-                    <option key={p} value={p}>
-                      {t(`routing.form.s2a.priority.options.${p}`)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="block font-bold text-slate-600 tracking-wider">
+                    {t("routing.form.s2a.priority.label")}
+                  </label>
+                  <input
+                    type="number"
+                    value={editFormData.priority ?? 100}
+                    onChange={(e) => handleEditFormChange("priority", e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
+                  />
+                </div>
 
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  {t("routing.form.common.status.label")}
-                </label>
-                <div className="flex items-center space-x-6 text-xs text-slate-700 font-semibold bg-slate-50/50 p-2 border border-slate-100 rounded-lg w-fit">
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="status"
-                      checked={editFormData.active === true}
-                      onChange={() => handleEditFormChange("active", true)}
-                      className="mr-2 cursor-pointer"
-                    />
-                    {t("routing.form.common.status.active")}
+                <div className="space-y-1.5">
+                  <label className="block font-bold text-slate-600 tracking-wider">
+                    {t("routing.form.common.status.label")}
                   </label>
-                  <label className="flex items-center cursor-pointer">
-                    <input
-                      type="radio"
-                      name="status"
-                      checked={editFormData.active === false}
-                      onChange={() => handleEditFormChange("active", false)}
-                      className="mr-2 cursor-pointer"
-                    />
-                    {t("routing.form.common.status.inactive")}
-                  </label>
+                  <div className="flex items-center space-x-4 p-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                    <label className="flex items-center cursor-pointer font-medium text-slate-700">
+                      <input
+                        type="radio"
+                        name="status-s2a"
+                        checked={editFormData.active === true}
+                        onChange={() => handleEditFormChange("active", true)}
+                        className="mr-1.5 cursor-pointer accent-indigo-600"
+                      />
+                      {t("routing.form.common.status.active")}
+                    </label>
+                    <label className="flex items-center cursor-pointer font-medium text-slate-700">
+                      <input
+                        type="radio"
+                        name="status-s2a"
+                        checked={editFormData.active === false}
+                        onChange={() => handleEditFormChange("active", false)}
+                        className="mr-1.5 cursor-pointer accent-slate-500"
+                      />
+                      {t("routing.form.common.status.inactive")}
+                    </label>
+                  </div>
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">
+                <label className="block font-bold text-slate-600 tracking-wider">
                   {t("routing.form.common.note.label")}
                 </label>
                 <textarea
                   value={editFormData.note || ""}
                   onChange={(e) => handleEditFormChange("note", e.target.value)}
                   placeholder={t("routing.form.s2a.note.placeholder")}
-                  rows={3}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-900"
+                  rows={2}
+                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                 />
               </div>
             </>
           )}
+        </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-            <button
-              onClick={handleCloseEdit}
-              className="px-4 py-2 border border-slate-200 text-slate-600 hover:bg-slate-50 rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer"
-            >
-              {t("routing.buttons.cancel")}
-            </button>
-            <button
-              onClick={handleSaveEditRule}
-              className="px-4 text-slate-600 py-2 bg-gradient-to-r from-blue-650 to-indigo-650 hover:bg-blue-300 text-white rounded-xl text-xs font-semibold active:scale-95 transition-all cursor-pointer shadow-sm hover:shadow"
-            >
-              {t("routing.buttons.saveRule")}
-            </button>
-          </div>
+        {/* Footer */}
+        <div className="px-5 py-3.5 border-t border-slate-100 flex justify-end gap-2.5 bg-white sticky bottom-0 z-10">
+          <button
+            onClick={handleCloseEdit}
+            className="px-4 py-2 border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-xl font-semibold transition cursor-pointer"
+          >
+            {t("routing.buttons.cancel")}
+          </button>
+          <button
+            onClick={handleSaveEditRule}
+            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition cursor-pointer shadow-xs"
+          >
+            {t("routing.buttons.save")}
+          </button>
         </div>
       </div>
     </div>,

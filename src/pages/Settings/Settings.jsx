@@ -81,8 +81,8 @@ export default function Settings() {
             <div>
               <h2 className="text-base font-bold text-slate-900 leading-tight">{user?.username}</h2>
               <div className="flex items-center gap-2 mt-1.5">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-indigo-50 border border-indigo-200/50 text-indigo-700 uppercase">
-                  {user?.role === "ADMIN" ? t("settings.profile.roleAdmin") : t("settings.profile.roleUser")}
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-indigo-50 border border-indigo-200/50 text-indigo-700">
+                  {user?.role?.toLowerCase() === "admin" ? t("settings.profile.roleAdmin") : t("settings.profile.roleUser")}
                 </span>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span className="text-[10px] text-slate-400 font-medium">Active Session</span>
@@ -131,7 +131,7 @@ export default function Settings() {
             /* Profile Panel */
             <div className="space-y-6">
               <div>
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                <h3 className="text-xs font-bold text-slate-500 tracking-wider mb-1">
                   {t("settings.profile.title")}
                 </h3>
                 <p className="text-[11px] text-slate-400">Account identifiers and details</p>
@@ -139,7 +139,7 @@ export default function Settings() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-2xl">
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider">
+                  <label className="block text-[10px] font-bold text-slate-450 tracking-wider">
                     {t("settings.profile.username")}
                   </label>
                   <div className="relative">
@@ -154,14 +154,14 @@ export default function Settings() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider">
+                  <label className="block text-[10px] font-bold text-slate-450 tracking-wider">
                     {t("settings.profile.role")}
                   </label>
                   <div className="relative">
                     <Shield size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-450" />
                     <input
                       type="text"
-                      value={user?.role === "ADMIN" ? t("settings.profile.roleAdmin") : t("settings.profile.roleUser")}
+                      value={user?.role?.toLowerCase() === "admin" ? t("settings.profile.roleAdmin") : t("settings.profile.roleUser")}
                       readOnly
                       className="w-full pl-10 pr-3.5 py-2.5 bg-slate-50/70 border border-slate-200 rounded-xl text-xs outline-none text-slate-500 cursor-not-allowed font-medium"
                     />
@@ -173,7 +173,7 @@ export default function Settings() {
             /* Security Panel */
             <form onSubmit={handleChangePassword} className="space-y-5 max-w-md">
               <div>
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                <h3 className="text-xs font-bold text-slate-500 tracking-wider mb-1">
                   {t("settings.security.title")}
                 </h3>
                 <p className="text-[11px] text-slate-400">Change your login credentials securely</p>
@@ -194,7 +194,7 @@ export default function Settings() {
               )}
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider">
+                <label className="block text-[10px] font-bold text-slate-450 tracking-wider">
                   {t("settings.security.oldPassword")}
                 </label>
                 <div className="relative">
@@ -210,7 +210,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider">
+                <label className="block text-[10px] font-bold text-slate-450 tracking-wider">
                   {t("settings.security.newPassword")}
                 </label>
                 <div className="relative">
@@ -226,7 +226,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-450 uppercase tracking-wider">
+                <label className="block text-[10px] font-bold text-slate-450 tracking-wider">
                   {t("settings.security.confirmPassword")}
                 </label>
                 <div className="relative">

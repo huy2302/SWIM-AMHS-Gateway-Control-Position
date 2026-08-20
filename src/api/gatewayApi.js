@@ -40,9 +40,16 @@ const gatewayApi = {
     return axiosClient.delete(`/accounts/${uuid}`);
   },
 
-  updateBindStatus: (uuid, status) => {
-    // Cập nhật trạng thái Bind (kết nối) của tài khoản
-    return axiosClient.patch(`/accounts/${uuid}/bind-status`, { status });
+  connectAccount: (id) => {
+    return axiosClient.post(`/accounts/${id}/connect`);
+  },
+
+  disconnectAccount: (id) => {
+    return axiosClient.post(`/accounts/${id}/disconnect`);
+  },
+
+  testAccountConnection: (id) => {
+    return axiosClient.post(`/accounts/${id}/test-connection`);
   },
 
   // --- 2. ROUTING CONFIGURATION (Cấu hình định tuyến) ---
@@ -64,7 +71,7 @@ const gatewayApi = {
         timeout: 10000,
       });
 
-      return response.data;
+      return response;
     } catch (error) {
       console.error("API createRouting error:", error);
 
@@ -89,7 +96,7 @@ const gatewayApi = {
         timeout: 10000,
       });
 
-      return response.data;
+      return response;
     } catch (error) {
       console.error("API updateRouting error:", error);
 
@@ -110,23 +117,13 @@ const gatewayApi = {
     return axiosClient.delete(`/routing/${uuid}`);
   },
 
-  getMessageLog: async () => {
-    const data = await axiosClient.get('/traffic-logs');
+  getMessageLog: async (params) => {
+    const data = await axiosClient.get('/traffic-logs', { params });
 
     return data;
   },
 
   // --- 3. MONITORING & PERFORMANCE (Giám sát hệ thống) ---
-  getLatestMetrics: () => {
-    // Lấy thông số CPU, RAM, Message count mới nhất để vẽ biểu đồ
-    return axiosClient.get('/metrics/latest');
-  },
-
-  getSystemStatus: () => {
-    // Trạng thái tổng quát của SWIM
-    return axiosClient.get('/swim/status');
-  },
-
   getSystemHealth: () => {
     // Thông tin sức khỏe hệ thống (CPU, RAM, Disk, MySQL)
     return axiosClient.get('/system/health');
@@ -146,31 +143,6 @@ const gatewayApi = {
   getAllAmhsMessages: (params) => {
     // Lấy toàn bộ điện văn đã lưu trữ (có phân trang/lọc)
     return axiosClient.get('/messages/outbound', { params });
-  },
-
-  updateArchiveStatus: (uuid, status) => {
-    // Cập nhật trạng thái xử lý của điện văn (ví dụ: đánh dấu đã xử lý lại)
-    return axiosClient.patch(`/archive/${uuid}/status`, { status });
-  },
-
-  searchMessages: (query) => {
-    // Tìm kiếm điện văn theo nội dung hoặc metadata
-    return axiosClient.get('/archive/search', { params: { q: query } });
-  },
-
-  getGatewayLogs: (params) => {
-    // Log chi tiết luồng xử lý của Gateway (AMHS <-> SWIM)
-    return axiosClient.get('/gateway-logs', { params });
-  },
-
-  getSystemLogsByModule: (module) => {
-    // Lọc log hệ thống theo từng module cụ thể (Control Position, Adapter...)
-    return axiosClient.get(`/system-logs/module/${module}`);
-  },
-
-  // Lấy dữ liệu từ bảng message_conversion_log (X.400)
-  getConversionLogs: (params) => {
-    return axiosClient.get('/conversions', { params });
   },
 
   getSystemEvents: (params) => {
@@ -218,10 +190,6 @@ const gatewayApi = {
 
   deactivateUser: (id) => {
     return axiosClient.put(`/users/${id}/deactivate`);
-  },
-
-  getUserRoles: () => {
-    return axiosClient.get('/metadata/roles');
   },
 
   getMessageTypes: () => {

@@ -43,7 +43,7 @@ const ServerMonitor = () => {
   return (
     <div className="bg-slate-100 border border-slate-300 rounded-lg flex flex-col shadow-inner">
       <div className="flex justify-between items-center border-b border-slate-300/50 px-3 py-1">
-        <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+        <span className="text-[10px] font-bold text-slate-300 tracking-widest">
           {t("sidebar.serverMonitor.title")}
         </span>
       </div>

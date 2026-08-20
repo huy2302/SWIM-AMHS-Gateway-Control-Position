@@ -1,218 +1,230 @@
 {
-    "title": {
-      "vi": "Quản lý tài khoản",
-      "en": "Account Management"
+  "title": {
+    "vi": "Quản lý tài khoản",
+    "en": "Account Management"
+  },
+  "table": {
+    "accountName": {
+      "vi": "Tên tài khoản",
+      "en": "Account name"
     },
-    "table": {
-      "accountName": {
-        "vi": "Tên tài khoản",
-        "en": "Account name"
-      },
-      "protocol": {
-        "vi": "Giao thức",
-        "en": "Protocol"
-      },
-      "status": {
-        "vi": "Trạng thái",
-        "en": "Status"
-      },
-      "bindStatus": {
-        "vi": "Trạng thái kết nối",
-        "en": "Bind Status"
-      },
-      "host": {
-        "vi": "Máy chủ",
-        "en": "Host"
-      },
-      "port": {
-        "vi": "Cổng",
-        "en": "Port"
-      }
+    "protocol": {
+      "vi": "Giao thức",
+      "en": "Protocol"
     },
-    "commands": {
-      "title": {
-        "vi": "Thao tác",
-        "en": "Commands"
-      },
-      "add": {
-        "vi": "Thêm mới",
-        "en": "Add"
-      },
-      "edit": {
-        "vi": "Chỉnh sửa",
-        "en": "Edit"
-      },
-      "delete": {
-        "vi": "Xóa",
-        "en": "Delete"
-      },
-      "enable": {
-        "vi": "Kích hoạt",
-        "en": "Enable"
-      },
-      "disable": {
-        "vi": "Vô hiệu hóa",
-        "en": "Disable"
-      }
+    "status": {
+      "vi": "Trạng thái",
+      "en": "Status"
     },
-    "modal": {
-      "addTitle": {
-        "vi": "Thêm tài khoản mới",
-        "en": "Add New Account"
-      },
-      "editTitle": {
-        "vi": "Chỉnh sửa tài khoản",
-        "en": "Edit Account"
-      },
-      "accountName": {
-        "vi": "Tên tài khoản",
-        "en": "Account Name"
-      },
-      "protocol": {
-        "vi": "Giao thức",
-        "en": "Protocol"
-      },
-      "port": {
-        "vi": "Cổng",
-        "en": "Port"
-      },
-      "host": {
-        "vi": "Máy chủ",
-        "en": "Host"
-      },
-      "username": {
-        "vi": "Tên đăng nhập",
-        "en": "Username"
-      },
-      "password": {
-        "vi": "Mật khẩu",
-        "en": "Password"
-      },
-      "vpn": {
-        "vi": "VPN",
-        "en": "VPN"
-      },
-      "status": {
-        "vi": "Trạng thái",
-        "en": "Status"
-      },
-      "bindStatus": {
-        "vi": "Trạng thái kết nối",
-        "en": "Bind Status"
-      },
-      "tlsEnabled": {
-        "vi": "Bật TLS",
-        "en": "TLS Enabled"
-      },
-      "cancel": {
-        "vi": "Hủy",
-        "en": "Cancel"
-      },
-      "save": {
-        "vi": "Lưu thay đổi",
-        "en": "Save Changes"
-      },
-      "create": {
-        "vi": "Tạo tài khoản",
-        "en": "Create Account"
-      },
-      "saving": {
-        "vi": "Đang lưu thay đổi...",
-        "en": "Saving changes..."
-      }
+    "bindStatus": {
+      "vi": "Trạng thái kết nối",
+      "en": "Bind Status"
     },
-    "confirm": {
-      "deleteTitle": {
-        "vi": "Xóa tài khoản",
-        "en": "Delete Account"
-      },
-      "deleteMessage": {
-        "vi": "Bạn có chắc chắn muốn xóa tài khoản này?",
-        "en": "Are you sure you want to delete this account?"
-      },
-      "deleteConfirm": {
-        "vi": "Xóa",
-        "en": "Delete"
-      },
-      "enableTitle": {
-        "vi": "Kích hoạt tài khoản",
-        "en": "Enable Account"
-      },
-      "enableMessage": {
-        "vi": "Bạn có chắc chắn muốn kích hoạt tài khoản này?",
-        "en": "Are you sure you want to enable this account?"
-      },
-      "enableConfirm": {
-        "vi": "Kích hoạt",
-        "en": "Enable"
-      },
-      "disableTitle": {
-        "vi": "Vô hiệu hóa tài khoản",
-        "en": "Disable Account"
-      },
-      "disableMessage": {
-        "vi": "Bạn có chắc chắn muốn vô hiệu hóa tài khoản này?",
-        "en": "Are you sure you want to disable this account?"
-      },
-      "disableConfirm": {
-        "vi": "Vô hiệu hóa",
-        "en": "Disable"
-      }
+    "host": {
+      "vi": "Máy chủ",
+      "en": "Host"
     },
-    "toast": {
-      "deleteSuccess": {
-        "vi": "Xóa tài khoản thành công!",
-        "en": "Account deleted successfully!"
-      },
-      "deleteFailed": {
-        "vi": "Xóa tài khoản thất bại: ",
-        "en": "Failed to delete account: "
-      },
-      "enableSuccess": {
-        "vi": "Kích hoạt tài khoản thành công!",
-        "en": "Account enabled successfully!"
-      },
-      "disableSuccess": {
-        "vi": "Vô hiệu hóa tài khoản thành công!",
-        "en": "Account disabled successfully!"
-      },
-      "updateSuccess": {
-        "vi": "Cập nhật tài khoản thành công!",
-        "en": "Account updated successfully!"
-      },
-      "saveError": {
-        "vi": "Lỗi khi lưu tài khoản",
-        "en": "Error saving account"
-      }
-    },
-    "protocols": {
-      "amqp": {
-        "vi": "AMQP Solace",
-        "en": "AMQP Solace"
-      },
-      "mqtt": {
-        "vi": "X.400 AMHS",
-        "en": "X.400 AMHS"
-      }
-    },
-    "statuses": {
-      "active": {
-        "vi": "Đang hoạt động",
-        "en": "Active"
-      },
-      "inactive": {
-        "vi": "Không hoạt động",
-        "en": "Inactive"
-      }
-    },
-    "bindStatuses": {
-      "connected": {
-        "vi": "Đã kết nối",
-        "en": "Connected"
-      },
-      "disconnected": {
-        "vi": "Đã ngắt kết nối",
-        "en": "Disconnected"
-      }
+    "port": {
+      "vi": "Cổng",
+      "en": "Port"
     }
+  },
+  "commands": {
+    "title": {
+      "vi": "Thao tác",
+      "en": "Commands"
+    },
+    "add": {
+      "vi": "Thêm mới",
+      "en": "Add"
+    },
+    "edit": {
+      "vi": "Chỉnh sửa",
+      "en": "Edit"
+    },
+    "delete": {
+      "vi": "Xóa",
+      "en": "Delete"
+    },
+    "enable": {
+      "vi": "Kích hoạt",
+      "en": "Enable"
+    },
+    "disable": {
+      "vi": "Vô hiệu hóa",
+      "en": "Disable"
+    }
+  },
+  "modal": {
+    "addTitle": {
+      "vi": "Thêm tài khoản mới",
+      "en": "Add New Account"
+    },
+    "editTitle": {
+      "vi": "Chỉnh sửa tài khoản",
+      "en": "Edit Account"
+    },
+    "accountName": {
+      "vi": "Tên tài khoản",
+      "en": "Account Name"
+    },
+    "protocol": {
+      "vi": "Giao thức",
+      "en": "Protocol"
+    },
+    "port": {
+      "vi": "Cổng",
+      "en": "Port"
+    },
+    "host": {
+      "vi": "Máy chủ",
+      "en": "Host"
+    },
+    "username": {
+      "vi": "Tên đăng nhập",
+      "en": "Username"
+    },
+    "password": {
+      "vi": "Mật khẩu",
+      "en": "Password"
+    },
+    "vpn": {
+      "vi": "VPN",
+      "en": "VPN"
+    },
+    "status": {
+      "vi": "Trạng thái",
+      "en": "Status"
+    },
+    "bindStatus": {
+      "vi": "Trạng thái kết nối",
+      "en": "Bind Status"
+    },
+    "tlsEnabled": {
+      "vi": "Bật TLS",
+      "en": "TLS Enabled"
+    },
+    "cancel": {
+      "vi": "Hủy",
+      "en": "Cancel"
+    },
+    "save": {
+      "vi": "Lưu thay đổi",
+      "en": "Save Changes"
+    },
+    "create": {
+      "vi": "Tạo tài khoản",
+      "en": "Create Account"
+    },
+    "saving": {
+      "vi": "Đang lưu thay đổi...",
+      "en": "Saving changes..."
+    }
+  },
+  "confirm": {
+    "deleteTitle": {
+      "vi": "Xóa tài khoản",
+      "en": "Delete Account"
+    },
+    "deleteMessage": {
+      "vi": "Bạn có chắc chắn muốn xóa tài khoản này?",
+      "en": "Are you sure you want to delete this account?"
+    },
+    "deleteConfirm": {
+      "vi": "Xóa",
+      "en": "Delete"
+    },
+    "enableTitle": {
+      "vi": "Kích hoạt tài khoản",
+      "en": "Enable Account"
+    },
+    "enableMessage": {
+      "vi": "Bạn có chắc chắn muốn kích hoạt tài khoản này?",
+      "en": "Are you sure you want to enable this account?"
+    },
+    "enableConfirm": {
+      "vi": "Kích hoạt",
+      "en": "Enable"
+    },
+    "disableTitle": {
+      "vi": "Vô hiệu hóa tài khoản",
+      "en": "Disable Account"
+    },
+    "disableMessage": {
+      "vi": "Bạn có chắc chắn muốn vô hiệu hóa tài khoản này?",
+      "en": "Are you sure you want to disable this account?"
+    },
+    "disableConfirm": {
+      "vi": "Vô hiệu hóa",
+      "en": "Disable"
+    }
+  },
+  "toast": {
+    "deleteSuccess": {
+      "vi": "Xóa tài khoản thành công!",
+      "en": "Account deleted successfully!"
+    },
+    "deleteFailed": {
+      "vi": "Xóa tài khoản thất bại: ",
+      "en": "Failed to delete account: "
+    },
+    "enableSuccess": {
+      "vi": "Kích hoạt tài khoản thành công!",
+      "en": "Account enabled successfully!"
+    },
+    "disableSuccess": {
+      "vi": "Vô hiệu hóa tài khoản thành công!",
+      "en": "Account disabled successfully!"
+    },
+    "enableFailed": {
+      "vi": "Kích hoạt tài khoản thất bại",
+      "en": "Failed to enable account"
+    },
+    "disableFailed": {
+      "vi": "Vô hiệu hóa tài khoản thất bại",
+      "en": "Failed to disable account"
+    },
+    "updateSuccess": {
+      "vi": "Cập nhật tài khoản thành công!",
+      "en": "Account updated successfully!"
+    },
+    "saveError": {
+      "vi": "Lỗi khi lưu tài khoản",
+      "en": "Error saving account"
+    },
+    "createSuccess": {
+      "vi": "Tạo tài khoản mới thành công",
+      "en": "Account created successfully"
+    }
+  },
+  "protocols": {
+    "amqp": {
+      "vi": "AMQP Solace",
+      "en": "AMQP Solace"
+    },
+    "mqtt": {
+      "vi": "X.400 AMHS",
+      "en": "X.400 AMHS"
+    }
+  },
+  "statuses": {
+    "active": {
+      "vi": "Đang hoạt động",
+      "en": "Active"
+    },
+    "inactive": {
+      "vi": "Không hoạt động",
+      "en": "Inactive"
+    }
+  },
+  "bindStatuses": {
+    "connected": {
+      "vi": "Đã kết nối",
+      "en": "Connected"
+    },
+    "disconnected": {
+      "vi": "Đã ngắt kết nối",
+      "en": "Disconnected"
+    }
+  }
 }

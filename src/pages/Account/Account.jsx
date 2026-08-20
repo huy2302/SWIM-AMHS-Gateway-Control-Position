@@ -7,6 +7,8 @@ import {
   Play,
   Square,
   X,
+  Mail,
+  Check,
 } from "lucide-react";
 import gatewayApi from "@/api/gatewayApi";
 import ConfirmModal from "@/components/ConfirmModal";
@@ -126,28 +128,43 @@ export default function Account() {
     setIsModalOpen(true);
   };
 
-  const handleDelete = (id) => {
-    if (gatewayApi.deleteAccount(id)) {
-      setAccounts(accounts.filter(acc => acc.id !== selectedId));
+  const handleDelete = async (id) => {
+    try {
+      await gatewayApi.deleteAccount(id);
+      setAccounts(accounts.filter(acc => acc.id !== id));
       setSelectedId(null);
       showSuccessToast(t("accounts.toast.deleteSuccess"), toast);
-    } else {
-      setSelectedId(null);
+    } catch (error) {
+      console.error("Lỗi khi xoá account:", error);
       showErrorToast(t("accounts.toast.deleteFailed"), toast);
     }
   };
 
-  const handleToggleStatus = (status) => {
-    showSuccessToast(
-      status === "ACTIVE" 
-        ? t("accounts.toast.enableSuccess") 
-        : t("accounts.toast.disableSuccess"), 
-      toast
-    );
-    setAccounts(accounts.map(acc => 
-      acc.id === selectedId ? { ...acc, status } : acc
-    ));
-    setAccountStatus(status);
+  const handleToggleStatus = async (status) => {
+    if (!selectedId) return;
+    try {
+      if (status === "ACTIVE") {
+        await gatewayApi.connectAccount(selectedId);
+      } else {
+        await gatewayApi.disconnectAccount(selectedId);
+      }
+      await fetchAccounts();
+      setAccountStatus(status);
+      showSuccessToast(
+        status === "ACTIVE"
+          ? t("accounts.toast.enableSuccess")
+          : t("accounts.toast.disableSuccess"),
+        toast
+      );
+    } catch (error) {
+      console.error("Lỗi khi bật/tắt account:", error);
+      showErrorToast(
+        status === "ACTIVE"
+          ? t("accounts.toast.enableFailed")
+          : t("accounts.toast.disableFailed"),
+        toast
+      );
+    }
   };
 
   const handleSaveAccount = async (e) => {
@@ -186,7 +203,7 @@ export default function Account() {
         const response = await gatewayApi.createAccount(savedAccount);
         const createdAccount = response?.data ?? response ?? savedAccount;
         setAccounts([...accounts, createdAccount]);
-        showSuccessToast(t("accounts.toast.createSuccess") || "Account created successfully", toast);
+        showSuccessToast(t("accounts.toast.createSuccess"), toast);
       }
 
       setIsModalOpen(false);
@@ -211,7 +228,7 @@ export default function Account() {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 uppercase tracking-wider border-b border-slate-200">
+                <tr className="bg-slate-50 text-slate-500 tracking-wider border-b border-slate-200">
                   <th className="px-4 py-3.5 font-semibold text-xs">{t("accounts.table.accountName")}</th>
                   <th className="px-4 py-3.5 font-semibold text-xs">{t("accounts.table.protocol")}</th>
                   <th className="px-4 py-3.5 font-semibold text-xs">{t("accounts.table.status")}</th>
@@ -290,7 +307,7 @@ export default function Account() {
 
         {/* RIGHT COLUMN: COMMAND BUTTONS */}
         <div className="w-48 flex flex-col gap-3">
-          <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-2">{t("accounts.commands.title")}</h3>
+          <h3 className="text-[10px] font-bold text-slate-400 tracking-wider px-2">{t("accounts.commands.title")}</h3>
           
           <div className="flex flex-col gap-1.5 bg-white p-3 rounded-xl border border-slate-200 shadow-xs">
             <CommandBtn 
@@ -360,22 +377,38 @@ export default function Account() {
 
         {/* MODAL FORM */}
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-            <div className="bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-zoom-in">
-              <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50">
-                <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  {editingAccountId ? t("accounts.modal.editTitle") : t("accounts.modal.addTitle")}
-                </h2>
-                <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
-                  <X size={18}/>
-                </button>
-              </div>
-              <form onSubmit={handleSaveAccount} className="p-6 flex flex-col gap-4 text-xs text-slate-600">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in" onClick={() => setIsModalOpen(false)}>
+          <div className="w-[540px] max-w-full bg-white max-h-[88vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-zoom-in border border-slate-200" onClick={(e) => e.stopPropagation()}>
+            
+            {/* MODAL HEADER */}
+            <div className="px-6 py-4 bg-white border-b border-slate-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 flex items-center justify-center shrink-0">
+                  <Mail size={20} />
+                </div>
                 <div>
-                  <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.accountName")}</label>
+                  <h3 className="font-bold text-base text-slate-900">
+                    {editingAccountId ? t("accounts.modal.editTitle") : t("accounts.modal.addTitle")}
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium mt-0.5">
+                    {formData.protocol || "AMQP"} Broker Account Configuration
+                  </p>
+                </div>
+              </div>
+              
+              <button onClick={() => setIsModalOpen(false)} className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-lg transition-colors cursor-pointer">
+                <X size={20}/>
+              </button>
+            </div>
+
+            {/* MODAL BODY */}
+            <form onSubmit={handleSaveAccount} className="flex flex-col flex-1 overflow-hidden">
+              <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4 text-xs">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.accountName")}</label>
                   <input 
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                     value={formData.accountName}
                     onChange={(e) => setFormData({...formData, accountName: e.target.value})}
                     disabled={editingAccountId ? true : false}
@@ -384,9 +417,9 @@ export default function Account() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.protocol")}</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.protocol")}</label>
                     <select
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                       value={formData.protocol}
                       onChange={(e) => setFormData({...formData, protocol: e.target.value})}
                     >
@@ -396,10 +429,10 @@ export default function Account() {
                   </div>
 
                   <div>
-                    <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.port")}</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.port")}</label>
                     <input
                       type="number"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                       value={formData.port}
                       onChange={(e) => setFormData({...formData, port: e.target.value})}
                     />
@@ -407,50 +440,54 @@ export default function Account() {
                 </div>
 
                 <div>
-                  <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.host")}</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.host")}</label>
                   <input 
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                     value={formData.host}
                     onChange={(e) => setFormData({...formData, host: e.target.value})}
                   />
                 </div>
 
                 <div>
-                  <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.username")}</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.username")}</label>
                   <input
                     type="text"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                     value={formData.username}
                     onChange={(e) => setFormData({...formData, username: e.target.value})}
                   />
                 </div>
                 
                 <div>
-                  <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.password")}</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.password")}</label>
                   <input
                     type="password"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                   />
                 </div>
 
                 <div>
-                  <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.vpn")}</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.vpn")}</label>
                   <input
                     type="text"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
-                    value={formData.configJson ? JSON.parse(formData.configJson).vpn : ""}
-                    onChange={(e) => setFormData({...formData, configJson: JSON.stringify({...JSON.parse(formData.configJson), vpn: e.target.value})})}
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    value={formData.configJson ? (JSON.parse(formData.configJson).vpn || "") : ""}
+                    onChange={(e) => {
+                      let parsed = {};
+                      try { parsed = JSON.parse(formData.configJson || "{}"); } catch(ex){}
+                      setFormData({...formData, configJson: JSON.stringify({...parsed, vpn: e.target.value})});
+                    }}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.status")}</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.status")}</label>
                     <select
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                       value={formData.status}
                       onChange={(e) => setFormData({...formData, status: e.target.value})}
                     >
@@ -460,9 +497,9 @@ export default function Account() {
                   </div>
 
                   <div>
-                    <label className="text-slate-500 font-semibold mb-1 block">{t("accounts.modal.bindStatus")}</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.bindStatus")}</label>
                     <select
-                      className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-slate-800 outline-none focus:border-indigo-500 transition-all font-medium"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                       value={formData.bindStatus}
                       onChange={(e) => setFormData({...formData, bindStatus: e.target.value})}
                     >
@@ -478,34 +515,37 @@ export default function Account() {
                     type="checkbox"
                     checked={formData.tlsEnabled}
                     onChange={(e) => setFormData({...formData, tlsEnabled: e.target.checked})}
-                    className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer h-4 w-4"
+                    className="rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer h-4 w-4"
                   />
-                  <label htmlFor="tlsEnabled" className="text-slate-500 font-semibold cursor-pointer">{t("accounts.modal.tlsEnabled")}</label>
+                  <label htmlFor="tlsEnabled" className="text-slate-700 font-semibold cursor-pointer text-xs">{t("accounts.modal.tlsEnabled")}</label>
                 </div>
+              </div>
 
-                <div className="flex gap-2 justify-end mt-4 pt-4 border-t border-slate-100">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsModalOpen(false)} 
-                    className="px-4 py-2 text-slate-500 hover:text-slate-700 transition-colors font-semibold"
-                  >
-                    {t("accounts.modal.cancel")}
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className={`bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold transition-all shadow-sm active:scale-95 ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-indigo-700"}`}
-                  >
-                    {editingAccountId ? t("accounts.modal.save") : t("accounts.modal.create")}
-                  </button>
-                </div>
-              </form>
-            </div>
+              {/* MODAL FOOTER */}
+              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-xs"
+                >
+                  {t("accounts.modal.cancel")}
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
+                >
+                  <Check size={14} />
+                  <span>{editingAccountId ? t("accounts.modal.save") : t("accounts.modal.create")}</span>
+                </button>
+              </div>
+            </form>
+
           </div>
-        )}
-      </div>
-
-      <ConfirmModal
+        </div>
+      )}
+    </div>
+    <ConfirmModal
         isOpen={confirmModal.open}
         title={confirmModal.title}
         message={confirmModal.message}

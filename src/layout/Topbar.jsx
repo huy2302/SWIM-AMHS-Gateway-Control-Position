@@ -24,59 +24,17 @@ const titleMap = {
   config: "sidebar.menu.admin",
 };
 
-const getSeverityIcon = (severity) => {
-  switch (severity) {
+const getSeverityMeta = (severity) => {
+  switch (severity?.toUpperCase()) {
     case "INFO":
-      return <Info size={14} className="text-blue-600" />;
+      return "bg-emerald-50 text-emerald-700 border-emerald-200/70";
     case "WARN":
-      return <TriangleAlert size={14} className="text-amber-600" />;
+    case "WARNING":
+      return "bg-amber-50 text-amber-700 border-amber-200/70";
     case "ERROR":
-      return <AlertCircle size={14} className="text-red-650" />;
+      return "bg-rose-50 text-rose-700 border-rose-200/70";
     default:
-      return <Info size={14} className="text-slate-500" />;
-  }
-};
-
-const getSeverityItemStyles = (severity) => {
-  switch (severity) {
-    case "INFO":
-      return {
-        borderLeft: 'border-l-blue-500',
-        bg: 'bg-blue-50/30 hover:bg-blue-100/30',
-        color: 'text-blue-700'
-      };
-    case "WARN":
-      return {
-        borderLeft: 'border-l-amber-500',
-        bg: 'bg-amber-50/30 hover:bg-amber-100/30',
-        color: 'text-amber-800'
-      };
-    case "ERROR":
-      return {
-        borderLeft: 'border-l-red-500',
-        bg: 'bg-red-50/30 hover:bg-red-100/30',
-        color: 'text-red-700'
-      };
-    default:
-      return {
-        borderLeft: 'border-l-slate-400',
-        bg: 'bg-slate-50/30 hover:bg-slate-100/30',
-        color: 'text-slate-600'
-      };
-  }
-};
-
-const getSeverityBg = (severity) => {
-  switch (severity) {
-    case 'error':
-      return 'bg-red-50 border-red-200';
-    case 'warning':
-      return 'bg-yellow-50 border-yellow-200';
-    case 'success':
-      return 'bg-green-50 border-green-200';
-    case 'info':
-    default:
-      return 'bg-blue-50 border-blue-200';
+      return "bg-slate-100 text-slate-600 border-slate-200";
   }
 };
 
@@ -188,7 +146,7 @@ export default function Topbar() {
         size: 5,
         userId: user?.userId || null,
       });
-      setNotifications(response?.histories?.content || []);
+      setNotifications(response?.histories?.items || response?.histories?.content || []);
     } catch (error) {
       console.error("Load system events in Topbar failed", error);
     } finally {
@@ -267,7 +225,7 @@ export default function Topbar() {
     <div className="topbar w-full flex justify-between items-center">
       {/* Title block */}
       <div className="flex flex-col justify-center">
-        <h2 className="text-[15px] font-bold text-slate-800 tracking-wide m-0 uppercase font-heading">{title}</h2>
+        <h2 className="text-[15px] font-bold text-slate-800 tracking-wide m-0 font-heading">{title}</h2>
       </div>
 
       {/* Uptime and info */}
@@ -324,15 +282,15 @@ export default function Topbar() {
           </button>
 
           {isOpen && (
-            <div className="absolute right-0 mt-3 top-full w-[360px] bg-white/95 backdrop-blur-md border border-slate-200/85 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.12)] z-50 overflow-hidden flex flex-col transition-all duration-300 transform scale-100 origin-top-right">
+            <div className="absolute right-0 mt-2.5 top-full w-[380px] bg-white border border-slate-200/90 rounded-xl shadow-xl z-50 overflow-hidden flex flex-col transition-all duration-150">
               {/* Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm text-slate-800 tracking-tight">
+              <div className="flex items-center justify-between gap-2 px-4 py-3 bg-slate-50/90 border-b border-slate-200/80">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="font-bold text-xs uppercase tracking-wider text-slate-700 truncate">
                     {t("dashboard.notifications")}
                   </span>
                   {unreadCount > 0 && (
-                    <span className="bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
+                    <span className="bg-blue-600 text-white px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0">
                       {unreadCount}
                     </span>
                   )}
@@ -340,85 +298,63 @@ export default function Topbar() {
                 {(unreadCount > 0 || notifications.some(n => !n.isRead)) && (
                   <button
                     onClick={handleMarkAllAsRead}
-                    className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700 bg-blue-50/50 hover:bg-blue-50/80 px-2.5 py-1 rounded-lg border border-blue-100/20 transition-all cursor-pointer"
+                    className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 hover:text-blue-600 transition-colors cursor-pointer whitespace-nowrap shrink-0"
                   >
-                    <Check size={12} />
+                    <Check size={13} />
                     {t("dashboard.markAllRead")}
                   </button>
                 )}
               </div>
 
               {/* List */}
-              <div className="flex-1 p-2 max-h-[340px] overflow-y-auto notification-list-scroll py-2 bg-slate-50/20">
+              <div className="flex-1 max-h-[360px] overflow-y-auto notification-list-scroll divide-y divide-slate-100 bg-white">
                 {loading ? (
-                  <div className="flex flex-col items-center justify-center py-12 gap-2 text-slate-400">
+                  <div className="flex flex-col items-center justify-center py-10 gap-2 text-slate-400">
                     <div className="w-5 h-5 border-2 border-slate-300 border-t-blue-600 rounded-full animate-spin" />
                     <span className="text-[11px] font-medium">Loading...</span>
                   </div>
                 ) : notifications.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-1.5">
-                    <Bell size={24} className="text-slate-300" />
+                  <div className="flex flex-col items-center justify-center py-10 text-slate-400 gap-1.5">
+                    <Bell size={22} className="text-slate-300" />
                     <span className="text-[11px] font-medium">{t("dashboard.noNotify")}</span>
                   </div>
                 ) : (
                   notifications.map((item) => 
                   {
-                    const itemStyles = getSeverityItemStyles(item.severity);
+                    const badgeStyle = getSeverityMeta(item.severity);
 
                     return (
                       <div
+                        key={item.id || item.eventTime}
                         onClick={() => handleMarkAsRead(item.id, item)}
                         className={`
-                          flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-all
-                          hover:bg-gray-50 border border-transparent border-l-4 ${itemStyles.borderLeft} ${itemStyles.bg}
-                          ${!item.isRead ? 'bg-blue-50/30 border-blue-200/50' : ''}
+                          px-4 py-3 cursor-pointer transition-colors flex flex-col gap-1.5
+                          ${!item.isRead ? 'bg-slate-50/80 hover:bg-slate-100/70' : 'bg-white hover:bg-slate-50/60'}
                         `}
                       >
-                        {/* Left: Icon */}
-                        <div className="flex-shrink-0 pt-0.5">
-                          <div className={`
-                            w-8 h-8 rounded-full flex items-center justify-center
-                            ${getSeverityBg(item.severity)}
-                          `}>
-                            {getSeverityIcon(item.severity)}
-                          </div>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded uppercase ${badgeStyle}`}>
+                            {item.severity}
+                          </span>
+                          <span className="text-[11px] font-mono text-slate-400 whitespace-nowrap">
+                            {formatRelativeTime(item.eventTime, language)}
+                          </span>
                         </div>
 
-                        {/* Right: Content */}
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-[13px] leading-relaxed ${
-                            !item.isRead ? 'text-gray-900 font-semibold' : 'text-gray-600'
-                          }`}>
-                            {item.title}
+                        <p className={`text-[13px] leading-snug ${
+                          !item.isRead ? 'text-slate-900 font-semibold' : 'text-slate-700 font-medium'
+                        }`}>
+                          {item.title}
+                        </p>
+                        
+                        {item.subtitle && (
+                          <p className="text-xs text-slate-500 leading-normal">
+                            {item.subtitle}
                           </p>
-                          
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[11px] ${itemStyles.color} font-semibold`}>
-                                {item.severity.toUpperCase()}
-                              </span>
-                              {!item.isRead && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-medium rounded-full">
-                                  <Circle size={6} className="fill-blue-600" />
-                                  New
-                                </span>
-                              )}
-                            </div>
-                            <span className="text-[11px] text-gray-400 font-medium whitespace-nowrap">
-                              {formatRelativeTime(item.eventTime, language)}
-                            </span>
-                          </div>
-                          
-                          {/* Hiển thị subtitle nếu có */}
-                          {item.subtitle && (
-                            <p className="text-xs text-gray-500 mt-0.5">
-                              {item.subtitle}
-                            </p>
-                          )}
-                        </div>
+                        )}
                       </div>  
-                      )
-                    })
+                    );
+                  })
                 )}
               </div>
 
@@ -426,7 +362,7 @@ export default function Topbar() {
               <Link
                 to="/system-events"
                 onClick={() => setIsOpen(false)}
-                className="w-full text-center py-3.5 text-xs text-blue-600 font-bold border-t border-slate-100 bg-slate-50/30 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5 rounded-b-2xl"
+                className="w-full text-center py-2.5 text-xs font-semibold text-slate-600 hover:text-blue-600 border-t border-slate-100 bg-slate-50/50 hover:bg-slate-100/60 transition-colors flex items-center justify-center gap-1 rounded-b-xl"
               >
                 {t("dashboard.seeAllHistory")}
                 <ChevronRight size={14} />

@@ -146,7 +146,7 @@ export default function AlertsView() {
               <AlertOctagon size={24} />
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider">{t("alerts.filterStatus.ACTIVE")}</div>
+              <div className="text-xs font-bold tracking-wider">{t("alerts.filterStatus.ACTIVE")}</div>
               <div className="text-2xl font-extrabold text-slate-900 mt-1">{stats.activeCount}</div>
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function AlertsView() {
               <Eye size={24} />
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider">{t("alerts.filterStatus.ACKNOWLEDGED")}</div>
+              <div className="text-xs font-bold tracking-wider">{t("alerts.filterStatus.ACKNOWLEDGED")}</div>
               <div className="text-2xl font-extrabold text-slate-900 mt-1">{stats.ackCount}</div>
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function AlertsView() {
               <CheckCircle2 size={24} />
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider">{t("alerts.filterStatus.RESOLVED")}</div>
+              <div className="text-xs font-bold tracking-wider">{t("alerts.filterStatus.RESOLVED")}</div>
               <div className="text-2xl font-extrabold text-slate-900 mt-1">{stats.resolvedCount}</div>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function AlertsView() {
                 <button
                   key={st}
                   onClick={() => setStatusFilter(st)}
-                  className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-md text-[10px] font-bold  transition-all cursor-pointer ${
                     statusFilter === st
                       ? "bg-white text-indigo-700 shadow-sm border border-slate-200/50"
                       : "text-slate-500 hover:text-slate-850"
@@ -209,7 +209,7 @@ export default function AlertsView() {
             {stats.activeCount > 0 && (
               <button
                 onClick={handleBulkAcknowledge}
-                className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/60 rounded-lg text-[10px] font-bold uppercase transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 h-[34px] shadow-xs"
+                className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/60 rounded-lg text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 h-[34px] shadow-xs"
               >
                 <Eye size={12} />
                 {t("alerts.buttons.bulkAck")}
@@ -219,7 +219,7 @@ export default function AlertsView() {
             {(stats.activeCount > 0 || stats.ackCount > 0) && (
               <button
                 onClick={handleBulkResolve}
-                className="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200/60 rounded-lg text-[10px] font-bold uppercase transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 h-[34px] shadow-xs"
+                className="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200/60 rounded-lg text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 h-[34px] shadow-xs"
               >
                 <CheckCircle2 size={12} />
                 {t("alerts.buttons.bulkResolve")}
@@ -252,7 +252,7 @@ export default function AlertsView() {
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200 font-bold uppercase tracking-wider">
+              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200 font-bold tracking-wider">
                 <tr>
                   <th className="p-4">{t("alerts.table.time")}</th>
                   <th className="p-4">{t("alerts.table.level")}</th>

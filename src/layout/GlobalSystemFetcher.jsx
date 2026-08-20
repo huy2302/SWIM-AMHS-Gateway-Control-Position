@@ -49,24 +49,14 @@ export default function GlobalSystemFetcher() {
         });
         setSystemData(response.unreadCount);
 
-        const systemEvent = response?.histories?.content[0];
+        const historiesList = response?.histories?.items || response?.histories?.content || [];
+        const systemEvent = historiesList[0];
         if (!systemEvent) return;
 
         if (!toastedIds.has(systemEvent.id) && status.includes(systemEvent.eventType)) {
-          // Toast tùy theo loại event
-          switch (systemEvent.eventType) {
-            case "ROUTING_DELETED":
-              showWarningToast(systemEvent.title, toast);
-              break;
-            case "ROUTING_UPDATED":
-              showWarningToast(systemEvent.title, toast);
-              break;
-            case "HIGH_MEMORY":
-            case "HIGH_CPU":
-              showWarningToast(systemEvent.title, toast);
-              break;
-            default:
-              showSuccessToast(systemEvent.title, toast);
+          // Chỉ nổ Toast màn hình cho các cảnh báo tài nguyên hệ thống quan trọng (Tránh nổ 2 toast khi sửa định tuyến)
+          if (systemEvent.eventType === "HIGH_MEMORY" || systemEvent.eventType === "HIGH_CPU") {
+            showWarningToast(systemEvent.title, toast);
           }
 
           // Đánh dấu event này đã toast
@@ -102,8 +92,8 @@ export default function GlobalSystemFetcher() {
         const uptime = response?.gatewayCp?.jvmUptimeSeconds;
         dispatch(setUptime(uptime));
         dispatch(setUsedProcess({
-          gatewayCp: response.gatewayCp,
-          mysqlCp: response.mysql,
+          gatewayCp: response?.gatewayCp,
+          mysql: response?.mysql,
         }));
       } catch (err) {
         clearTimeout(timeoutId);

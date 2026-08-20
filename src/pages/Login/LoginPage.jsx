@@ -11,12 +11,7 @@ export default function LoginPage() {
                 src={background}
                 className="absolute inset-0 h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-r 
-                from-white/80 
-                via-[#f0f6fb]/20 
-                via-[#dcecff]/5 
-                via-[#f0f6fb]/20 
-                to-white/80" 
+            <div className="absolute inset-0 bg-gradient-to-r from-white/80 via-[#f0f6fb]/20 via-[#dcecff]/5 via-[#f0f6fb]/20 to-white/80" 
             />
             
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,.02),transparent_40%)]" />

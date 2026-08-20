@@ -186,28 +186,28 @@
     },
     "fields": {
       "origin": {
-        "vi": "ĐỊA CHỈ PHÁT",
-        "en": "ORIGIN"
+        "vi": "Địa Chỉ Phát",
+        "en": "Origin"
       },
       "address": {
-        "vi": "ĐỊA CHỈ NHẬN",
-        "en": "ADDRESS"
+        "vi": "Địa Chỉ Nhận",
+        "en": "Address"
       },
       "subject": {
         "vi": "CHỦ ĐỀ / LOẠI TIN",
         "en": "SUBJECT / TYPE"
       },
       "priority": {
-        "vi": "ĐỘ KHẨN",
-        "en": "PRIORITY"
+        "vi": "Độ Khẩn",
+        "en": "Priority"
       },
       "time": {
-        "vi": "THỜI GIAN",
-        "en": "TIME"
+        "vi": "Thời Gian",
+        "en": "Time"
       },
       "errorType": {
-        "vi": "LOẠI LỖI",
-        "en": "ERROR TYPE"
+        "vi": "Loại Lỗi",
+        "en": "Error Type"
       },
       "rawMessage": {
         "vi": "Nội dung điện văn gốc",

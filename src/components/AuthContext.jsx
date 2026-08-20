@@ -1,5 +1,6 @@
 // AuthContext.jsx
 import { createContext, useContext, useState, useEffect } from 'react';
+import { authUtils } from '../api/axiosClient';
 
 const AuthContext = createContext();
 
@@ -38,9 +39,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Helper functions
-  const isAdmin = () => user?.role?.toLowerCase() === 'admin';
+  // role lấy từ claim trong JWT hiện tại (nguồn duy nhất, luôn đồng bộ qua các lần refresh token),
+  // fallback về user.role (response /auth/login) nếu vì lý do gì đó chưa decode được token
+  const getRole = () => authUtils.getRole() || user?.role;
+  const isAdmin = () => getRole()?.toLowerCase() === 'admin';
   const getUsername = () => user?.username;
-  const getRole = () => user?.role;
 
   return (
     <AuthContext.Provider value={{ 

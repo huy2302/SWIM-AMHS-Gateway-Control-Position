@@ -8,11 +8,15 @@ body {
   background: #f8fafc;
   color: #0f172a;
   height: 100vh;
+  overflow: hidden;
 }
 
 .app {
   display: flex;
   background: #f8fafc;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
 .sidebar {
@@ -22,15 +26,17 @@ body {
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.02);
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .sidebar.collapsed {
   width: 70px;
 }
+
 .sidebar .menu-item {
   display: flex;
   align-items: center;
   gap: 10px;
   justify-content: flex-start;
-  padding: 9px 12px;
+  padding: 8px 12px;
   margin: 3px 6px;
   color: #64748b;
   font-size: 13px;
@@ -40,33 +46,40 @@ body {
   position: relative;
   overflow: hidden;
 }
+
 .sidebar .menu-item svg {
   color: #64748b;
   transition: color 0.2s ease, transform 0.2s ease;
   flex-shrink: 0;
 }
+
 .sidebar.collapsed .menu-item {
   justify-content: center;
   padding: 9px 0;
   margin: 3px 4px;
   gap: 0;
 }
+
 .sidebar .menu-item:hover {
   background: #f1f5f9;
   color: #0f172a;
 }
+
 .sidebar .menu-item:hover svg {
   color: #2563eb;
   transform: scale(1.05);
 }
+
 .sidebar .menu-item.active {
   background: rgba(37, 99, 235, 0.06);
   color: #2563eb;
   font-weight: 600;
 }
+
 .sidebar .menu-item.active svg {
   color: #2563eb;
 }
+
 .sidebar .menu-item.active::before {
   content: "";
   position: absolute;
@@ -88,6 +101,7 @@ body {
   opacity: 1;
   min-width: 0;
 }
+
 .menu-label.collapsed,
 .sidebar-title.collapsed {
   max-width: 0;
@@ -99,8 +113,12 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+  min-height: 0;
   overflow: hidden;
 }
+
 .topbar {
   height: 60px;
   background: rgba(255, 255, 255, 0.85);
@@ -113,11 +131,13 @@ body {
   padding: 0 24px;
   position: relative;
   z-index: 40;
+  flex-shrink: 0;
 }
 
 .content {
   padding: 24px;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   background: #f8fafc;
 }
@@ -132,12 +152,15 @@ body {
 .acp {
   color: rgb(39, 174, 96);
 }
+
 .wrn {
   color: rgb(241, 196, 15);
 }
+
 .err {
   color: rgb(231, 76, 60);
 }
+
 .def {
   color: #64748b;
 }
@@ -191,11 +214,13 @@ table {
   width: 100%;
   border-collapse: collapse;
 }
+
 th,
 td {
   padding: 8px;
   border-bottom: 1px solid #e2e8f0;
 }
+
 th {
   font-weight: 600;
   color: #0f172a;
@@ -205,13 +230,16 @@ th {
   width: 6px;
   height: 6px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #f8fafc;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
 }
+
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
@@ -220,25 +248,32 @@ th {
 [class*="bg-slate-950"] {
   background-color: #f8fafc !important;
 }
+
 [class*="bg-slate-900"] {
   background-color: #ffffff !important;
 }
+
 [class*="bg-slate-800"] {
   background-color: rgba(241, 245, 249, 0.9) !important;
 }
+
 [class*="bg-slate-700"] {
   background-color: #e2e8f0 !important;
 }
+
 [class*="bg-black"] {
   background-color: #ffffff !important;
 }
+
 [class*="border-slate-900"],
 [class*="border-slate-800"] {
   border-color: #cbd5e1 !important;
 }
+
 [class*="border-slate-700"] {
   border-color: #e2e8f0 !important;
 }
+
 .text-slate-200,
 .text-slate-300,
 .text-slate-400,
@@ -246,19 +281,23 @@ th {
 .text-slate-600 {
   color: #334155 !important;
 }
+
 .text-slate-300 {
   color: #475569 !important;
 }
+
 .text-slate-400,
 .text-slate-500 {
   color: #64748b !important;
 }
+
 .hover\:bg-slate-800:hover,
 .hover\:bg-slate-800\/40:hover,
 .hover\:bg-slate-900:hover,
 .hover\:bg-black\/40:hover {
   background-color: #e2e8f0 !important;
 }
+
 .group-hover\:bg-slate-800:hover,
 .group-hover\:bg-black\/40:hover {
   background-color: #e2e8f0 !important;
@@ -280,6 +319,7 @@ th {
   padding: 20px 24px;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
+
 .hero-card:hover,
 .summary-card:hover,
 .dashboard-panel:hover {
@@ -601,6 +641,7 @@ th {
 }
 
 @media (max-width: 1200px) {
+
   .dashboard-hero,
   .dashboard-panels,
   .dashboard-bottom-grid {
@@ -613,6 +654,7 @@ th {
 }
 
 @media (max-width: 768px) {
+
   .hero-card,
   .summary-card,
   .dashboard-panel {

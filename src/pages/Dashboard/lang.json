@@ -1,367 +1,74 @@
 {
   "title": {
-    "vi": "Bảng điều khiển Gateway Monitor",
-    "en": "Gateway Monitor Dashboard"
+    "vi": "Giám sát Hệ thống",
+    "en": "System Monitoring"
   },
-  "systemHealthy": {
-    "vi": "Hệ thống hoạt động bình thường",
-    "en": "All systems are operating normally"
+  "subtitle": {
+    "vi": "",
+    "en": ""
   },
-  "uptime": {
-    "vi": "Thời gian hoạt động",
-    "en": "Up time"
-  },
-  "administrator": {
-    "vi": "Quản trị viên",
-    "en": "Administrator"
-  },
-  "lastUpdated": {
-    "vi": "Cập nhật lần cuối",
-    "en": "Last updated"
-  },
-  "notifications": {
-    "vi": "Thông báo",
-    "en": "Notifications"
-  },
-  "markAllRead": {
-    "vi": "Đánh dấu tất cả đã đọc",
-    "en": "Mark all read"
-  },
-  "seeAllHistory": {
-    "vi": "Xem tất cả lịch sử",
-    "en": "See all history"
-  },
-  "noNotifications": {
-    "vi": "Không có thông báo mới",
-    "en": "No notifications"
-  },
-  "noNotify": {
-    "vi": "Không có sự kiện nào",
-    "en": "No events found"
-  },
-  "loading": {
-    "vi": "Đang tải...",
-    "en": "Loading..."
-  },
-
-  "health": {
-    "title": {
-      "vi": "TRẠNG THÁI HỆ THỐNG TỐT",
-      "en": "SYSTEM HEALTHY"
+  "trafficCard": {
+    "swimToAmhs": {
+      "vi": "SWIM → AMHS",
+      "en": "SWIM → AMHS"
     },
-    "error": {
-      "vi": "MẤT KẾT NỐI ĐẾN SERVER",
-      "en": "DISCONNECT TO SERVER"
+    "amhsToSwim": {
+      "vi": "AMHS → SWIM",
+      "en": "AMHS → SWIM"
     },
-    "try": {
-      "vi": "Đang thử kết nối lại đến server...",
-      "en": "Trying to reconnect to the server..."
-    },
-    "description": {
-      "vi": "Hệ thống hoạt động bình thường",
-      "en": "All systems are operating normally"
-    },
-    "totalErrorsToday": {
-      "vi": "Tổng số lỗi hôm nay",
-      "en": "Total errors today"
-    },
-    "lastErrorTime": {
-      "vi": "Thời gian lỗi gần nhất",
-      "en": "Last error time"
-    },
-    "runningSince": {
-      "vi": "Hoạt động từ",
-      "en": "Running since"
-    }
-  },
-
-  "amhsSent": {
-    "title": {
-      "vi": "Chiều gửi đi AMHS (SWIM → AMHS)",
-      "en": "Inbound to AMHS (SWIM → AMHS)"
-    },
-    "total": {
-      "vi": "Tổng số",
-      "en": "Total"
+    "messages": {
+      "vi": "điện văn",
+      "en": "msgs"
     },
     "pending": {
-      "vi": "Đang chờ",
+      "vi": "Pending",
       "en": "Pending"
     },
-    "convertSuccess": {
-      "vi": "Chuyển đổi thành công",
-      "en": "Convert Success"
+    "unrouted": {
+      "vi": "Unrouted",
+      "en": "Unrouted"
     },
-    "publishSuccess": {
-      "vi": "Truyền phát thành công",
-      "en": "Sent Success"
+    "delivered": {
+      "vi": "Delivered",
+      "en": "Delivered"
     },
-    "error": {
-      "vi": "Lỗi xử lý",
-      "en": "Error"
+    "published": {
+      "vi": "Published",
+      "en": "Published"
+    },
+    "failed": {
+      "vi": "Failed",
+      "en": "Failed"
     },
     "successRate": {
       "vi": "Tỷ lệ thành công",
       "en": "Success Rate"
     }
   },
-
-  "amqpSent": {
-    "title": {
-      "vi": "Chiều gửi đi SWIM (AMHS → SWIM)",
-      "en": "Outbound to SWIM (AMHS → SWIM)"
-    },
-    "total": {
-      "vi": "Tổng số",
-      "en": "Total"
-    },
-    "pending": {
-      "vi": "Đang chờ",
-      "en": "Pending"
-    },
-    "convertSuccess": {
-      "vi": "Chuyển đổi thành công",
-      "en": "Convert Success"
-    },
-    "sentSuccess": {
-      "vi": "Truyền phát thành công",
-      "en": "Sent Success"
-    },
-    "noRouting": {
-      "vi": "Lỗi định tuyến",
-      "en": "No Routing"
-    },
-    "error": {
-      "vi": "Lỗi xử lý",
-      "en": "Error"
-    }
-  },
-
-  "conversionStatus": {
-    "title": {
-      "vi": "Trạng thái chuyển đổi",
-      "en": "Conversion Status"
-    },
-    "successfulConversions": {
-      "vi": "Chuyển đổi thành công",
-      "en": "Successful conversions"
-    },
-    "failedConversions": {
-      "vi": "Chuyển đổi thất bại",
-      "en": "Failed conversions"
-    },
-    "successRate": {
-      "vi": "Tỷ lệ thành công",
-      "en": "Success rate"
-    }
-  },
-
-  "messageFlow": {
-    "title": {
-      "vi": "Luồng bản tin",
-      "en": "Message Flow"
-    },
-    "totalReceived": {
-      "vi": "Tổng nhận",
-      "en": "Total Received"
-    },
-    "amhsToSwim": {
-      "vi": "AMHS → SWIM",
-      "en": "AMHS → SWIM"
-    },
-    "swimToAmhs": {
-      "vi": "SWIM → AMHS",
-      "en": "SWIM → AMHS"
-    }
-  },
-
-  "server": {
-    "title": {
-      "vi": "Thông tin máy chủ",
-      "en": "Server Information"
-    },
-    "consoleConnection": {
-      "vi": "Kết nối Console",
-      "en": "Console Connection"
-    },
-    "connecting": {
-      "vi": "Đang kết nối đến server ...",
-      "en": "Connecting to server ..."
-    },
-    "connectedSupervisor": {
-      "vi": "Đã kết nối (Supervisor)",
-      "en": "Connected (Supervisor)"
-    },
-    "serverName": {
-      "vi": "Tên máy chủ",
-      "en": "Server name"
-    },
-    "runningSince": {
-      "vi": "Khởi động từ",
-      "en": "Server running since"
-    },
-    "uptime": {
-      "vi": "Thời gian hoạt động",
-      "en": "Server up time"
-    },
-    "version": {
-      "vi": "Phiên bản phần mềm",
-      "en": "Server Software Version"
-    },
-    "runState": {
-      "vi": "Trạng thái",
-      "en": "Run State"
-    },
-    "running": {
-      "vi": "Đang chạy",
-      "en": "Running"
-    },
-    "stop": {
-      "vi": "Đã dừng",
-      "en": "Stop"
-    },
-    "memoryUsage": {
-      "vi": "Bộ nhớ sử dụng (MB)",
-      "en": "Memory Usage (MB)"
-    },
-    "allocated": {
-      "vi": "Đã cấp phát",
-      "en": "Allocated"
-    },
-    "unused": {
-      "vi": "Chưa sử dụng",
-      "en": "Unused"
-    },
-    "diskSpace": {
-      "vi": "Dung lượng ổ đĩa (GB)",
-      "en": "Disk Space (GB)"
-    },
-    "free": {
-      "vi": "Còn trống",
-      "en": "Free"
-    },
-    "total": {
-      "vi": "Tổng",
-      "en": "Total"
-    }
-  },
-
-  "swimToAmhsQueue": {
-    "title": {
-      "vi": "SWIM → AMHS (Hàng đợi AMQP)",
-      "en": "SWIM → AMHS (AMQP Queue)"
-    },
-    "total": {
-      "vi": "Tổng",
-      "en": "Total"
-    },
-    "pending": {
-      "vi": "Đang chờ",
-      "en": "Pending"
-    },
-    "converted": {
-      "vi": "Đã chuyển đổi",
-      "en": "Converted"
-    },
-    "convertedFailed": {
-      "vi": "Chuyển đổi thất bại",
-      "en": "Converted Failed"
-    },
-    "sent": {
-      "vi": "Đã gửi",
-      "en": "Sent"
-    },
-    "noRouting": {
-      "vi": "Không có tuyến",
-      "en": "No Routing"
-    }
-  },
-
-  "queueOverview": {
-    "title": {
-      "vi": "Tổng quan hàng đợi",
-      "en": "Queue Overview"
-    },
-    "pending": {
-      "vi": "Đang chờ",
-      "en": "Pending"
-    },
-    "converted": {
-      "vi": "Đã chuyển đổi",
-      "en": "Converted"
-    },
-    "convertFailed": {
-      "vi": "Chuyển đổi thất bại",
-      "en": "Convert Failed"
-    },
-    "sent": {
-      "vi": "Đã gửi",
-      "en": "Sent"
-    },
-    "publish": {
-      "vi": "Phát hành",
-      "en": "Publish"
-    },
-    "noRouting": {
-      "vi": "Không có tuyến",
-      "en": "No Routing"
-    }
-  },
-
-  "amhsToSwim": {
-    "title": {
-      "vi": "AMHS → SWIM",
-      "en": "AMHS → SWIM"
-    },
-    "total": {
-      "vi": "Tổng",
-      "en": "Total"
-    },
-    "pending": {
-      "vi": "Đang chờ",
-      "en": "Pending"
-    },
-    "converted": {
-      "vi": "Đã chuyển đổi",
-      "en": "Converted"
-    },
-    "convertedFailed": {
-      "vi": "Chuyển đổi thất bại",
-      "en": "Converted Failed"
-    },
-    "published": {
-      "vi": "Đã publish",
-      "en": "Published"
-    },
-    "undefined": {
-      "vi": "Không xác định",
-      "en": "Undefined"
-    }
-  },
   "channels": {
     "title": {
-      "vi": "Trạng thái kết nối kênh",
-      "en": "Channel Connection Status"
+      "vi": "Kênh Kết nối",
+      "en": "Channel Status"
     },
     "amqp": {
-      "vi": "Kênh AMQP (SWIM)",
-      "en": "AMQP Channels"
+      "vi": "AMQP Broker",
+      "en": "AMQP Broker"
     },
     "amhs": {
-      "vi": "Kênh AMHS (X.400)",
-      "en": "AMHS/X.400 Channels"
+      "vi": "AMHS Mtcu",
+      "en": "AMHS Mtcu"
+    },
+    "connected": {
+      "vi": "Connected",
+      "en": "Connected"
+    },
+    "disconnected": {
+      "vi": "Disconnected",
+      "en": "Disconnected"
     },
     "noConfig": {
       "vi": "Chưa cấu hình kênh",
       "en": "No channels configured"
-    },
-    "connected": {
-      "vi": "Kết nối",
-      "en": "Connected"
-    },
-    "disconnected": {
-      "vi": "Mất kết nối",
-      "en": "Disconnected"
     },
     "connectedCount": {
       "vi": "kênh đang kết nối",
@@ -372,58 +79,72 @@
       "en": "channels disconnected"
     }
   },
-
-  "hero": {
-    "errors": {
-      "vi": "lỗi",
-      "en": "errors"
+  "server": {
+    "title": {
+      "vi": "Thông tin Server",
+      "en": "Server Info"
     },
-    "unrouted": {
-      "vi": "chờ định tuyến",
-      "en": "awaiting routing"
+    "serverName": {
+      "vi": "Tên Server",
+      "en": "Host Name"
+    },
+    "runningSince": {
+      "vi": "Khởi động",
+      "en": "Start Time"
+    },
+    "uptime": {
+      "vi": "Uptime",
+      "en": "Uptime"
+    },
+    "version": {
+      "vi": "Phiên bản",
+      "en": "Version"
+    },
+    "memoryUsage": {
+      "vi": "Heap RAM",
+      "en": "Heap RAM"
+    },
+    "unused": {
+      "vi": "Chưa sử dụng",
+      "en": "Unused"
     }
   },
-
-  "trafficCard": {
-    "swimToAmhs": {
-      "vi": "SWIM → AMHS (Luồng vào)",
-      "en": "SWIM → AMHS (Inbound)"
+  "health": {
+    "title": {
+      "vi": "Tình trạng Hệ thống",
+      "en": "System Health"
     },
-    "amhsToSwim": {
-      "vi": "AMHS → SWIM (Luồng ra)",
-      "en": "AMHS → SWIM (Outbound)"
+    "error": {
+      "vi": "Lỗi kết nối Máy chủ",
+      "en": "Server Connection Error"
     },
-    "messages": {
-      "vi": "điện văn",
-      "en": "messages"
+    "try": {
+      "vi": "Mất kết nối với máy chủ Gateway",
+      "en": "Lost connection to Gateway Server"
     },
-    "pending": {
-      "vi": "Đang chờ xử lý",
-      "en": "Pending"
-    },
-    "converted": {
-      "vi": "Chuyển đổi thành công",
-      "en": "Converted"
-    },
-    "convertFailed": {
-      "vi": "Lỗi chuyển đổi",
-      "en": "Conversion failed"
-    },
-    "unrouted": {
-      "vi": "Chờ định tuyến",
-      "en": "Awaiting routing"
-    },
-    "sent": {
-      "vi": "Đã gửi thành công",
-      "en": "Sent successfully"
-    },
-    "failed": {
-      "vi": "Lỗi xử lý",
-      "en": "Processing error"
-    },
-    "successRate": {
-      "vi": "Tỷ lệ gửi thành công",
-      "en": "Delivery success rate"
+    "description": {
+      "vi": "Máy chủ đang hoạt động bình thường",
+      "en": "Server is operating normally"
     }
+  },
+  "uptime": {
+    "vi": "Uptime máy chủ",
+    "en": "Server Uptime"
+  },
+  "notifications": {
+    "vi": "Thông báo hệ thống",
+    "en": "System Notifications"
+  },
+  "markAllRead": {
+    "vi": "Đánh dấu đã đọc tất cả",
+    "en": "Mark all as read"
+  },
+  "noNotify": {
+    "vi": "Không có thông báo mới",
+    "en": "No new notifications"
+  },
+  "seeAllHistory": {
+    "vi": "Xem toàn bộ lịch sử",
+    "en": "View all history"
   }
 }

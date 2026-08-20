@@ -18,25 +18,29 @@ export default function DashboardLayout({ children }) {
       <GlobalSystemFetcher />
       <Toaster 
         position="top-right"
+        gutter={10}
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#FFFFFF',
-            color: '#000',
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            background: '#ffffff',
+            color: '#0f172a',
+            fontSize: '13px',
+            fontWeight: '600',
             borderRadius: '12px',
-            padding: '12px 16px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            border: '1px solid #e5e7eb',
+            padding: '10px 14px',
+            boxShadow: '0 12px 30px -6px rgba(15, 23, 42, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.04)',
+            border: '1px solid #e2e8f0',
           },
           success: {
-            iconTheme: { primary: '#10b981', secondary: '#fff' },
+            iconTheme: { primary: '#10b981', secondary: '#ffffff' },
           },
           error: {
-            iconTheme: { primary: '#ef4444', secondary: '#fff' },
+            iconTheme: { primary: '#ef4444', secondary: '#ffffff' },
             duration: 5000,
           },
           loading: {
-            iconTheme: { primary: '#3b82f6', secondary: '#fff' },
+            iconTheme: { primary: '#3b82f6', secondary: '#ffffff' },
           },
         }}
       />

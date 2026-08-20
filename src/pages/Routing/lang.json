@@ -1,402 +1,290 @@
 {
-    "tabs": {
-      "a2s": {
-        "vi": "OUT (AMHS → SWIM)",
-        "en": "OUT (AMHS → SWIM)"
-      },
-      "s2a": {
-        "vi": "IN (SWIM → AMHS)",
-        "en": "IN (SWIM → AMHS)"
-      }
+  "title": {
+    "a2s": {
+      "vi": "Chiều SWIM → AMHS (Inbound)",
+      "en": "SWIM → AMHS (Inbound)"
     },
-    "title": {
-      "a2s": {
-        "vi": "Luồng đi (AMHS → SWIM)",
-        "en": "Outbound Rules (AMHS → SWIM)"
-      },
-      "s2a": {
-        "vi": "Luồng vào (SWIM → AMHS)",
-        "en": "Inbound Rules (SWIM → AMHS)"
-      }
+    "s2a": {
+      "vi": "Chiều AMHS → SWIM (Outbound)",
+      "en": "AMHS → SWIM (Outbound)"
+    }
+  },
+  "subtitle": {
+    "vi": "",
+    "en": ""
+  },
+  "tabs": {
+    "a2s": {
+      "vi": "SWIM → AMHS",
+      "en": "SWIM → AMHS"
     },
-    "table": {
-      "id": {
-        "vi": "#",
-        "en": "#"
-      },
-      "messageType": {
-        "vi": "Loại điện văn",
-        "en": "Message Type"
-      },
-      "sendTopic": {
-        "vi": "Topic gửi",
-        "en": "Send Topic"
-      },
-      "receiveTopic": {
-        "vi": "Topic nhận",
-        "en": "Receive Topic"
-      },
-      "recipients": {
-        "vi": "Địa chỉ nhận",
-        "en": "Recipients"
-      },
-      "originator": {
-        "vi": "Địa chỉ phát",
-        "en": "Originator"
-      },
-      "priority": {
-        "vi": "Độ khẩn",
-        "en": "Priority"
-      },
-      "note": {
-        "vi": "Ghi chú",
-        "en": "Note"
-      },
-      "active": {
-        "vi": "Trạng thái",
-        "en": "Active"
-      },
-      "action": {
-        "vi": "Thao tác",
-        "en": "Action"
-      }
+    "s2a": {
+      "vi": "AMHS → SWIM",
+      "en": "AMHS → SWIM"
+    }
+  },
+  "toolbar": {
+    "search": {
+      "vi": "Tìm quy tắc...",
+      "en": "Search rules..."
     },
-    "filter": {
-      "title": {
-        "vi": "Bộ lọc:",
-        "en": "Filter:"
-      },
-      "allMessageTypes": {
-        "vi": "Tất cả loại tin",
-        "en": "All Message Types"
-      },
-      "allStatus": {
-        "vi": "Tất cả trạng thái",
-        "en": "All Status"
-      },
-      "active": {
-        "vi": "Hoạt động",
-        "en": "Active"
-      },
-      "inactive": {
-        "vi": "Không hoạt động",
-        "en": "Inactive"
-      },
-      "searchPlaceholder": {
-        "vi": "Tìm kiếm...",
-        "en": "Search..."
-      },
-      "searchButton": {
-        "vi": "Tìm kiếm",
-        "en": "Search"
-      }
+    "add": {
+      "vi": "Thêm Quy tắc",
+      "en": "Add Rule"
+    }
+  },
+  "table": {
+    "id": {
+      "vi": "ID",
+      "en": "ID"
     },
-    "buttons": {
-      "addRule": {
-        "vi": "THÊM RULE",
-        "en": "ADD RULE"
-      },
-      "saveRule": {
-        "vi": "Lưu rule",
-        "en": "Save Rule"
-      },
-      "cancel": {
-        "vi": "Hủy",
-        "en": "Cancel"
-      },
-      "delete": {
-        "vi": "Xóa",
-        "en": "Delete"
-      }
+    "messageType": {
+      "vi": "Loại Điện Văn",
+      "en": "Msg Type"
     },
-    "status": {
-      "on": {
-        "vi": "🟢 BẬT",
-        "en": "🟢 ON"
-      },
-      "off": {
-        "vi": "🔴 TẮT",
-        "en": "🔴 OFF"
-      },
-      "active": {
-        "vi": "Hoạt động",
-        "en": "Active"
-      },
-      "inactive": {
-        "vi": "Không hoạt động",
-        "en": "Inactive"
-      }
+    "detectPattern": {
+      "vi": "Detect Pattern",
+      "en": "Detect Pattern"
     },
-    "modal": {
-      "editTitle": {
-        "vi": "CHỈNH SỬA RULE - ",
-        "en": "EDIT RULE - "
-      },
-      "deleteTitle": {
-        "vi": "Xác nhận xóa rule ID: ",
-        "en": "Confirm Delete Rule ID: "
-      },
-      "deleteMessage": {
-        "vi": "Bạn có chắc chắn muốn xóa rule này? Hành động này không thể hoàn tác.",
-        "en": "Are you sure you want to delete this rule? This action cannot be undone."
-      },
-      "topicLabel": {
-        "vi": "Topic: ",
-        "en": "Topic: "
-      },
-      "passwordLabel": {
-        "vi": "Nhập mật khẩu",
-        "en": "Enter Password"
-      },
-      "passwordPlaceholder": {
-        "vi": "Nhập mật khẩu",
-        "en": "Enter password"
-      },
-      "deleteError": {
-        "vi": "Mật khẩu không đúng",
-        "en": "Incorrect password"
-      }
+    "sendTopic": {
+      "vi": "Topic Phát",
+      "en": "Send Topic"
     },
-    "form": {
-      "a2s": {
-        "messageType": {
-          "label": {
-            "vi": "Loại tin *",
-            "en": "Message Type *"
-          },
-          "placeholder": {
-            "vi": "Nhập hoặc chọn loại tin, nhấn Enter",
-            "en": "Enter or select message type, press Enter"
-          },
-          "addButton": {
-            "vi": "Thêm",
-            "en": "Add"
-          },
-          "hint": {
-            "vi": "Bạn có thể nhập bằng tay hoặc chọn từ danh sách. Nhập nhiều mục, mỗi mục cách nhau dấu phẩy hoặc nhấn Enter.",
-            "en": "You can type manually or select from list. Enter multiple items separated by commas or press Enter."
-          }
-        },
-        "sendTopic": {
-          "label": {
-            "vi": "Topic gửi * (AMQP Topic)",
-            "en": "Send Topic * (AMQP Topic)"
-          },
-          "placeholder": {
-            "vi": "ats/met/metar",
-            "en": "ats/met/metar"
-          }
-        },
-        "priority": {
-          "label": {
-            "vi": "Độ khẩn (AMHS: SS=cao nhất, KK=thấp nhất)",
-            "en": "Priority (AMHS: SS=highest, KK=lowest)"
-          },
-          "options": {
-            "ss": {
-              "vi": "SS (Cao nhất)",
-              "en": "SS (Highest)"
-            },
-            "dd": {
-              "vi": "DD",
-              "en": "DD"
-            },
-            "ff": {
-              "vi": "FF (Bình thường)",
-              "en": "FF (Normal)"
-            },
-            "gg": {
-              "vi": "GG",
-              "en": "GG"
-            },
-            "kk": {
-              "vi": "KK (Thấp nhất)",
-              "en": "KK (Lowest)"
-            }
-          }
-        },
-        "note": {
-          "label": {
-            "vi": "Ghi chú",
-            "en": "Note"
-          },
-          "placeholder": {
-            "vi": "Gửi IWXXM METAR lên topic ats/met/metar",
-            "en": "Send IWXXM METAR to topic ats/met/metar"
-          }
-        }
-      },
-      "s2a": {
-        "receiveTopic": {
-          "label": {
-            "vi": "Topic nhận * (AMQP Topic)",
-            "en": "Receive Topic * (AMQP Topic)"
-          },
-          "placeholder": {
-            "vi": "ats/met/metar",
-            "en": "ats/met/metar"
-          }
-        },
-        "messageFilter": {
-          "label": {
-            "vi": "Bộ lọc tin (Trống = tất cả)",
-            "en": "Message Filter (Empty = all)"
-          },
-          "placeholder": {
-            "vi": "METAR, FPL...",
-            "en": "METAR, FPL..."
-          }
-        },
-        "recipients": {
-          "label": {
-            "vi": "Địa chỉ nhận * (Danh sách địa chỉ AFTN, phân cách bằng khoảng trắng)",
-            "en": "Recipients * (List of AFTN addresses, space separated)"
-          },
-          "placeholder": {
-            "vi": "VVHHZQZX VVHHZTZX VVHHZDZX",
-            "en": "VVHHZQZX VVHHZTZX VVHHZDZX"
-          }
-        },
-        "originator": {
-          "label": {
-            "vi": "Địa chỉ phát (Địa chỉ AFTN)",
-            "en": "Originator (AFTN address)"
-          },
-          "placeholder": {
-            "vi": "VVHHZPZX",
-            "en": "VVHHZPZX"
-          },
-          "error": {
-            "vi": "Phải có đúng 8 ký tự",
-            "en": "Must be exactly 8 characters"
-          }
-        },
-        "priority": {
-          "label": {
-            "vi": "Độ khẩn (SWIM: 0=cao nhất, 9=thấp nhất)",
-            "en": "Priority (SWIM: 0=highest, 9=lowest)"
-          },
-          "options": {
-            "0": {
-              "vi": "0 (SS/DD)",
-              "en": "0 (SS/DD)"
-            },
-            "1": {
-              "vi": "1 (SS/DD)",
-              "en": "1 (SS/DD)"
-            },
-            "2": {
-              "vi": "2 (FF)",
-              "en": "2 (FF)"
-            },
-            "3": {
-              "vi": "3 (FF)",
-              "en": "3 (FF)"
-            },
-            "4": {
-              "vi": "4 (GG)",
-              "en": "4 (GG)"
-            },
-            "5": {
-              "vi": "5 (GG)",
-              "en": "5 (GG)"
-            },
-            "6": {
-              "vi": "6 (GG)",
-              "en": "6 (GG)"
-            },
-            "7": {
-              "vi": "7 (KK)",
-              "en": "7 (KK)"
-            },
-            "8": {
-              "vi": "8 (KK)",
-              "en": "8 (KK)"
-            },
-            "9": {
-              "vi": "9 (KK)",
-              "en": "9 (KK)"
-            }
-          }
-        },
-        "note": {
-          "label": {
-            "vi": "Ghi chú",
-            "en": "Note"
-          },
-          "placeholder": {
-            "vi": "Tất cả METAR gửi cho Hanoi MET + ACC",
-            "en": "All METAR send to Hanoi MET + ACC"
-          }
-        }
-      },
-      "common": {
-        "status": {
-          "label": {
-            "vi": "Trạng thái",
-            "en": "Status"
-          },
-          "active": {
-            "vi": "Hoạt động",
-            "en": "Active"
-          },
-          "inactive": {
-            "vi": "Không hoạt động",
-            "en": "Inactive"
-          }
-        },
-        "note": {
-          "label": {
-            "vi": "Ghi chú",
-            "en": "Note"
-          }
-        }
-      }
+    "receiveTopic": {
+      "vi": "Topic Nhận",
+      "en": "Receive Topic"
     },
-    "toast": {
-      "deleteSuccess": {
-        "vi": "Xóa rule thành công!",
-        "en": "Rule deleted successfully!"
-      },
-      "deleteFailed": {
-        "vi": "Xóa rule thất bại: ",
-        "en": "Failed to delete rule: "
-      },
-      "saveSuccess": {
-        "vi": "Lưu rule thành công!",
-        "en": "Rule saved successfully!"
-      },
-      "saveFailed": {
-        "vi": "Lưu rule thất bại: ",
-        "en": "Failed to save rule: "
-      },
-      "fetchFailed": {
-        "vi": "Không thể tải dữ liệu routing từ API.",
-        "en": "Cannot load routing data from API."
-      }
+    "recipients": {
+      "vi": "Địa Chỉ Nhận",
+      "en": "Recipients"
+    },
+    "note": {
+      "vi": "Ghi Chú",
+      "en": "Note"
     },
     "priority": {
-      "amhs": {
-        "ss": {
-          "vi": "SS (Cao nhất)",
-          "en": "SS (Highest)"
+      "vi": "Độ Ưu Tiên",
+      "en": "Priority"
+    },
+    "active": {
+      "vi": "Trạng Thái",
+      "en": "Status"
+    },
+    "action": {
+      "vi": "Thao Tác",
+      "en": "Actions"
+    }
+  },
+  "modal": {
+    "deleteTitle": {
+      "vi": "Xóa Quy tắc Định tuyến",
+      "en": "Delete Routing Rule"
+    },
+    "deleteMessage": {
+      "vi": "Bạn có chắc chắn muốn xóa quy tắc định tuyến này?",
+      "en": "Are you sure you want to delete this routing rule?"
+    },
+    "deleteError": {
+      "vi": "Không thể xóa quy tắc này",
+      "en": "Failed to delete rule"
+    },
+    "topicLabel": {
+      "vi": "Topic",
+      "en": "Topic"
+    },
+    "passwordLabel": {
+      "vi": "Mật khẩu xác nhận",
+      "en": "Confirmation Password"
+    },
+    "passwordPlaceholder": {
+      "vi": "Nhập mật khẩu quản trị...",
+      "en": "Enter admin password..."
+    },
+    "editTitle": {
+      "vi": "Chỉnh sửa Quy tắc",
+      "en": "Edit Routing Rule"
+    }
+  },
+  "buttons": {
+    "addRule": {
+      "vi": "Thêm Quy tắc mới",
+      "en": "Add New Rule"
+    },
+    "save": {
+      "vi": "Lưu Quy tắc",
+      "en": "Save Rule"
+    },
+    "cancel": {
+      "vi": "Hủy bỏ",
+      "en": "Cancel"
+    },
+    "edit": {
+      "vi": "Sửa",
+      "en": "Edit"
+    },
+    "delete": {
+      "vi": "Xóa",
+      "en": "Delete"
+    }
+  },
+  "filter": {
+    "searchPlaceholder": {
+      "vi": "Tìm kiếm quy tắc...",
+      "en": "Search rules..."
+    },
+    "allMessageTypes": {
+      "vi": "Tất cả loại điện văn",
+      "en": "All Message Types"
+    },
+    "allStatus": {
+      "vi": "Tất cả trạng thái",
+      "en": "All Statuses"
+    },
+    "active": {
+      "vi": "Kích hoạt",
+      "en": "Active"
+    },
+    "inactive": {
+      "vi": "Tạm dừng",
+      "en": "Inactive"
+    }
+  },
+  "status": {
+    "on": {
+      "vi": "Bật",
+      "en": "Active"
+    },
+    "off": {
+      "vi": "Tắt",
+      "en": "Inactive"
+    }
+  },
+  "form": {
+    "a2s": {
+      "messageType": {
+        "label": {
+          "vi": "Loại điện văn (Message Type)",
+          "en": "Message Type"
         },
-        "dd": {
-          "vi": "DD",
-          "en": "DD"
+        "placeholder": {
+          "vi": "Nhập loại điện văn (ví dụ: FPL, METAR...)",
+          "en": "e.g. FPL, METAR..."
         },
-        "ff": {
-          "vi": "FF (Bình thường)",
-          "en": "FF (Normal)"
+        "addButton": {
+          "vi": "Thêm",
+          "en": "Add"
+        }
+      },
+      "sendTopic": {
+        "label": {
+          "vi": "Topic phát SWIM (Send Topic)",
+          "en": "SWIM Send Topic"
         },
-        "gg": {
-          "vi": "GG",
-          "en": "GG"
+        "placeholder": {
+          "vi": "Nhập topic SWIM...",
+          "en": "Enter SWIM topic..."
+        }
+      },
+      "priority": {
+        "label": {
+          "vi": "Mức ưu tiên (Priority)",
+          "en": "Priority Level"
+        }
+      },
+      "note": {
+        "placeholder": {
+          "vi": "Nhập ghi chú cho quy tắc này...",
+          "en": "Enter notes for this rule..."
+        }
+      }
+    },
+    "s2a": {
+      "receiveTopic": {
+        "label": {
+          "vi": "Topic nhận (Receive Topic)",
+          "en": "Receive Topic"
         },
-        "kk": {
-          "vi": "KK (Thấp nhất)",
-          "en": "KK (Lowest)"
+        "placeholder": {
+          "vi": "Nhập topic nhận...",
+          "en": "Enter receive topic..."
+        }
+      },
+      "recipients": {
+        "label": {
+          "vi": "Địa chỉ người nhận AMHS",
+          "en": "AMHS Recipients"
+        },
+        "placeholder": {
+          "vi": "Nhập danh sách địa chỉ người nhận...",
+          "en": "Enter AMHS recipients..."
+        }
+      },
+      "originator": {
+        "label": {
+          "vi": "Địa chỉ người phát (Originator)",
+          "en": "Originator Address"
+        },
+        "placeholder": {
+          "vi": "Nhập địa chỉ người phát...",
+          "en": "Enter originator address..."
+        }
+      },
+      "priority": {
+        "label": {
+          "vi": "Mức ưu tiên (Priority)",
+          "en": "Priority Level"
+        }
+      },
+      "note": {
+        "placeholder": {
+          "vi": "Nhập ghi chú cho quy tắc này...",
+          "en": "Enter notes for this rule..."
+        }
+      }
+    },
+    "common": {
+      "status": {
+        "label": {
+          "vi": "Trạng thái quy tắc",
+          "en": "Rule Status"
+        },
+        "active": {
+          "vi": "Kích hoạt (Active)",
+          "en": "Active"
+        },
+        "inactive": {
+          "vi": "Tạm dừng (Inactive)",
+          "en": "Inactive"
+        }
+      },
+      "note": {
+        "label": {
+          "vi": "Ghi chú bổ sung",
+          "en": "Rule Notes"
         }
       }
     }
+  },
+  "toast": {
+    "fetchFailed": {
+      "vi": "Tải danh sách quy tắc thất bại",
+      "en": "Failed to load routing rules"
+    },
+    "saveSuccess": {
+      "vi": "Cập nhật cấu hình định tuyến thành công",
+      "en": "Routing configuration updated"
+    },
+    "saveFailed": {
+      "vi": "Không thể cập nhật cấu hình định tuyến",
+      "en": "Failed to update routing configuration"
+    },
+    "deleteSuccess": {
+      "vi": "Đã loại bỏ cấu hình định tuyến",
+      "en": "Routing rule removed"
+    },
+    "deleteFailed": {
+      "vi": "Không thể loại bỏ cấu hình định tuyến",
+      "en": "Failed to remove routing rule"
+    }
+  }
 }

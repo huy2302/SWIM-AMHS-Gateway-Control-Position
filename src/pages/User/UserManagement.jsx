@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import DashboardLayout from "@/layout/DashboardLayout";
-import { Plus, Edit2, Trash2, Shield, UserCheck, UserX, Search, X } from "lucide-react";
+import { Plus, Edit2, Trash2, Shield, UserCheck, UserX, Search, X, Users, Check } from "lucide-react";
 import gatewayApi from "@/api/gatewayApi";
 import ConfirmModal from "@/components/ConfirmModal";
 import toast from "react-hot-toast";
@@ -13,8 +13,7 @@ export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [roles, setRoles] = useState([]);
-  
+
   // Pagination & Sorting state
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -31,7 +30,7 @@ export default function UserManagement() {
     fullName: "",
     email: "",
     password: "",
-    role: "USER",
+    role: "viewer",
     isActive: true,
   };
   const [formData, setFormData] = useState(defaultForm);
@@ -57,8 +56,9 @@ export default function UserManagement() {
         sortBy: "id",
         sortDir: "asc",
       });
-      if (response && response.users) {
-        setUsers(response.users);
+      const userItems = response?.items || response?.users || [];
+      if (response) {
+        setUsers(userItems);
         setTotalPages(response.totalPages || 1);
         setTotalItems(response.totalItems || 0);
       }
@@ -70,18 +70,8 @@ export default function UserManagement() {
     }
   }, [page, pageSize, isAdmin]);
 
-  // Fetch roles metadata
   useEffect(() => {
-    const fetchMetadata = async () => {
-      try {
-        const rolesRes = await gatewayApi.getUserRoles();
-        setRoles(rolesRes || []);
-      } catch (error) {
-        console.error("Failed to load user roles:", error);
-      }
-    };
     if (isAdmin) {
-      fetchMetadata();
       fetchUsers();
     }
   }, [isAdmin, fetchUsers]);
@@ -102,7 +92,8 @@ export default function UserManagement() {
         sortDir: "asc",
       });
       // Filter locally based on keyword for search consistency if backend search is simple
-      const filtered = (response?.users || []).filter(
+      const userItems = response?.items || response?.users || [];
+      const filtered = userItems.filter(
         (u) =>
           u.username.toLowerCase().includes(searchKeyword.toLowerCase()) ||
           u.email.toLowerCase().includes(searchKeyword.toLowerCase()) ||
@@ -131,7 +122,7 @@ export default function UserManagement() {
       fullName: user.fullName || "",
       email: user.email || "",
       password: "", // Do not populate password for editing security
-      role: user.role || "USER",
+      role: user.role || "viewer",
       isActive: user.isActive !== false,
     });
     setIsDialogOpen(true);
@@ -262,9 +253,9 @@ export default function UserManagement() {
 
         {/* Users Table */}
         <div className="bg-white border border-slate-200/80 rounded-xl overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto min-h-[260px]">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold uppercase tracking-wider">
+              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200/80 font-bold tracking-wider">
                 <tr>
                   <th className="p-4">{t("users.table.username")}</th>
                   <th className="p-4">{t("users.table.fullName")}</th>
@@ -297,10 +288,8 @@ export default function UserManagement() {
                       <td className="p-4 text-slate-500">{row.email || "-"}</td>
                       <td className="p-4">
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          row.role === "ADMIN" 
-                            ? "bg-red-50 text-red-700 border-red-200/60" 
-                            : row.role === "OPERATOR"
-                            ? "bg-amber-50 text-amber-700 border-amber-200/60"
+                          row.role?.toLowerCase() === "admin"
+                            ? "bg-red-50 text-red-700 border-red-200/60"
                             : "bg-blue-50 text-blue-700 border-blue-200/60"
                         }`}>
                           {t(`users.roles.${row.role}`) || row.role}
@@ -360,145 +349,149 @@ export default function UserManagement() {
 
         {/* Modal: Add/Edit User Dialog */}
         {isDialogOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in">
-            <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden animate-zoom-in">
-              <div className="flex justify-between items-center border-b border-slate-100 px-6 py-4 bg-slate-50">
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
-                  {editingUser ? t("users.editUser") : t("users.addUser")}
-                </h3>
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in" onClick={() => setIsDialogOpen(false)}>
+            <div className="w-[540px] max-w-full bg-white max-h-[88vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-zoom-in border border-slate-200" onClick={(e) => e.stopPropagation()}>
+              
+              {/* MODAL HEADER */}
+              <div className="px-6 py-4 bg-white border-b border-slate-200 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 flex items-center justify-center shrink-0">
+                    <Users size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-slate-900">
+                      {editingUser ? t("users.editUser") : t("users.addUser")}
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      System User Account Management
+                    </p>
+                  </div>
+                </div>
+                
                 <button
                   onClick={() => setIsDialogOpen(false)}
-                  className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                  className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-lg transition-colors cursor-pointer"
                 >
-                  <X size={16} />
+                  <X size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                {/* Username */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
-                    {t("users.dialog.username")}
-                  </label>
-                  <input
-                    type="text"
-                    name="username"
-                    required
-                    disabled={Boolean(editingUser)} // Username is unique and unchangeable
-                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900 disabled:opacity-50 disabled:bg-slate-50"
-                    value={formData.username}
-                    onChange={handleFormChange}
-                  />
+              {/* MODAL BODY */}
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4 text-xs">
+                  {/* Username */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("users.dialog.username")}
+                    </label>
+                    <input
+                      type="text"
+                      name="username"
+                      required
+                      disabled={Boolean(editingUser)}
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all disabled:opacity-50 disabled:bg-slate-100"
+                      value={formData.username}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+
+                  {/* Full Name */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("users.dialog.fullName")}
+                    </label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      value={formData.fullName}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("users.dialog.email")}
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      value={formData.email}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+
+                  {/* Password */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("users.dialog.password")}
+                    </label>
+                    <input
+                      type="password"
+                      name="password"
+                      required={!editingUser}
+                      placeholder={editingUser ? t("users.dialog.passwordHelp") : ""}
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      value={formData.password}
+                      onChange={handleFormChange}
+                    />
+                  </div>
+
+                  {/* Role */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("users.dialog.role")}
+                    </label>
+                    <select
+                      name="role"
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all cursor-pointer"
+                      value={formData.role}
+                      onChange={handleFormChange}
+                    >
+                      <option value="viewer">{t("users.roles.viewer")}</option>
+                      <option value="admin">{t("users.roles.admin")}</option>
+                    </select>
+                  </div>
+
+                  {/* Is Active (Toggle check) */}
+                  <div className="flex items-center gap-2 pt-2">
+                    <input
+                      type="checkbox"
+                      name="isActive"
+                      id="isActive"
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                      checked={formData.isActive}
+                      onChange={handleFormChange}
+                    />
+                    <label htmlFor="isActive" className="text-xs font-semibold text-slate-700 select-none cursor-pointer">
+                      Active Account
+                    </label>
+                  </div>
                 </div>
 
-                {/* Full Name */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
-                    {t("users.dialog.fullName")}
-                  </label>
-                  <input
-                    type="text"
-                    name="fullName"
-                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900"
-                    value={formData.fullName}
-                    onChange={handleFormChange}
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
-                    {t("users.dialog.email")}
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900"
-                    value={formData.email}
-                    onChange={handleFormChange}
-                  />
-                </div>
-
-                {/* Password */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
-                    {t("users.dialog.password")}
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    required={!editingUser} // Required only for new users
-                    placeholder={editingUser ? t("users.dialog.passwordHelp") : ""}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900"
-                    value={formData.password}
-                    onChange={handleFormChange}
-                  />
-                </div>
-
-                {/* Role */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
-                    {t("users.dialog.role")}
-                  </label>
-                  <select
-                    name="role"
-                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 text-xs text-slate-900 cursor-pointer"
-                    value={formData.role}
-                    onChange={handleFormChange}
-                  >
-                    {roles.length > 0 ? (
-                      roles.map((r) => (
-                        <option key={r.code} value={r.code}>
-                          {r.name}
-                        </option>
-                      ))
-                    ) : (
-                      <>
-                        <option value="USER">User</option>
-                        <option value="OPERATOR">Operator</option>
-                        <option value="ADMIN">Admin</option>
-                      </>
-                    )}
-                  </select>
-                </div>
-
-                {/* Is Active (Toggle check) */}
-                <div className="flex items-center gap-2 pt-2">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    id="isActive"
-                    className="h-4 w-4 border-slate-300 text-indigo-600 rounded cursor-pointer"
-                    checked={formData.isActive}
-                    onChange={handleFormChange}
-                  />
-                  <label htmlFor="isActive" className="text-xs font-medium text-slate-700 select-none cursor-pointer">
-                    Active Account
-                  </label>
-                </div>
-
-                {/* Dialog Actions */}
-                <div className="flex justify-end gap-2 border-t border-slate-100 pt-4 mt-6">
+                {/* MODAL FOOTER */}
+                <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end gap-2.5">
                   <button
                     type="button"
                     onClick={() => setIsDialogOpen(false)}
-                    className="rounded-lg bg-white border border-slate-300 hover:bg-slate-50 px-4 py-2.5 text-xs text-slate-700 font-semibold transition-colors cursor-pointer"
+                    className="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-xs"
                   >
                     {t("users.dialog.cancel")}
                   </button>
                   <button
                     type="submit"
-                    className="rounded-lg bg-indigo-600 hover:bg-indigo-500 px-4 py-2.5 text-xs text-white font-semibold transition-colors shadow-sm hover:shadow active:scale-95 cursor-pointer"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
                   >
-                    {t("users.dialog.save")}
+                    <Check size={14} />
+                    <span>{t("users.dialog.save")}</span>
                   </button>
                 </div>
               </form>
             </div>
           </div>
         )}
-
-        {/* Reusable Confirm Dialog */}
         <ConfirmModal
           isOpen={confirmModal.open}
           title={confirmModal.title}

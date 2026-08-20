@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Noto+Serif:ital,wght@0,400..700;1,400..700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -14,8 +14,8 @@
   --shadow:
     rgba(15, 23, 42, 0.05) 0px 1px 2px 0px, rgba(15, 23, 42, 0.06) 0px 4px 12px 0px;
 
-  --sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --heading: 'Outfit', sans-serif;
+  --sans: 'Times New Roman', 'Noto Serif', 'Lora', Georgia, serif;
+  --heading: 'Times New Roman', 'Noto Serif', 'Lora', Georgia, serif;
   --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   --acp-color: rgb(39, 174, 96);

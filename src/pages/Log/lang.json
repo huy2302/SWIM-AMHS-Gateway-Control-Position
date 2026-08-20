@@ -1,230 +1,200 @@
 {
-    "title": {
-      "vi": "Nhật ký hệ thống",
-      "en": "System Logs"
+  "title": {
+    "vi": "Nhật ký Hệ thống & Điện văn",
+    "en": "System & Traffic Logs"
+  },
+  "subtitle": {
+    "vi": "",
+    "en": ""
+  },
+  "filter": {
+    "searchPlaceholder": {
+      "vi": "Tìm theo Mã nhật ký, MTS ID, IPM ID, Nội dung...",
+      "en": "Search by Log ID, MTS ID, IPM ID, Content..."
+    }
+  },
+  "tabs": {
+    "traffic": {
+      "vi": "SWIM → AMHS",
+      "en": "SWIM → AMHS"
     },
-    "toolbar": {
-      "clear": {
-        "vi": "Xóa Logs",
-        "en": "Clear Logs"
-      },
-      "copy": {
-        "vi": "Sao chép",
-        "en": "Copy"
-      },
-      "todayLog": {
-        "vi": "Nhật ký hôm nay",
-        "en": "Today's Log"
-      },
-      "update": {
-        "vi": "Cập nhật",
-        "en": "Update"
-      },
-      "searchPlaceholder": {
-        "vi": "Tìm kiếm (ID, Nội dung, Nguồn gửi...)",
-        "en": "Search Log (ID, Content, Origin...)"
-      }
+    "system": {
+      "vi": "AMHS → SWIM",
+      "en": "AMHS → SWIM"
+    }
+  },
+  "table": {
+    "id": {
+      "vi": "Mã Bản Ghi",
+      "en": "Log ID"
     },
-    "table": {
-      "id": {
-        "vi": "#",
-        "en": "#"
-      },
-      "time": {
-        "vi": "THỜI GIAN CHUYỂN DẪN",
-        "en": "CONVERTED TIME"
-      },
-      "dir": {
-        "vi": "HƯỚNG CHUYỂN ĐỔI",
-        "en": "CONVERSION"
-      },
-      "mtsId": {
-        "vi": "MTS ID",
-        "en": "MTS ID"
-      },
-      "ipmId": {
-        "vi": "IPM ID",
-        "en": "IPM ID"
-      },
-      "msgId": {
-        "vi": "MSG ID",
-        "en": "MSG ID"
-      },
-      "type": {
-        "vi": "LOẠI",
-        "en": "TYPE"
-      },
-      "prio": {
-        "vi": "ƯU TIÊN",
-        "en": "PRIO"
-      },
-      "message": {
-        "vi": "NỘI DUNG",
-        "en": "CONTENT"
-      },
-      "origin": {
-        "vi": "NGUỒN GỬI",
-        "en": "ORIGIN"
-      },
-      "status": {
-        "vi": "TRẠNG THÁI",
-        "en": "STATUS"
-      }
+    "time": {
+      "vi": "Thời Gian",
+      "en": "Timestamp"
+    },
+    "dir": {
+      "vi": "Hướng Truyền",
+      "en": "Direction"
+    },
+    "mtsId": {
+      "vi": "MTS ID",
+      "en": "MTS ID"
+    },
+    "ipmId": {
+      "vi": "IPM ID",
+      "en": "IPM ID"
+    },
+    "type": {
+      "vi": "Loại Điện Văn",
+      "en": "Msg Type"
+    },
+    "prio": {
+      "vi": "Độ Ưu Tiên",
+      "en": "Priority"
+    },
+    "message": {
+      "vi": "Nội Dung",
+      "en": "Content"
+    },
+    "origin": {
+      "vi": "Originator",
+      "en": "Originator"
     },
     "status": {
-      "ok": {
-        "vi": "THÀNH CÔNG",
-        "en": "OK"
-      },
-      "error": {
-        "vi": "LỖI HỆ THỐNG",
-        "en": "ERROR"
-      },
-      "reject": {
-        "vi": "BỊ TỪ CHỐI",
-        "en": "REJECT"
-      },
-      "unrouted": {
-        "vi": "CHƯA ĐỊNH TUYẾN",
-        "en": "UNROUTED"
-      },
-      "success": {
-        "vi": "THÀNH CÔNG",
-        "en": "SUCCESS"
-      },
-      "failed": {
-        "vi": "THẤT BẠI",
-        "en": "FAILED"
-      }
+      "vi": "Trạng Thái",
+      "en": "Status"
+    }
+  },
+  "modal": {
+    "title": {
+      "vi": "Chi tiết Nhật ký",
+      "en": "Log Details"
     },
     "direction": {
-      "out": {
-        "vi": "RA (AMHS → SWIM)",
-        "en": "OUT (AMHS → SWIM)"
-      },
-      "in": {
-        "vi": "VÀO (SWIM → AMHS)",
-        "en": "IN (SWIM → AMHS)"
-      }
+      "vi": "Chiều Điện Văn",
+      "en": "Direction"
     },
-    "priority": {
-      "ss": {
-        "vi": "SS (Cao nhất)",
-        "en": "SS (Highest)"
-      },
-      "dd": {
-        "vi": "DD (Cao)",
-        "en": "DD (High)"
-      },
-      "ff": {
-        "vi": "FF (Trung bình)",
-        "en": "FF (Normal)"
-      },
-      "gg": {
-        "vi": "GG (Thấp)",
-        "en": "GG (Low)"
-      },
-      "kk": {
-        "vi": "KK (Thấp nhất)",
-        "en": "KK (Lowest)"
-      }
+    "status": {
+      "vi": "Trạng Thái",
+      "en": "Status"
     },
-    "preview": {
-      "title": {
-        "vi": "Chi tiết nhật ký chuyển đổi",
-        "en": "Conversion Log Detail"
-      },
-      "mtsId": {
-        "vi": "MTS ID:",
-        "en": "MTS ID:"
-      },
-      "ipmId": {
-        "vi": "IPM ID:",
-        "en": "IPM ID:"
-      },
-      "amqpMessageId": {
-        "vi": "AMQP Message ID:",
-        "en": "AMQP Message ID:"
-      },
-      "convertedTime": {
-        "vi": "Thời gian chuyển:",
-        "en": "Converted Time:"
-      },
-      "status": {
-        "vi": "Trạng thái:",
-        "en": "Status:"
-      },
-      "direction": {
-        "vi": "Chiều chuyển đổi:",
-        "en": "Direction:"
-      },
-      "priority": {
-        "vi": "Độ ưu tiên:",
-        "en": "Priority:"
-      },
-      "origin": {
-        "vi": "Nguồn gửi:",
-        "en": "Origin:"
-      },
-      "subject": {
-        "vi": "Tiêu đề:",
-        "en": "Subject:"
-      },
-      "actionTaken": {
-        "vi": "Hành động xử lý:",
-        "en": "Action Taken:"
-      },
-      "nonDeliveryReason": {
-        "vi": "Lý do lỗi (Reason):",
-        "en": "NDR Reason:"
-      },
-      "nonDeliveryDiagnostic": {
-        "vi": "Lỗi chi tiết (Diagnostic):",
-        "en": "NDR Diagnostic:"
-      },
-      "supplementaryInfo": {
-        "vi": "Thông tin bổ sung:",
-        "en": "Supplementary Info:"
-      },
-      "remark": {
-        "vi": "Ghi chú:",
-        "en": "Remark:"
-      },
-      "content": {
-        "vi": "Nội dung chuyển đổi:",
-        "en": "Converted Content:"
-      },
-      "error": {
-        "vi": "Lỗi phát sinh:",
-        "en": "Error Details:"
-      },
-      "noData": {
-        "vi": "Không có dữ liệu",
-        "en": "No data"
-      }
+    "origin": {
+      "vi": "Người Phát (originator)",
+      "en": "Originator"
     },
-    "toast": {
-      "copied": {
-        "vi": "Đã sao chép chi tiết nhật ký vào clipboard!",
-        "en": "Copied log details to clipboard!"
-      },
-      "fetchFailed": {
-        "vi": "Không thể tải dữ liệu nhật ký",
-        "en": "Failed to load logs"
-      },
-      "noLogs": {
-        "vi": "Không có nhật ký nào",
-        "en": "No logs available"
-      }
+    "convertedTime": {
+      "vi": "Thời Gian Chuyển Đổi",
+      "en": "Converted Time"
     },
-    "empty": {
-      "title": {
-        "vi": "Không có nhật ký nào",
-        "en": "No logs found"
-      },
-      "description": {
-        "vi": "Không tìm thấy nhật ký nào phù hợp với tìm kiếm của bạn",
-        "en": "No logs match your search"
-      }
+    "actionTaken": {
+      "vi": "Thao Tác Thực Hiện",
+      "en": "Action Taken"
+    },
+    "nonDeliveryReason": {
+      "vi": "Lý Do Từ Chối",
+      "en": "Rejection Reason"
+    },
+    "rawContent": {
+      "vi": "Nội Dung Điện Văn Gốc",
+      "en": "Raw Payload"
+    },
+    "copy": {
+      "vi": "Sao chép",
+      "en": "Copy"
+    },
+    "copied": {
+      "vi": "Đã sao chép",
+      "en": "Copied"
+    },
+    "close": {
+      "vi": "Đóng",
+      "en": "Close"
+    },
+    "noContent": {
+      "vi": "Không có nội dung.",
+      "en": "No content available."
     }
+  },
+  "empty": {
+    "title": {
+      "vi": "Không tìm thấy nhật ký nào",
+      "en": "No logs found"
+    }
+  },
+  "direction": {
+    "in": {
+      "vi": "SWIM → AMHS",
+      "en": "SWIM → AMHS"
+    },
+    "out": {
+      "vi": "AMHS → SWIM",
+      "en": "AMHS → SWIM"
+    }
+  },
+  "toast": {
+    "fetchFailed": {
+      "vi": "Tải nhật ký thất bại",
+      "en": "Failed to load logs"
+    },
+    "copied": {
+      "vi": "Đã sao chép nội dung nhật ký",
+      "en": "Log content copied"
+    },
+    "noLogs": {
+      "vi": "Không có nhật ký nào",
+      "en": "No logs available"
+    }
+  },
+  "toolbar": {
+    "clear": {
+      "vi": "Xóa bộ lọc",
+      "en": "Clear Filters"
+    },
+    "copy": {
+      "vi": "Sao chép nhật ký",
+      "en": "Copy Log"
+    }
+  },
+  "actionTaken": {
+    "received_routed": {
+      "vi": "Đã tiếp nhận & Định tuyến theo Quy tắc",
+      "en": "Received & Routed via Rule"
+    },
+    "published_swim": {
+      "vi": "Đã đóng gói & Đẩy lên SWIM Broker",
+      "en": "Published to SWIM Broker"
+    },
+    "delivered_amhs": {
+      "vi": "Đã chuyển đổi & Phát tới AMHS",
+      "en": "Delivered to AMHS MTCU"
+    },
+    "unrouted_queue": {
+      "vi": "Đẩy vào Hàng đợi Chờ định tuyến",
+      "en": "Sent to Unrouted Queue"
+    },
+    "routing_failed": {
+      "vi": "Lỗi định tuyến (Không có quy tắc khớp)",
+      "en": "Routing Failed (No Matching Rule)"
+    },
+    "validation_failed": {
+      "vi": "Lỗi kiểm tra cú pháp / định dạng",
+      "en": "Validation Failed"
+    },
+    "unauthorized": {
+      "vi": "Không có quyền phát điện văn",
+      "en": "Unauthorized Originator"
+    },
+    "ttl_expired": {
+      "vi": "Điện văn quá hạn xử lý (TTL Expired)",
+      "en": "TTL Expired"
+    },
+    "type_detection_failed": {
+      "vi": "Lỗi nhận diện loại điện văn",
+      "en": "Type Detection Failed"
+    },
+    "ndr": {
+      "vi": "Tạo báo cáo từ chối giao điện (NDR)",
+      "en": "Non-Delivery Report (NDR) Generated"
+    }
+  }
 }

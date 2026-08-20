@@ -6,8 +6,6 @@ import FullLogView from "./pages/Log/FullLogView";
 import MessageView from "./pages/Message/MessageView";
 import ConfigView from "./pages/Config/ConfigView";
 import SystemMonitorView from "./pages/System/SystemMonitorView";
-import Login from "./components/Login";
-// import NewGatewayDashboard from "./pages/NewGatewayDashboard";
 import {
   BrowserRouter,
   Routes,
@@ -17,7 +15,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { AuthProvider } from "./components/AuthContext";
+import { AuthProvider, useAuth } from "./components/AuthContext";
 import SystemEvents from "./pages/SystemEvents/SystemEventsView";
 import { authApi } from "./api/authApi";
 import LoginPage from "./pages/Login/LoginPage";
@@ -36,6 +34,18 @@ function RequireAuth() {
 
   if (!authApi.isAuthenticated()) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <Outlet />;
+}
+
+// Chặn truy cập trực tiếp URL vào các trang chỉ dành cho admin (khớp với việc ẩn menu
+// trong Sidebar), tránh viewer vẫn vào được UI dù API sẽ trả 403.
+function RequireAdmin() {
+  const { isAdmin } = useAuth();
+
+  if (!isAdmin()) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Outlet />;
@@ -73,14 +83,16 @@ function App() {
             <Route path="routing" element={<RoutingView />} />
             <Route path="log" element={<FullLogView />} />
             <Route path="messages" element={<MessageView />} />
-            <Route path="config" element={<ConfigView />} />
             <Route path="system" element={<SystemMonitorView />} />
             <Route path="system-events" element={<SystemEvents />} />
-            <Route path="users" element={<UserManagement />} />
             <Route path="unrouted" element={<UnroutedQueue />} />
             <Route path="alerts" element={<AlertsView />} />
             <Route path="settings" element={<Settings />} />
-            <Route path="login1" element={<LoginPage />} />
+
+            <Route element={<RequireAdmin />}>
+              <Route path="users" element={<UserManagement />} />
+              <Route path="config" element={<ConfigView />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />

@@ -58,8 +58,8 @@ export default function UnroutedQueue() {
       const rate = await gatewayApi.getAddressingSuccessRate("last_7d");
       if (rate) {
         setSuccessRateData([
-          { name: t("global.pagination.routed") || "Routed", value: rate.resolved, color: "#10B981" },
-          { name: t("global.pagination.unrouted") || "Unrouted", value: rate.unrouted, color: "#EF4444" },
+          { name: t("global.pagination.routed"), value: rate.resolved, color: "#10B981" },
+          { name: t("global.pagination.unrouted"), value: rate.unrouted, color: "#EF4444" },
         ]);
         setOverallStats({
           total: rate.totalMessages,
@@ -85,10 +85,11 @@ export default function UnroutedQueue() {
         params.source = originatorFilter.trim();
       }
       const response = await gatewayApi.getUnroutedMessages(params);
-      if (response && response.content) {
-        setMessages(response.content);
+      const itemsList = response?.items || response?.content || [];
+      if (response) {
+        setMessages(itemsList);
         setTotalPages(response.totalPages || 1);
-        setTotalElements(response.totalElements || 0);
+        setTotalElements(response.totalItems ?? response.totalElements ?? 0);
       }
     } catch (error) {
       console.error("Error fetching unrouted messages:", error);
@@ -254,7 +255,7 @@ export default function UnroutedQueue() {
               <BarChart3 size={24} />
             </div>
             <div>
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">{t("unrouted.stats.total")}</div>
+              <div className="text-xs text-slate-500 font-bold tracking-wider">{t("unrouted.stats.total")}</div>
               <div className="text-2xl font-extrabold text-slate-900 mt-1">{overallStats.total}</div>
             </div>
           </div>
@@ -264,7 +265,7 @@ export default function UnroutedQueue() {
               <AlertCircle size={24} />
             </div>
             <div>
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">{t("unrouted.stats.unroutedCount")}</div>
+              <div className="text-xs text-slate-500 font-bold tracking-wider">{t("unrouted.stats.unroutedCount")}</div>
               <div className="text-2xl font-extrabold text-slate-900 mt-1">{overallStats.pending}</div>
             </div>
           </div>
@@ -274,7 +275,7 @@ export default function UnroutedQueue() {
               <Check size={24} />
             </div>
             <div>
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-wider">{t("unrouted.stats.successRate")}</div>
+              <div className="text-xs text-slate-500 font-bold tracking-wider">{t("unrouted.stats.successRate")}</div>
               <div className="text-2xl font-extrabold text-slate-900 mt-1">{overallStats.rate}%</div>
             </div>
           </div>
@@ -285,7 +286,7 @@ export default function UnroutedQueue() {
           {/* Source Distribution Chart */}
           <div className="bg-white border border-slate-200/80 p-5 rounded-xl shadow-xs">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <h3 className="text-xs font-bold text-slate-700 tracking-wider">
                 {t("unrouted.stats.distributionTitle")}
               </h3>
               <select
@@ -301,7 +302,7 @@ export default function UnroutedQueue() {
             </div>
             <div className="h-64">
               {distributionData.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <BarChart data={distributionData}>
                     <XAxis dataKey="name" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
                     <YAxis stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
@@ -323,12 +324,12 @@ export default function UnroutedQueue() {
 
           {/* Success vs Unrouted Pie Chart */}
           <div className="bg-white border border-slate-200/80 p-5 rounded-xl shadow-xs">
-            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-4">
+            <h3 className="text-xs font-bold text-slate-700 tracking-wider mb-4">
               {t("unrouted.stats.rateTitle")}
             </h3>
             <div className="h-64">
               {successRateData ? (
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
                   <PieChart>
                     <Pie
                        data={successRateData}
@@ -414,9 +415,9 @@ export default function UnroutedQueue() {
 
         {/* Unrouted Queue Table */}
         <div className="bg-white border border-slate-200/80 rounded-xl overflow-hidden shadow-xs">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto min-h-[260px]">
             <table className="w-full text-left text-sm border-collapse font-sans">
-              <thead className="bg-slate-50 text-slate-555 border-b border-slate-200/80 font-bold uppercase tracking-wider text-[11px]">
+              <thead className="bg-slate-50 text-slate-555 border-b border-slate-200/80 font-bold tracking-wider text-[11px]">
                 <tr>
                   <th className="p-4 w-12 text-center">
                     <input
@@ -536,17 +537,22 @@ export default function UnroutedQueue() {
             totalPages={totalPages}
             onPageChange={setPage}
             totalItems={totalElements}
+            pageSize={pageSize}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setPage(0);
+            }}
           />
         </div>
 
         {/* Modal: Details view */}
         {detailMessage && (
-          <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/45 backdrop-blur-xs p-4 animate-fade-in">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in">
             <div className="w-full max-w-5xl bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden animate-zoom-in">
               {/* HEADER */}
               <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">
+                  <span className="text-[10px] font-bold tracking-wider text-slate-400">
                     {t("unrouted.dialog.detailTitle")}
                   </span>
                   <div className="flex items-center gap-3 mt-1">
@@ -572,7 +578,7 @@ export default function UnroutedQueue() {
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
                   <div className="flex flex-col gap-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl relative shadow-xs">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t("unrouted.dialog.fields.origin") || "ĐỊA CHỈ PHÁT"}</span>
+                      <span className="text-[10px] text-slate-400 font-bold tracking-wider">{t("unrouted.dialog.fields.origin")}</span>
                       <button onClick={() => handleCopy(detailMessage.origin)} className="text-indigo-600 hover:text-indigo-500 cursor-pointer" title="Copy"><Copy size={12} /></button>
                     </div>
                     <div className="text-slate-800 break-all text-[11px] font-mono font-medium mt-0.5">{detailMessage.origin || "N/A"}</div>
@@ -580,7 +586,7 @@ export default function UnroutedQueue() {
 
                   <div className="flex flex-col gap-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl relative shadow-xs">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t("unrouted.dialog.fields.address") || "ĐỊA CHỈ NHẬN"}</span>
+                      <span className="text-[10px] text-slate-400 font-bold tracking-wider">{t("unrouted.dialog.fields.address")}</span>
                       <button onClick={() => handleCopy(detailMessage.address)} className="text-indigo-600 hover:text-indigo-500 cursor-pointer" title="Copy"><Copy size={12} /></button>
                     </div>
                     <div className="text-slate-800 break-all text-[11px] font-mono font-medium mt-0.5">{detailMessage.address || "N/A"}</div>
@@ -588,7 +594,7 @@ export default function UnroutedQueue() {
 
                   <div className="flex flex-col gap-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl relative shadow-xs">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t("unrouted.dialog.fields.subject") || "CHỦ ĐỀ / LOẠI TIN"}</span>
+                      <span className="text-[10px] text-slate-400 font-bold tracking-wider">{t("unrouted.dialog.fields.subject")}</span>
                       <button onClick={() => handleCopy(detailMessage.subject)} className="text-indigo-600 hover:text-indigo-500 cursor-pointer" title="Copy"><Copy size={12} /></button>
                     </div>
                     <div className="text-slate-800 break-all text-[11px] font-mono font-medium mt-0.5">{detailMessage.subject || "N/A"}</div>
@@ -596,7 +602,7 @@ export default function UnroutedQueue() {
 
                   <div className="flex flex-col gap-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl relative shadow-xs">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t("unrouted.dialog.fields.priority") || "ĐỘ KHẨN"}</span>
+                      <span className="text-[10px] text-slate-400 font-bold tracking-wider">{t("unrouted.dialog.fields.priority")}</span>
                       <button onClick={() => handleCopy(detailMessage.priority)} className="text-indigo-600 hover:text-indigo-500 cursor-pointer" title="Copy"><Copy size={12} /></button>
                     </div>
                     <div className="text-slate-800 break-all text-[11px] font-mono font-medium mt-0.5">{detailMessage.priority || "NORMAL"}</div>
@@ -604,7 +610,7 @@ export default function UnroutedQueue() {
 
                   <div className="flex flex-col gap-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl relative shadow-xs">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t("unrouted.dialog.fields.time") || "THỜI GIAN"}</span>
+                      <span className="text-[10px] text-slate-400 font-bold tracking-wider">{t("unrouted.dialog.fields.time")}</span>
                       <button onClick={() => handleCopy(detailMessage.time)} className="text-indigo-600 hover:text-indigo-500 cursor-pointer" title="Copy"><Copy size={12} /></button>
                     </div>
                     <div className="text-slate-800 break-all text-[11px] font-mono font-medium mt-0.5">{detailMessage.time ? new Date(detailMessage.time).toLocaleString() : "N/A"}</div>
@@ -612,7 +618,7 @@ export default function UnroutedQueue() {
 
                   <div className="flex flex-col gap-1.5 p-3 bg-red-50/50 border border-red-150 rounded-xl relative shadow-xs md:col-span-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-[10px] text-red-700 font-bold uppercase tracking-wider">{t("unrouted.dialog.fields.errorType") || "CHI TIẾT LỖI ĐỊNH TUYẾN"}</span>
+                      <span className="text-[10px] text-red-700 font-bold tracking-wider">{t("unrouted.dialog.fields.errorType")}</span>
                       <button onClick={() => handleCopy(detailMessage.errorDesc)} className="text-red-700 hover:text-red-650 cursor-pointer" title="Copy"><Copy size={12} /></button>
                     </div>
                     <div className="text-red-700 break-all text-[11px] font-mono font-bold mt-0.5">{detailMessage.errorDesc || "NO_MATCHING_ROUTING_RULE"}</div>
@@ -622,7 +628,7 @@ export default function UnroutedQueue() {
                 {/* RAW MESSAGE TEXT */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                    <span className="text-xs font-bold tracking-wider text-slate-500">
                       {t("unrouted.dialog.fields.rawMessage")}
                     </span>
                     <button
@@ -639,25 +645,7 @@ export default function UnroutedQueue() {
                   </div>
                 </div>
 
-                {/* PAYLOAD CONTENT */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                      {t("unrouted.dialog.fields.payload")}
-                    </span>
-                    <button
-                      onClick={() => handleCopy(detailMessage.payloadContent)}
-                      className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer"
-                    >
-                      {t("messages.modal.buttons.copy")}
-                    </button>
-                  </div>
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-inner max-h-48 overflow-y-auto custom-scrollbar">
-                    <pre className="text-slate-800 text-[12px] whitespace-pre-wrap font-mono leading-relaxed">
-                      {detailMessage.payloadContent || "N/A"}
-                    </pre>
-                  </div>
-                </div>
+
               </div>
 
               {/* FOOTER */}
@@ -696,89 +684,107 @@ export default function UnroutedQueue() {
 
         {/* Modal: Manual Route Dialog */}
         {isRouteOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs animate-fade-in">
-            <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden animate-zoom-in">
-              <div className="flex justify-between items-center border-b border-slate-100 px-6 py-4 bg-slate-50">
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
-                  {t("unrouted.dialog.routeTitle")}
-                </h3>
-                <button onClick={() => setIsRouteOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
-                  <X size={16} />
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in" onClick={() => setIsRouteOpen(false)}>
+            <div className="w-[540px] max-w-full bg-white max-h-[88vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-zoom-in border border-slate-200" onClick={(e) => e.stopPropagation()}>
+              
+              {/* MODAL HEADER */}
+              <div className="px-6 py-4 bg-white border-b border-slate-200 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl border border-blue-100 flex items-center justify-center shrink-0">
+                    <Send size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-slate-900">
+                      {t("unrouted.dialog.routeTitle")}
+                    </h3>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5">
+                      Manual Aeronautical Message Routing
+                    </p>
+                  </div>
+                </div>
+                
+                <button onClick={() => setIsRouteOpen(false)} className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-lg transition-colors cursor-pointer">
+                  <X size={20} />
                 </button>
               </div>
 
-              <form onSubmit={handleRouteSubmit} className="p-6 space-y-4">
-                {/* Originator Input */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
-                    {t("unrouted.dialog.originator")}
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    maxLength={8}
-                    placeholder={t("unrouted.dialog.originatorPlaceholder")}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900 font-mono font-bold uppercase"
-                    value={routeFormData.originator}
-                    onChange={(e) => setRouteFormData({ ...routeFormData, originator: e.target.value })}
-                  />
+              {/* MODAL BODY */}
+              <form onSubmit={handleRouteSubmit} className="flex flex-col flex-1 overflow-hidden">
+                <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4 text-xs">
+                  {/* Originator Input */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("unrouted.dialog.originator")}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={8}
+                      placeholder={t("unrouted.dialog.originatorPlaceholder")}
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      value={routeFormData.originator}
+                      onChange={(e) => setRouteFormData({ ...routeFormData, originator: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Recipients Input */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("unrouted.dialog.recipients")}
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder={t("unrouted.dialog.recipientsPlaceholder")}
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-mono font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      value={routeFormData.recipients}
+                      onChange={(e) => setRouteFormData({ ...routeFormData, recipients: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Operator Note Input */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("unrouted.dialog.note")}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={t("unrouted.dialog.notePlaceholder")}
+                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      value={routeFormData.note}
+                      onChange={(e) => setRouteFormData({ ...routeFormData, note: e.target.value })}
+                    />
+                  </div>
                 </div>
 
-                {/* Recipients Input */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
-                    {t("unrouted.dialog.recipients")}
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder={t("unrouted.dialog.recipientsPlaceholder")}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900 font-mono font-bold uppercase"
-                    value={routeFormData.recipients}
-                    onChange={(e) => setRouteFormData({ ...routeFormData, recipients: e.target.value })}
-                  />
-                </div>
-
-                {/* Operator Note Input */}
-                <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
-                    {t("unrouted.dialog.note")}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={t("unrouted.dialog.notePlaceholder")}
-                    className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900 font-medium"
-                    value={routeFormData.note}
-                    onChange={(e) => setRouteFormData({ ...routeFormData, note: e.target.value })}
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2 border-t border-slate-100 pt-4 mt-6">
+                {/* MODAL FOOTER */}
+                <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex justify-end gap-2.5">
                   <button
                     type="button"
                     onClick={() => setIsRouteOpen(false)}
-                    className="rounded-lg bg-white border border-slate-300 hover:bg-slate-50 px-4 py-2.5 text-xs text-slate-700 font-semibold transition-colors cursor-pointer"
+                    className="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-xs"
                   >
                     {t("unrouted.dialog.cancel")}
                   </button>
                   <button
                     type="submit"
-                    className="rounded-lg bg-indigo-600 hover:bg-indigo-500 px-4 py-2.5 text-xs text-white font-semibold transition-colors shadow-sm hover:shadow active:scale-95 cursor-pointer"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-xs flex items-center gap-1.5"
                   >
-                    {t("unrouted.dialog.submit")}
+                    <Send size={14} />
+                    <span>{t("unrouted.dialog.submit")}</span>
                   </button>
                 </div>
               </form>
+
             </div>
           </div>
         )}
-
         {/* Modal: Reject Dialog */}
         {isRejectOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs animate-fade-in">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in">
             <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden animate-zoom-in">
               <div className="flex justify-between items-center border-b border-slate-100 px-6 py-4 bg-slate-50">
-                <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">
+                <h3 className="text-sm font-bold text-slate-800 tracking-wider">
                   {t("unrouted.dialog.rejectTitle")}
                 </h3>
                 <button onClick={() => setIsRouteOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -788,7 +794,7 @@ export default function UnroutedQueue() {
 
               <form onSubmit={handleRejectSubmit} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase">
+                  <label className="block text-[11px] font-bold text-slate-500 mb-1.5">
                     {t("unrouted.dialog.rejectReason")}
                   </label>
                   <textarea

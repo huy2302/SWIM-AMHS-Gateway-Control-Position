@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   uptime: 0,
-  status: "connecting",   // idle | running | error
+  status: "running",   // idle | running | error
   error: null,
   GatewayProcess: null,
   Mysql: null,
@@ -23,7 +23,7 @@ const systemSlice = createSlice({
     },
     setUsedProcess: (state, action) => {
       state.GatewayProcess = action.payload.gatewayCp;
-      state.Mysql = action.payload.mysql;
+      state.Mysql = action.payload.mysql || action.payload.mysqlCp || null;
     }
   },
 });

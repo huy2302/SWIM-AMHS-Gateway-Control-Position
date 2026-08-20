@@ -71,21 +71,7 @@ export default function LoginCard() {
   return (
     <>
       <form
-        className="
-              w-[27em]
-              rounded-[34px]
-              border
-              border-white/70
-              bg-white/92
-              backdrop-blur-xl
-              px-10
-              py-5
-              transition-all
-              duration-500
-              hover:-translate-y-1
-              hover:shadow-[0_40px_100px_rgba(40,80,140,.20)]
-              shadow-[0_30px_80px_rgba(40,80,140,.18)]
-          "
+        className="w-[27em] rounded-[34px] border border-white/70 bg-white/92 backdrop-blur-xl px-10 py-5 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_40px_100px_rgba(40,80,140,.20)] shadow-[0_30px_80px_rgba(40,80,140,.18)]"
         onSubmit={handleLogin}
       >
         <div className="flex justify-center">
@@ -94,7 +80,7 @@ export default function LoginCard() {
           </div>
         </div>
 
-        <h2 className="mt-8 text-[24px] text-center font-bold tracking-[6px] uppercase">
+        <h2 className="mt-8 text-[24px] text-center font-bold tracking-[6px]">
           {t("login.title")}
         </h2>
 
@@ -176,7 +162,7 @@ export default function LoginCard() {
         </div>
 
         <button
-          className="group relative mt-5 py-3 w-full overflow-hidden rounded-xl bg-gradient-to-r from-[#0A5FD8] via-[#2176FF] to-[#44A4FF] font-semibold text-white hover:shadow-xl "
+          className="group relative mt-5 py-3 w-full overflow-hidden rounded-xl bg-gradient-to-r from-[#0A5FD8] via-[#2176FF] to-[#44A4FF] font-semibold text-white hover:shadow-xl"
           type="submit"
           disabled={loading}
         >

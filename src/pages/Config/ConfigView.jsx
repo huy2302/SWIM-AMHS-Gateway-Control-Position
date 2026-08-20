@@ -57,7 +57,7 @@ export default function ConfigView() {
         <div className="bg-white border border-slate-200/80 rounded-2xl shadow-xs overflow-hidden">
           <div className="p-4 overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200 font-bold uppercase tracking-wider">
+              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200 font-bold tracking-wider">
                 <tr>
                   <th className="p-3.5 w-1/3">{t("admin.settings.key")}</th>
                   <th className="p-3.5 w-1/2">{t("admin.settings.value")}</th>
@@ -93,14 +93,14 @@ export default function ConfigView() {
                             <button
                               onClick={() => handleSaveConfig(row.configKey)}
                               className="p-2 rounded-xl border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 transition-colors cursor-pointer active:scale-95 shadow-xxs"
-                              title={t("global.save") || "Save"}
+                              title={t("global.save")}
                             >
                               <Save size={14} />
                             </button>
                             <button
                               onClick={() => setEditingConfigKey(null)}
                               className="p-2 rounded-xl border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors cursor-pointer active:scale-95 shadow-xxs"
-                              title={t("global.cancel") || "Cancel"}
+                              title={t("global.cancel")}
                             >
                               <X size={14} />
                             </button>
@@ -109,7 +109,7 @@ export default function ConfigView() {
                           <button
                             onClick={() => startEditConfig(row)}
                             className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-950 transition-colors cursor-pointer active:scale-95 shadow-xxs"
-                            title={t("global.edit") || "Edit Setting"}
+                            title={t("global.edit")}
                           >
                             <Edit2 size={14} />
                           </button>

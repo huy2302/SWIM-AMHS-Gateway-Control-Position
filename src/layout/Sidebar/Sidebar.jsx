@@ -29,9 +29,8 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`sidebar flex flex-col p-2 relative transition-all duration-300 ${
-        collapsed ? "collapsed w-[70px]" : "w-[240px]"
-      }`}
+      className={`sidebar flex flex-col p-2 relative transition-all duration-300 ${collapsed ? "collapsed w-[70px]" : "w-[240px]"
+        }`}
     >
       {/* Collapse Toggle Button */}
       <div className="absolute top-1/2 -right-3 flex flex-col items-center -translate-y-1/2 z-50">
@@ -46,10 +45,10 @@ export default function Sidebar() {
       </div>
 
       {/* Brand Header */}
-      <div className={`flex items-center gap-2 mb-4 p-2 ${collapsed ? "justify-center" : ""}`}>
-        <img className="w-[45px] min-w-[45px] h-[45px] object-contain" src="/bg2.webp" alt="Logo" />
+      <div className={`flex items-center gap-2 p-1.5 ${collapsed ? "justify-center" : ""}`}>
+        <img className="w-[36px] min-w-[36px] h-[36px] object-contain" src="/bg2.webp" alt="Logo" />
         {!collapsed && (
-          <span className="sidebar-title font-extrabold text-[13px] leading-tight text-slate-800 tracking-wide uppercase">
+          <span className="sidebar-title font-extrabold text-[13px] leading-tight text-slate-800 tracking-wide">
             AMHS SWIM <br />
             <span className="text-blue-600 font-bold text-[11px]">Control Position</span>
           </span>
@@ -57,12 +56,12 @@ export default function Sidebar() {
       </div>
 
       {/* Navigation Groups */}
-      <nav className="flex-1 w-full space-y-3 overflow-y-auto px-1 custom-scrollbar">
-        
+      <nav className="flex-1 w-full space-y-1.5 overflow-y-auto px-1 custom-scrollbar">
+
         {/* GROUP 1: GIÁM SÁT & VẬN HÀNH */}
         <div className="space-y-1">
           {!collapsed && (
-            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase px-3 mb-1">
+            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider px-3 mb-1">
               {t("sidebar.sections.monitoring")}
             </div>
           )}
@@ -107,9 +106,9 @@ export default function Sidebar() {
         </div>
 
         {/* GROUP 2: ĐIỆN VĂN & ĐỊNH TUYẾN */}
-        <div className="space-y-1 pt-2 border-t border-slate-100">
+        <div className="space-y-1 pt-0 border-t border-slate-100">
           {!collapsed && (
-            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase px-3 mb-1">
+            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider px-3 mb-1">
               {t("sidebar.sections.traffic")}
             </div>
           )}
@@ -154,9 +153,9 @@ export default function Sidebar() {
         </div>
 
         {/* GROUP 3: NHẬT KÝ & LỊCH SỬ */}
-        <div className="space-y-1 pt-2 border-t border-slate-100">
+        <div className="space-y-1 pt-1 border-t border-slate-100">
           {!collapsed && (
-            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase px-3 mb-1">
+            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider px-3 mb-1">
               {t("sidebar.sections.logs")}
             </div>
           )}
@@ -188,13 +187,13 @@ export default function Sidebar() {
         </div>
 
         {/* GROUP 4: QUẢN TRỊ & CẤU HÌNH */}
-        <div className="space-y-1 pt-2 border-t border-slate-100">
+        <div className="space-y-1 pt-1 border-t border-slate-100">
           {!collapsed && (
-            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider uppercase px-3 mb-1">
+            <div className="text-[10px] font-extrabold text-slate-400 tracking-wider px-3 mb-1">
               {t("sidebar.sections.admin")}
             </div>
           )}
-          
+
           <NavLink
             to="/accounts"
             className={({ isActive }) =>
@@ -238,12 +237,11 @@ export default function Sidebar() {
             </NavLink>
           )}
         </div>
+        {/* Collapsible server resource monitor widget inside scrollable area */}
+        <div className={`sidebar-extra border-t border-slate-100 ${collapsed ? "collapsed opacity-0 max-h-0 overflow-hidden" : "opacity-100"}`}>
+          <ServerMonitor />
+        </div>
       </nav>
-
-      {/* Collapsible server resource monitor widget */}
-      <div className={`sidebar-extra mt-2 pt-2 border-t border-slate-100 ${collapsed ? "collapsed opacity-0 max-h-0 overflow-hidden" : "opacity-100"}`}>
-        <ServerMonitor />
-      </div>
     </div>
   );
 }

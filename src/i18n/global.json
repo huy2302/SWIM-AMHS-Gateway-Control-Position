@@ -33,8 +33,58 @@
       "en": "Unrouted"
     }
   },
+  "userMenu": {
+    "adminRole": {
+      "vi": "Quản trị viên",
+      "en": "Administrator"
+    },
+    "userRole": {
+      "vi": "Người dùng",
+      "en": "User"
+    },
+    "role": {
+      "vi": "Vai trò",
+      "en": "Role"
+    },
+    "admin": {
+      "vi": "Quản trị viên",
+      "en": "Administrator"
+    },
+    "user": {
+      "vi": "Người dùng",
+      "en": "User"
+    },
+    "session": {
+      "vi": "Phiên đăng nhập",
+      "en": "Session"
+    },
+    "profile": {
+      "vi": "Trang cá nhân",
+      "en": "Profile"
+    },
+    "settings": {
+      "vi": "Cài đặt",
+      "en": "Settings"
+    },
+    "logout": {
+      "vi": "Đăng xuất",
+      "en": "Log Out"
+    }
+  },
   "noData": {
     "vi": "Không có dữ liệu",
     "en": "No data"
+  },
+  "save": {
+    "vi": "Lưu",
+    "en": "Save"
+  },
+  "cancel": {
+    "vi": "Hủy",
+    "en": "Cancel"
+  },
+  "edit": {
+    "vi": "Sửa",
+    "en": "Edit"
   }
 }
