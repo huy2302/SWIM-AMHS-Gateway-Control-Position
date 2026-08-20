@@ -2,8 +2,14 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useLanguageStore } from '../store/languageStore';
 
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  return `http://${host}:8180/api`;
+};
+
 const axiosClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://192.168.22.160:8180/api',
+  baseURL: getBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
