@@ -1,24 +1,76 @@
 {
-    "title":  {
-                  "vi":  "Sự kiện Hệ thống",
-                  "en":  "System Events Audit"
-              },
-    "table":  {
-                  "time":  {
-                               "vi":  "Thời gian",
-                               "en":  "Timestamp"
-                           },
-                  "event":  {
-                                "vi":  "Tên sự kiện",
-                                "en":  "Event Name"
-                            },
-                  "user":  {
-                               "vi":  "Người thực hiện",
-                               "en":  "Triggered By"
-                           },
-                  "detail":  {
-                                 "vi":  "Chi tiết",
-                                 "en":  "Event Details"
-                             }
-              }
+  "title": {
+    "vi": "Sự kiện Hệ thống",
+    "en": "System Events Audit"
+  },
+  "markAllRead": {
+    "vi": "Đánh dấu tất cả đã đọc",
+    "en": "Mark all as read"
+  },
+  "table": {
+    "time": {
+      "vi": "Thời gian",
+      "en": "Time"
+    },
+    "severity": {
+      "vi": "Mức độ",
+      "en": "Severity"
+    },
+    "type": {
+      "vi": "Loại sự kiện",
+      "en": "Type"
+    },
+    "message": {
+      "vi": "Nội dung",
+      "en": "Message"
+    },
+    "createdBy": {
+      "vi": "Người thực hiện",
+      "en": "Created By"
+    },
+    "description": {
+      "vi": "Chi tiết",
+      "en": "Description"
+    },
+    "event": {
+      "vi": "Tên sự kiện",
+      "en": "Event Name"
+    },
+    "user": {
+      "vi": "Người thực hiện",
+      "en": "Triggered By"
+    },
+    "detail": {
+      "vi": "Chi tiết",
+      "en": "Event Details"
+    }
+  },
+  "status": {
+    "loading": {
+      "vi": "Đang tải nhật ký hệ thống...",
+      "en": "Loading system events..."
+    },
+    "noData": {
+      "vi": "Không tìm thấy sự kiện nào.",
+      "en": "No system events found."
+    }
+  },
+  "dialog": {
+    "title": {
+      "vi": "Chi tiết sự kiện nhật ký",
+      "en": "System Event Detail"
+    },
+    "description": {
+      "vi": "Mô tả chi tiết",
+      "en": "Detailed Description"
+    },
+    "noDescription": {
+      "vi": "Không có mô tả chi tiết nào.",
+      "en": "No description available"
+    },
+    "close": {
+      "vi": "Đóng",
+      "en": "Close"
+    }
+  }
 }

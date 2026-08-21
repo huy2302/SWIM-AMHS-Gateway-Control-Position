@@ -1,22 +1,128 @@
 {
-    "title":  {
-                  "vi":  "Giám sát Tài nguyên \u0026 Tiến trình",
-                  "en":  "System Resources \u0026 Process Monitor"
-              },
-    "cpu":  {
-                "vi":  "Sử dụng CPU",
-                "en":  "CPU Usage"
-            },
-    "ram":  {
-                "vi":  "Sử dụng RAM",
-                "en":  "Memory Usage"
-            },
-    "disk":  {
-                 "vi":  "Dung lượng Ổ đĩa",
-                 "en":  "Disk Usage"
-             },
-    "services":  {
-                     "vi":  "Trạng thái các dịch vụ Gateway",
-                     "en":  "Gateway Services Status"
-                 }
+  "title": {
+    "vi": "Giám sát Tài nguyên & Tiến trình",
+    "en": "System Resources & Process Monitor"
+  },
+  "cpu": {
+    "vi": "Sử dụng CPU",
+    "en": "CPU Usage"
+  },
+  "ram": {
+    "vi": "Sử dụng RAM",
+    "en": "Memory Usage"
+  },
+  "disk": {
+    "vi": "Dung lượng Ổ đĩa",
+    "en": "Disk Usage"
+  },
+  "services": {
+    "vi": "Trạng thái các dịch vụ Gateway",
+    "en": "Gateway Services Status"
+  },
+  "charts": {
+    "cpu": {
+      "title": {
+        "vi": "Tiến trình & Tải CPU hệ thống",
+        "en": "Process & System CPU Load"
+      },
+      "legend": {
+        "process": {
+          "vi": "Tiến trình Gateway",
+          "en": "Gateway Process"
+        },
+        "system": {
+          "vi": "Toàn hệ thống",
+          "en": "Entire System"
+        }
+      }
+    },
+    "memory": {
+      "title": {
+        "vi": "Sử dụng RAM (Bộ nhớ ứng dụng & Hệ thống)",
+        "en": "Memory Usage (Heap & Physical)"
+      },
+      "legend": {
+        "process": {
+          "vi": "RAM ứng dụng (Heap)",
+          "en": "Process Heap RAM"
+        },
+        "system": {
+          "vi": "RAM hệ thống",
+          "en": "System Physical RAM"
+        }
+      }
+    },
+    "mysql": {
+      "connections": {
+        "title": {
+          "vi": "Kết nối Cơ sở dữ liệu MySQL",
+          "en": "MySQL Connections"
+        }
+      },
+      "cpu": {
+        "title": {
+          "vi": "Mức sử dụng CPU của CSDL",
+          "en": "Database CPU Load"
+        }
+      }
+    }
+  },
+  "disks": {
+    "title": {
+      "vi": "Dung lượng Ổ đĩa",
+      "en": "Disk Storage Capacity"
+    },
+    "partition": {
+      "vi": "Phân vùng ",
+      "en": "Partition "
+    }
+  },
+  "info": {
+    "cpu": {
+      "totalLoad": {
+        "vi": "Mức tải CPU toàn hệ thống",
+        "en": "TOTAL SYSTEM CPU LOAD"
+      },
+      "processLoad": {
+        "vi": "Mức tải CPU của Gateway",
+        "en": "GATEWAY PROCESS CPU LOAD"
+      },
+      "cpuInfo": {
+        "vi": "Thông tin bộ vi xử lý (CPU)",
+        "en": "CPU HARDWARE INFO"
+      },
+      "uptime": {
+        "vi": "Thời gian hoạt động (Uptime)",
+        "en": "UPTIME"
+      }
+    },
+    "memory": {
+      "processHeap": {
+        "vi": "Bộ nhớ RAM ứng dụng",
+        "en": "PROCESS HEAP RAM"
+      },
+      "systemUsed": {
+        "vi": "Bộ nhớ RAM hệ thống đã dùng",
+        "en": "USED SYSTEM RAM"
+      },
+      "totalRam": {
+        "vi": "Tổng bộ nhớ RAM hệ thống",
+        "en": "TOTAL SYSTEM RAM"
+      }
+    },
+    "mysql": {
+      "activeConn": {
+        "vi": "Số kết nối CSDL đang mở",
+        "en": "ACTIVE DATABASE CONNECTIONS"
+      },
+      "status": {
+        "vi": "Trạng thái kết nối CSDL",
+        "en": "DB CONNECTION STATUS"
+      },
+      "dbCpuLoad": {
+        "vi": "Mức tải CPU dịch vụ CSDL",
+        "en": "DATABASE SERVICE CPU LOAD"
+      }
+    }
+  }
 }

@@ -1,34 +1,158 @@
 {
-    "title":  {
-                  "vi":  "Tổng quan Hệ thống Gateway",
-                  "en":  "Gateway Dashboard Overview"
-              },
-    "stats":  {
-                  "totalInbound":  {
-                                       "vi":  "Điện văn SWIM (Inbound)",
-                                       "en":  "SWIM Messages (Inbound)"
-                                   },
-                  "totalOutbound":  {
-                                        "vi":  "Điện văn AMHS (Outbound)",
-                                        "en":  "AMHS Messages (Outbound)"
-                                    },
-                  "unrouted":  {
-                                   "vi":  "Điện văn lỗi tuyến (Unrouted)",
-                                   "en":  "Unrouted Queue"
-                               },
-                  "successRate":  {
-                                      "vi":  "Tỷ lệ chuyển đổi thành công",
-                                      "en":  "Conversion Success Rate"
-                                  }
-              },
-    "charts":  {
-                   "traffic":  {
-                                   "vi":  "Lưu lượng điện văn theo giờ",
-                                   "en":  "Hourly Message Traffic"
-                               },
-                   "distribution":  {
-                                        "vi":  "Phân bố loại điện văn",
-                                        "en":  "Message Type Distribution"
-                                    }
-               }
+  "title": {
+    "vi": "Tổng quan Hệ thống Gateway",
+    "en": "Gateway Dashboard Overview"
+  },
+  "uptime": {
+    "vi": "Thời gian hoạt động",
+    "en": "Uptime"
+  },
+  "notifications": {
+    "vi": "Thông báo hệ thống",
+    "en": "System Notifications"
+  },
+  "markAllRead": {
+    "vi": "Đánh dấu tất cả đã đọc",
+    "en": "Mark all as read"
+  },
+  "noNotify": {
+    "vi": "Không có thông báo mới",
+    "en": "No notifications"
+  },
+  "seeAllHistory": {
+    "vi": "Xem tất cả lịch sử",
+    "en": "View all history"
+  },
+  "health": {
+    "title": {
+      "vi": "Hệ thống hoạt động bình thường",
+      "en": "System is operating normally"
+    },
+    "description": {
+      "vi": "Tất cả các dịch vụ kết nối đang chạy ổn định",
+      "en": "All connected services are running smoothly"
+    },
+    "error": {
+      "vi": "Hệ thống gặp sự cố kết nối",
+      "en": "System connection error"
+    },
+    "try": {
+      "vi": "Vui lòng kiểm tra lại trạng thái kết nối các broker hoặc dịch vụ",
+      "en": "Please check the status of brokers or connection services"
+    }
+  },
+  "channels": {
+    "title": {
+      "vi": "Kênh kết nối AMQP",
+      "en": "AMQP Channels"
+    },
+    "amqp": {
+      "vi": "AMQP Broker",
+      "en": "AMQP Broker"
+    },
+    "noConfig": {
+      "vi": "Chưa có cấu hình kênh kết nối",
+      "en": "No channels configured"
+    },
+    "connected": {
+      "vi": "Đã kết nối",
+      "en": "Connected"
+    },
+    "disconnected": {
+      "vi": "Mất kết nối",
+      "en": "Disconnected"
+    }
+  },
+  "trafficCard": {
+    "swimToAmhs": {
+      "vi": "Luồng điện văn SWIM ➔ AMHS (Vào)",
+      "en": "SWIM to AMHS (Inbound)"
+    },
+    "amhsToSwim": {
+      "vi": "Luồng điện văn AMHS ➔ SWIM (Ra)",
+      "en": "AMHS to SWIM (Outbound)"
+    },
+    "messages": {
+      "vi": "điện văn",
+      "en": "messages"
+    },
+    "pending": {
+      "vi": "Đang chờ xử lý",
+      "en": "Pending"
+    },
+    "unrouted": {
+      "vi": "Lỗi định tuyến",
+      "en": "Unrouted"
+    },
+    "delivered": {
+      "vi": "Đã gửi thành công",
+      "en": "Delivered"
+    },
+    "published": {
+      "vi": "Đã phát hành",
+      "en": "Published"
+    },
+    "failed": {
+      "vi": "Thất bại",
+      "en": "Failed"
+    },
+    "successRate": {
+      "vi": "Tỷ lệ thành công",
+      "en": "Success Rate"
+    }
+  },
+  "server": {
+    "title": {
+      "vi": "Thông tin Máy chủ & Bộ nhớ",
+      "en": "Server & Memory Info"
+    },
+    "serverName": {
+      "vi": "Tên máy chủ",
+      "en": "Server Name"
+    },
+    "runningSince": {
+      "vi": "Thời gian khởi chạy từ",
+      "en": "Running Since"
+    },
+    "version": {
+      "vi": "Phiên bản",
+      "en": "Version"
+    },
+    "memoryUsage": {
+      "vi": "Bộ nhớ RAM ứng dụng",
+      "en": "Heap Memory Usage"
+    },
+    "unused": {
+      "vi": "RAM hệ thống trống",
+      "en": "Free RAM"
+    }
+  },
+  "stats": {
+    "totalInbound": {
+      "vi": "Điện văn SWIM (Đầu vào)",
+      "en": "SWIM Messages (Inbound)"
+    },
+    "totalOutbound": {
+      "vi": "Điện văn AMHS (Đầu ra)",
+      "en": "AMHS Messages (Outbound)"
+    },
+    "unrouted": {
+      "vi": "Điện văn lỗi định tuyến",
+      "en": "Unrouted Queue"
+    },
+    "successRate": {
+      "vi": "Tỷ lệ chuyển đổi thành công",
+      "en": "Conversion Success Rate"
+    }
+  },
+  "charts": {
+    "traffic": {
+      "vi": "Lưu lượng điện văn theo giờ",
+      "en": "Hourly Message Traffic"
+    },
+    "distribution": {
+      "vi": "Phân bố loại điện văn",
+      "en": "Message Type Distribution"
+    }
+  }
 }

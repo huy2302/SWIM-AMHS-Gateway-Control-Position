@@ -1,32 +1,224 @@
 {
-    "title":  {
-                  "vi":  "Nhật ký Hệ thống",
-                  "en":  "System Logs"
-              },
-    "search":  {
-                   "vi":  "Tìm kiếm nhật ký...",
-                   "en":  "Search logs..."
-               },
-    "level":  {
-                  "vi":  "Cấp độ log:",
-                  "en":  "Log Level:"
-              },
-    "table":  {
-                  "time":  {
-                               "vi":  "Thời gian",
-                               "en":  "Timestamp"
-                           },
-                  "level":  {
-                                "vi":  "Mức độ",
-                                "en":  "Level"
-                            },
-                  "logger":  {
-                                 "vi":  "Thành phần",
-                                 "en":  "Logger"
-                             },
-                  "message":  {
-                                  "vi":  "Nội dung",
-                                  "en":  "Log Message"
-                              }
-              }
+  "title": {
+    "vi": "Nhật ký Hệ thống",
+    "en": "System Logs"
+  },
+  "search": {
+    "vi": "Tìm kiếm nhật ký...",
+    "en": "Search logs..."
+  },
+  "level": {
+    "vi": "Cấp độ log:",
+    "en": "Log Level:"
+  },
+  "direction": {
+    "in": {
+      "vi": "Vào (SWIM ➔ AMHS)",
+      "en": "IN (SWIM ➔ AMHS)"
+    },
+    "out": {
+      "vi": "Ra (AMHS ➔ SWIM)",
+      "en": "OUT (AMHS ➔ SWIM)"
+    }
+  },
+  "status": {
+    "SUCCESS": {
+      "vi": "Thành công",
+      "en": "SUCCESS"
+    },
+    "FAILED": {
+      "vi": "Thất bại",
+      "en": "FAILED"
+    },
+    "PENDING": {
+      "vi": "Đang xử lý",
+      "en": "PENDING"
+    },
+    "DELIVERED": {
+      "vi": "Đã giao",
+      "en": "DELIVERED"
+    },
+    "PUBLISHED": {
+      "vi": "Đã phát hành",
+      "en": "PUBLISHED"
+    },
+    "UNROUTED": {
+      "vi": "Chưa định tuyến",
+      "en": "UNROUTED"
+    }
+  },
+  "actionTaken": {
+    "routing_failed": {
+      "vi": "Lỗi định tuyến",
+      "en": "Routing Failed"
+    },
+    "validation_failed": {
+      "vi": "Dữ liệu không hợp lệ",
+      "en": "Validation Failed"
+    },
+    "unauthorized": {
+      "vi": "Không có quyền truy cập",
+      "en": "Unauthorized"
+    },
+    "ttl_expired": {
+      "vi": "Hết thời gian chờ (TTL)",
+      "en": "TTL Expired"
+    },
+    "type_detection_failed": {
+      "vi": "Không nhận diện được loại điện văn",
+      "en": "Type Detection Failed"
+    },
+    "ndr": {
+      "vi": "Báo cáo không giao được (NDR)",
+      "en": "Non-Delivery Report"
+    },
+    "received_routed": {
+      "vi": "Đã tiếp nhận & định tuyến",
+      "en": "Received & Routed"
+    },
+    "published_swim": {
+      "vi": "Đã phát hành sang SWIM",
+      "en": "Published to SWIM"
+    },
+    "delivered_amhs": {
+      "vi": "Đã giao tới AMHS",
+      "en": "Delivered to AMHS"
+    },
+    "unrouted_queue": {
+      "vi": "Chuyển vào hàng chờ lỗi tuyến",
+      "en": "Moved to Unrouted Queue"
+    }
+  },
+  "toast": {
+    "fetchFailed": {
+      "vi": "Tải danh sách nhật ký thất bại",
+      "en": "Failed to fetch logs"
+    },
+    "copied": {
+      "vi": "Đã sao chép nội dung log",
+      "en": "Log content copied"
+    },
+    "noLogs": {
+      "vi": "Không có dữ liệu nhật ký",
+      "en": "No log data available"
+    }
+  },
+  "toolbar": {
+    "clear": {
+      "vi": "Xóa bộ lọc",
+      "en": "Clear Filter"
+    },
+    "copy": {
+      "vi": "Sao chép tất cả",
+      "en": "Copy All"
+    }
+  },
+  "filter": {
+    "searchPlaceholder": {
+      "vi": "Tìm theo Mã tin, Địa chỉ, Tiêu đề hoặc Nội dung...",
+      "en": "Search by ID, Address, Subject or Content..."
+    }
+  },
+  "table": {
+    "id": {
+      "vi": "ID",
+      "en": "ID"
+    },
+    "time": {
+      "vi": "Thời gian",
+      "en": "Timestamp"
+    },
+    "level": {
+      "vi": "Mức độ",
+      "en": "Level"
+    },
+    "logger": {
+      "vi": "Thành phần",
+      "en": "Logger"
+    },
+    "message": {
+      "vi": "Nội dung",
+      "en": "Log Message"
+    },
+    "dir": {
+      "vi": "Hướng",
+      "en": "Direction"
+    },
+    "mtsId": {
+      "vi": "MTS ID",
+      "en": "MTS ID"
+    },
+    "ipmId": {
+      "vi": "IPM ID",
+      "en": "IPM ID"
+    },
+    "type": {
+      "vi": "Loại điện văn",
+      "en": "Type"
+    },
+    "prio": {
+      "vi": "Độ ưu tiên",
+      "en": "Priority"
+    },
+    "origin": {
+      "vi": "Địa chỉ gửi",
+      "en": "Originator"
+    },
+    "status": {
+      "vi": "Trạng thái",
+      "en": "Status"
+    }
+  },
+  "empty": {
+    "title": {
+      "vi": "Không có bản ghi nhật ký nào phù hợp.",
+      "en": "No logs matching criteria."
+    }
+  },
+  "modal": {
+    "title": {
+      "vi": "Chi tiết Nhật ký",
+      "en": "Log Detail"
+    },
+    "direction": {
+      "vi": "Hướng điện văn",
+      "en": "DIRECTION"
+    },
+    "status": {
+      "vi": "Trạng thái",
+      "en": "STATUS"
+    },
+    "origin": {
+      "vi": "Địa chỉ gửi (Originator)",
+      "en": "ORIGINATOR"
+    },
+    "convertedTime": {
+      "vi": "Thời gian chuyển đổi",
+      "en": "CONVERTED TIME"
+    },
+    "nonDeliveryReason": {
+      "vi": "Lý do không giao được (NDR)",
+      "en": "NON-DELIVERY REASON"
+    },
+    "rawContent": {
+      "vi": "Nội dung chi tiết điện văn",
+      "en": "Raw Content / Message Detail"
+    },
+    "copy": {
+      "vi": "Sao chép",
+      "en": "Copy"
+    },
+    "copied": {
+      "vi": "Đã sao chép",
+      "en": "Copied"
+    },
+    "noContent": {
+      "vi": "Không có nội dung chi tiết.",
+      "en": "No detail content available."
+    },
+    "close": {
+      "vi": "Đóng",
+      "en": "Close"
+    }
+  }
 }

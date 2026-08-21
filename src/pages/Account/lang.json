@@ -1,62 +1,266 @@
 {
-    "title":  {
-                  "vi":  "Thông tin Tài khoản",
-                  "en":  "Account Profile"
-              },
-    "subtitle":  {
-                     "vi":  "Quản lý thông tin cá nhân và mật khẩu truy cập",
-                     "en":  "Manage profile information and password"
-                 },
-    "personalInfo":  {
-                         "vi":  "Thông tin cá nhân",
-                         "en":  "Personal Information"
-                     },
-    "username":  {
-                     "vi":  "Tên đăng nhập",
-                     "en":  "Username"
-                 },
-    "fullName":  {
-                     "vi":  "Họ và tên",
-                     "en":  "Full Name"
-                 },
-    "email":  {
-                  "vi":  "Địa chỉ Email",
-                  "en":  "Email Address"
-              },
-    "role":  {
-                 "vi":  "Vai trò hệ thống",
-                 "en":  "System Role"
-             },
-    "changePassword":  {
-                           "vi":  "Đổi mật khẩu",
-                           "en":  "Change Password"
-                       },
-    "currentPassword":  {
-                            "vi":  "Mật khẩu hiện tại",
-                            "en":  "Current Password"
-                        },
-    "newPassword":  {
-                        "vi":  "Mật khẩu mới",
-                        "en":  "New Password"
-                    },
-    "confirmPassword":  {
-                            "vi":  "Xác nhận mật khẩu mới",
-                            "en":  "Confirm New Password"
-                        },
-    "save":  {
-                 "vi":  "Cập nhật",
-                 "en":  "Update Profile"
-             },
-    "passwordMismatch":  {
-                             "vi":  "Mật khẩu xác nhận không khớp",
-                             "en":  "Passwords do not match"
-                         },
-    "updateSuccess":  {
-                          "vi":  "Đã cập nhật thông tin thành công",
-                          "en":  "Profile updated successfully"
-                      },
-    "updateFailed":  {
-                         "vi":  "Cập nhật thông tin thất bại",
-                         "en":  "Failed to update profile"
-                     }
+  "title": {
+    "vi": "Quản lý Tài khoản Kết nối",
+    "en": "Connection Accounts Management"
+  },
+  "subtitle": {
+    "vi": "Quản lý các tài khoản kết nối AMQP và MQTT",
+    "en": "Manage AMQP and MQTT connection accounts"
+  },
+  "personalInfo": {
+    "vi": "Thông tin cá nhân",
+    "en": "Personal Information"
+  },
+  "username": {
+    "vi": "Tên đăng nhập",
+    "en": "Username"
+  },
+  "fullName": {
+    "vi": "Họ và tên",
+    "en": "Full Name"
+  },
+  "email": {
+    "vi": "Địa chỉ Email",
+    "en": "Email Address"
+  },
+  "role": {
+    "vi": "Vai trò hệ thống",
+    "en": "System Role"
+  },
+  "changePassword": {
+    "vi": "Đổi mật khẩu",
+    "en": "Change Password"
+  },
+  "currentPassword": {
+    "vi": "Mật khẩu hiện tại",
+    "en": "Current Password"
+  },
+  "newPassword": {
+    "vi": "Mật khẩu mới",
+    "en": "New Password"
+  },
+  "confirmPassword": {
+    "vi": "Xác nhận mật khẩu mới",
+    "en": "Confirm New Password"
+  },
+  "save": {
+    "vi": "Cập nhật",
+    "en": "Update Profile"
+  },
+  "passwordMismatch": {
+    "vi": "Mật khẩu xác nhận không khớp",
+    "en": "Passwords do not match"
+  },
+  "updateSuccess": {
+    "vi": "Đã cập nhật thông tin thành công",
+    "en": "Profile updated successfully"
+  },
+  "updateFailed": {
+    "vi": "Cập nhật thông tin thất bại",
+    "en": "Failed to update profile"
+  },
+  "toast": {
+    "deleteSuccess": {
+      "vi": "Xóa tài khoản thành công!",
+      "en": "Account deleted successfully!"
+    },
+    "deleteFailed": {
+      "vi": "Xóa tài khoản thất bại!",
+      "en": "Failed to delete account!"
+    },
+    "enableSuccess": {
+      "vi": "Đã kích hoạt tài khoản!",
+      "en": "Account enabled successfully!"
+    },
+    "disableSuccess": {
+      "vi": "Đã vô hiệu hóa tài khoản!",
+      "en": "Account disabled successfully!"
+    },
+    "enableFailed": {
+      "vi": "Kích hoạt tài khoản thất bại!",
+      "en": "Failed to enable account!"
+    },
+    "disableFailed": {
+      "vi": "Vô hiệu hóa tài khoản thất bại!",
+      "en": "Failed to disable account!"
+    },
+    "updateSuccess": {
+      "vi": "Cập nhật tài khoản thành công!",
+      "en": "Account updated successfully!"
+    },
+    "createSuccess": {
+      "vi": "Tạo tài khoản mới thành công!",
+      "en": "Account created successfully!"
+    },
+    "saveError": {
+      "vi": "Lưu thông tin tài khoản thất bại!",
+      "en": "Failed to save account details!"
+    }
+  },
+  "table": {
+    "accountName": {
+      "vi": "Tên tài khoản",
+      "en": "Account Name"
+    },
+    "protocol": {
+      "vi": "Giao thức",
+      "en": "Protocol"
+    },
+    "status": {
+      "vi": "Trạng thái",
+      "en": "Status"
+    },
+    "bindStatus": {
+      "vi": "Trạng thái kết nối",
+      "en": "Bind Status"
+    },
+    "host": {
+      "vi": "Máy chủ (Host)",
+      "en": "Host"
+    },
+    "port": {
+      "vi": "Cổng (Port)",
+      "en": "Port"
+    }
+  },
+  "protocols": {
+    "amqp": {
+      "vi": "AMQP",
+      "en": "AMQP"
+    },
+    "mqtt": {
+      "vi": "MQTT",
+      "en": "MQTT"
+    }
+  },
+  "statuses": {
+    "active": {
+      "vi": "Hoạt động",
+      "en": "Active"
+    },
+    "inactive": {
+      "vi": "Ngưng hoạt động",
+      "en": "Inactive"
+    }
+  },
+  "bindStatuses": {
+    "connected": {
+      "vi": "Đã kết nối",
+      "en": "Connected"
+    },
+    "disconnected": {
+      "vi": "Mất kết nối",
+      "en": "Disconnected"
+    }
+  },
+  "commands": {
+    "title": {
+      "vi": "Thao tác tài khoản",
+      "en": "Account Commands"
+    },
+    "add": {
+      "vi": "Thêm mới",
+      "en": "Add Account"
+    },
+    "edit": {
+      "vi": "Chỉnh sửa",
+      "en": "Edit"
+    },
+    "delete": {
+      "vi": "Xóa",
+      "en": "Delete"
+    },
+    "enable": {
+      "vi": "Kích hoạt",
+      "en": "Enable"
+    },
+    "disable": {
+      "vi": "Vô hiệu hóa",
+      "en": "Disable"
+    }
+  },
+  "confirm": {
+    "deleteTitle": {
+      "vi": "Xác nhận xóa tài khoản",
+      "en": "Confirm Account Deletion"
+    },
+    "deleteMessage": {
+      "vi": "Bạn có chắc chắn muốn xóa tài khoản này không?",
+      "en": "Are you sure you want to delete this account?"
+    },
+    "deleteConfirm": {
+      "vi": "Xóa tài khoản",
+      "en": "Delete Account"
+    },
+    "enableTitle": {
+      "vi": "Kích hoạt tài khoản",
+      "en": "Enable Account"
+    },
+    "enableMessage": {
+      "vi": "Bạn có muốn kích hoạt tài khoản này không?",
+      "en": "Do you want to enable this account?"
+    },
+    "enableConfirm": {
+      "vi": "Kích hoạt",
+      "en": "Enable"
+    },
+    "disableTitle": {
+      "vi": "Vô hiệu hóa tài khoản",
+      "en": "Disable Account"
+    },
+    "disableMessage": {
+      "vi": "Bạn có muốn vô hiệu hóa tài khoản này không?",
+      "en": "Do you want to disable this account?"
+    },
+    "disableConfirm": {
+      "vi": "Vô hiệu hóa",
+      "en": "Disable"
+    }
+  },
+  "modal": {
+    "editTitle": {
+      "vi": "Chỉnh sửa tài khoản",
+      "en": "Edit Account"
+    },
+    "addTitle": {
+      "vi": "Thêm mới tài khoản",
+      "en": "Add New Account"
+    },
+    "accountName": {
+      "vi": "Tên tài khoản",
+      "en": "Account Name"
+    },
+    "protocol": {
+      "vi": "Giao thức",
+      "en": "Protocol"
+    },
+    "port": {
+      "vi": "Cổng",
+      "en": "Port"
+    },
+    "host": {
+      "vi": "Máy chủ",
+      "en": "Host"
+    },
+    "username": {
+      "vi": "Tên đăng nhập",
+      "en": "Username"
+    },
+    "password": {
+      "vi": "Mật khẩu",
+      "en": "Password"
+    },
+    "vpn": {
+      "vi": "VPN / Vhost",
+      "en": "VPN / Vhost"
+    },
+    "status": {
+      "vi": "Trạng thái hoạt động",
+      "en": "Active Status"
+    },
+    "bindStatus": {
+      "vi": "Trạng thái kết nối",
+      "en": "Bind Status"
+    }
+  }
 }

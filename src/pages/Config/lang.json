@@ -1,26 +1,176 @@
 {
-    "title":  {
-                  "vi":  "Cấu hình Hệ thống",
-                  "en":  "System Configuration"
-              },
-    "subtitle":  {
-                     "vi":  "Quản lý tham số hoạt động của SWIM \u0026 AMHS Gateway",
-                     "en":  "Manage SWIM \u0026 AMHS Gateway operational parameters"
-                 },
-    "amqpConfig":  {
-                       "vi":  "Cấu hình SWIM AMQP Broker",
-                       "en":  "SWIM AMQP Broker Settings"
-                   },
-    "amhsConfig":  {
-                       "vi":  "Cấu hình AMHS MTA Connection",
-                       "en":  "AMHS MTA Connection Settings"
-                   },
-    "save":  {
-                 "vi":  "Lưu cấu hình",
-                 "en":  "Save Configuration"
-             },
-    "reset":  {
-                  "vi":  "Đặt lại",
-                  "en":  "Reset Parameters"
-              }
+  "title": {
+    "vi": "Cấu hình Hệ thống",
+    "en": "System Configuration"
+  },
+  "subtitle": {
+    "vi": "Quản lý các tham số hoạt động của SWIM & AMHS Gateway",
+    "en": "Manage SWIM & AMHS Gateway operational parameters"
+  },
+  "amqpConfig": {
+    "vi": "Cấu hình kết nối SWIM AMQP Broker",
+    "en": "SWIM AMQP Broker Settings"
+  },
+  "amhsConfig": {
+    "vi": "Cấu hình kết nối AMHS MTA",
+    "en": "AMHS MTA Connection Settings"
+  },
+  "save": {
+    "vi": "Lưu cấu hình",
+    "en": "Save Configuration"
+  },
+  "reset": {
+    "vi": "Đặt lại",
+    "en": "Reset Parameters"
+  },
+  "caution": {
+    "vi": "Lưu ý: Các thao tác trong mục này sẽ thay đổi trực tiếp cấu hình hoạt động hoặc dọn dẹp dữ liệu hệ thống.",
+    "en": "Caution: Administrative operations will directly modify application settings or prune system databases."
+  },
+  "diagnostics": {
+    "dbStatus": {
+      "vi": "Trạng thái Cơ sở dữ liệu",
+      "en": "Database status"
+    },
+    "conversionLogs": {
+      "vi": "Nhật ký chuyển đổi",
+      "en": "Conversion Logs"
+    },
+    "availableDisk": {
+      "vi": "Dung lượng ổ đĩa trống",
+      "en": "Available Disk"
+    },
+    "activeConnections": {
+      "vi": "Số kết nối đang mở",
+      "en": "Active Connections"
+    },
+    "bound": {
+      "vi": "Đã kết nối",
+      "en": "Bound"
+    },
+    "toastSuccess": {
+      "vi": "Đã hoàn thành kiểm tra hệ thống",
+      "en": "Diagnostic check completed"
+    },
+    "toastFail": {
+      "vi": "Kiểm tra hệ thống thất bại",
+      "en": "Failed to perform diagnostics"
+    }
+  },
+  "dbOps": {
+    "title": {
+      "vi": "Thao tác Cơ sở dữ liệu",
+      "en": "Database Operations"
+    },
+    "purgeLogs": {
+      "vi": "Xóa nhật ký cũ",
+      "en": "Purge Old Logs"
+    },
+    "purgeDesc": {
+      "vi": "Xóa các bản ghi nhật ký chuyển đổi đã cũ để giải phóng dung lượng",
+      "en": "Cleans conversion log tables"
+    },
+    "toastSuccess": {
+      "vi": "Đã xóa nhật ký cũ thành công!",
+      "en": "Old database logs cleaned successfully"
+    },
+    "toastFail": {
+      "vi": "Xóa nhật ký cũ thất bại!",
+      "en": "Failed to clean database"
+    }
+  },
+  "maintenance": {
+    "title": {
+      "vi": "Bảo trì & Kiểm tra",
+      "en": "Maintenance"
+    },
+    "vacuum": {
+      "vi": "Tối ưu Cơ sở dữ liệu (Vacuum)",
+      "en": "Vacuum Database"
+    },
+    "vacuumDesc": {
+      "vi": "Thu dọn bộ nhớ thừa và tăng tốc truy vấn cơ sở dữ liệu",
+      "en": "Optimizes database size and speeds up indices"
+    },
+    "check": {
+      "vi": "Kiểm tra hệ thống",
+      "en": "Check Diagnostics"
+    },
+    "checkDesc": {
+      "vi": "Kiểm tra tài nguyên máy chủ và trạng thái kết nối",
+      "en": "Checks hardware resources and database connections"
+    },
+    "toastSuccess": {
+      "vi": "Bảo trì cơ sở dữ liệu thành công!",
+      "en": "Database maintenance executed successfully"
+    },
+    "toastFail": {
+      "vi": "Bảo trì cơ sở dữ liệu thất bại!",
+      "en": "Failed to perform maintenance"
+    }
+  },
+  "converter": {
+    "title": {
+      "vi": "Tra cứu chuyển đổi địa chỉ",
+      "en": "Address Converter"
+    },
+    "label": {
+      "vi": "Địa chỉ AFTN / AMHS",
+      "en": "AFTN/AMHS Address"
+    },
+    "placeholder": {
+      "vi": "Ví dụ: VVTSZQZX...",
+      "en": "e.g. VVTSZQZX..."
+    },
+    "submit": {
+      "vi": "Tra cứu",
+      "en": "Convert Address"
+    },
+    "result": {
+      "vi": "Kết quả",
+      "en": "Result"
+    },
+    "method": {
+      "vi": "Phương thức",
+      "en": "Method"
+    },
+    "noResult": {
+      "vi": "Không tìm thấy kết quả chuyển đổi",
+      "en": "No routing result"
+    },
+    "toastFail": {
+      "vi": "Tra cứu địa chỉ thất bại!",
+      "en": "Failed to convert address"
+    }
+  },
+  "settings": {
+    "title": {
+      "vi": "Tham số cấu hình hệ thống",
+      "en": "System Settings"
+    },
+    "key": {
+      "vi": "Tên tham số (Key)",
+      "en": "Config Key"
+    },
+    "value": {
+      "vi": "Giá trị",
+      "en": "Config Value"
+    },
+    "actions": {
+      "vi": "Thao tác",
+      "en": "Actions"
+    },
+    "noData": {
+      "vi": "Chưa có tham số cấu hình nào.",
+      "en": "No configurations defined."
+    },
+    "toast": {
+      "vi": "Cập nhật tham số thành công!",
+      "en": "Configuration updated successfully!"
+    },
+    "toastFail": {
+      "vi": "Cập nhật tham số thất bại!",
+      "en": "Failed to update configuration"
+    }
+  }
 }
