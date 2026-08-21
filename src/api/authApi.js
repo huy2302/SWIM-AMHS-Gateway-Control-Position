@@ -43,6 +43,11 @@ export const authApi = {
 
   // Refresh token
   refreshToken: async () => {
+    const auth = authUtils.getAuth();
+    if (!auth?.token) {
+      authUtils.removeAuth();
+      throw new Error('No token available to refresh');
+    }
     try {
       const response = await axiosClient.post('/auth/refresh');
       authUtils.saveAuth(response);

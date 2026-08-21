@@ -157,6 +157,15 @@ axiosClient.interceptors.response.use(
 
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
+      const currentAuth = authUtils.getAuth();
+      if (!currentAuth?.token) {
+        authUtils.removeAuth();
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
+      }
+
       try {
         const refreshResponse = await axiosClient.post('/auth/refresh');
         const auth = authUtils.getAuth();
@@ -170,7 +179,9 @@ axiosClient.interceptors.response.use(
         return axiosClient(originalRequest);
       } catch (refreshError) {
         authUtils.removeAuth();
-        window.location.href = '/login';
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
       }
     }
 
