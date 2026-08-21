@@ -1,32 +1,26 @@
 {
-  "settings": {
-    "title": {
-      "vi": "Cấu hình hệ thống",
-      "en": "System Settings"
-    },
-    "key": {
-      "vi": "Khóa cấu hình",
-      "en": "Config Key"
-    },
-    "value": {
-      "vi": "Giá trị",
-      "en": "Config Value"
-    },
-    "actions": {
-      "vi": "Thao tác",
-      "en": "Actions"
-    },
-    "noData": {
-      "vi": "Không có cấu hình nào được định nghĩa.",
-      "en": "No configurations defined."
-    },
-    "toast": {
-      "vi": "Cập nhật cấu hình thành công!",
-      "en": "Configuration updated successfully!"
-    },
-    "toastFail": {
-      "vi": "Cập nhật cấu hình thất bại!",
-      "en": "Failed to update configuration"
-    }
-  }
+    "title":  {
+                  "vi":  "Cấu hình Hệ thống",
+                  "en":  "System Configuration"
+              },
+    "subtitle":  {
+                     "vi":  "Quản lý tham số hoạt động của SWIM \u0026 AMHS Gateway",
+                     "en":  "Manage SWIM \u0026 AMHS Gateway operational parameters"
+                 },
+    "amqpConfig":  {
+                       "vi":  "Cấu hình SWIM AMQP Broker",
+                       "en":  "SWIM AMQP Broker Settings"
+                   },
+    "amhsConfig":  {
+                       "vi":  "Cấu hình AMHS MTA Connection",
+                       "en":  "AMHS MTA Connection Settings"
+                   },
+    "save":  {
+                 "vi":  "Lưu cấu hình",
+                 "en":  "Save Configuration"
+             },
+    "reset":  {
+                  "vi":  "Đặt lại",
+                  "en":  "Reset Parameters"
+              }
 }

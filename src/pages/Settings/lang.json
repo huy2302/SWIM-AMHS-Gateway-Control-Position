@@ -1,72 +1,18 @@
 {
-  "title": {
-    "vi": "Cài đặt tài khoản",
-    "en": "Account Settings"
-  },
-  "tabs": {
-    "profile": {
-      "vi": "Trang cá nhân",
-      "en": "Profile"
-    },
-    "security": {
-      "vi": "Bảo mật",
-      "en": "Security"
-    }
-  },
-  "profile": {
-    "title": {
-      "vi": "Thông tin cá nhân",
-      "en": "Personal Information"
-    },
-    "username": {
-      "vi": "Tên đăng nhập",
-      "en": "Username"
-    },
-    "role": {
-      "vi": "Vai trò",
-      "en": "Role"
-    },
-    "roleAdmin": {
-      "vi": "Quản trị viên",
-      "en": "Administrator"
-    },
-    "roleUser": {
-      "vi": "Người dùng",
-      "en": "User"
-    }
-  },
-  "security": {
-    "title": {
-      "vi": "Đổi mật khẩu",
-      "en": "Change Password"
-    },
-    "oldPassword": {
-      "vi": "Mật khẩu hiện tại",
-      "en": "Current Password"
-    },
-    "newPassword": {
-      "vi": "Mật khẩu mới",
-      "en": "New Password"
-    },
-    "confirmPassword": {
-      "vi": "Xác nhận mật khẩu mới",
-      "en": "Confirm New Password"
-    },
-    "submit": {
-      "vi": "Đổi mật khẩu",
-      "en": "Change Password"
-    },
-    "success": {
-      "vi": "Đổi mật khẩu thành công!",
-      "en": "Password changed successfully!"
-    },
-    "errorMismatch": {
-      "vi": "Xác nhận mật khẩu mới không khớp!",
-      "en": "Confirm password does not match!"
-    },
-    "errorEmpty": {
-      "vi": "Vui lòng nhập đầy đủ thông tin!",
-      "en": "Please fill in all fields!"
-    }
-  }
+    "title":  {
+                  "vi":  "Cài đặt Ứng dụng",
+                  "en":  "Application Settings"
+              },
+    "language":  {
+                     "vi":  "Ngôn ngữ hiển thị",
+                     "en":  "Display Language"
+                 },
+    "theme":  {
+                  "vi":  "Giao diện",
+                  "en":  "Color Theme"
+              },
+    "autoRefresh":  {
+                        "vi":  "Tự động làm mới dữ liệu",
+                        "en":  "Auto-refresh Interval"
+                    }
 }

@@ -10,8 +10,8 @@
     }
   },
   "subtitle": {
-    "vi": "",
-    "en": ""
+    "vi": "Cấu hình định tuyến tự động cho các loại điện văn không gian mạng",
+    "en": "Automatic routing rules configuration for aeronautical messages"
   },
   "tabs": {
     "a2s": {

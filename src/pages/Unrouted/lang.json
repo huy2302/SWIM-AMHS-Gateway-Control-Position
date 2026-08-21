@@ -149,7 +149,7 @@
       "en": "Recipients"
     },
     "recipientsPlaceholder": {
-      "vi": "Nhập danh sách địa chỉ nhận, cách nhau bởi khoảng trắng...",
+      "vi": "Nhập danh sách địa chỉ nhận, cách nhau bởi khoảng trống...",
       "en": "Enter recipient addresses separated by spaces..."
     },
     "note": {

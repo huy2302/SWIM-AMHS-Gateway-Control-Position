@@ -1,150 +1,34 @@
 {
-  "title": {
-    "vi": "Giám sát Hệ thống",
-    "en": "System Monitoring"
-  },
-  "subtitle": {
-    "vi": "",
-    "en": ""
-  },
-  "trafficCard": {
-    "swimToAmhs": {
-      "vi": "SWIM → AMHS",
-      "en": "SWIM → AMHS"
-    },
-    "amhsToSwim": {
-      "vi": "AMHS → SWIM",
-      "en": "AMHS → SWIM"
-    },
-    "messages": {
-      "vi": "điện văn",
-      "en": "msgs"
-    },
-    "pending": {
-      "vi": "Pending",
-      "en": "Pending"
-    },
-    "unrouted": {
-      "vi": "Unrouted",
-      "en": "Unrouted"
-    },
-    "delivered": {
-      "vi": "Delivered",
-      "en": "Delivered"
-    },
-    "published": {
-      "vi": "Published",
-      "en": "Published"
-    },
-    "failed": {
-      "vi": "Failed",
-      "en": "Failed"
-    },
-    "successRate": {
-      "vi": "Tỷ lệ thành công",
-      "en": "Success Rate"
-    }
-  },
-  "channels": {
-    "title": {
-      "vi": "Kênh Kết nối",
-      "en": "Channel Status"
-    },
-    "amqp": {
-      "vi": "AMQP Broker",
-      "en": "AMQP Broker"
-    },
-    "amhs": {
-      "vi": "AMHS Mtcu",
-      "en": "AMHS Mtcu"
-    },
-    "connected": {
-      "vi": "Connected",
-      "en": "Connected"
-    },
-    "disconnected": {
-      "vi": "Disconnected",
-      "en": "Disconnected"
-    },
-    "noConfig": {
-      "vi": "Chưa cấu hình kênh",
-      "en": "No channels configured"
-    },
-    "connectedCount": {
-      "vi": "kênh đang kết nối",
-      "en": "channels connected"
-    },
-    "disconnectedCount": {
-      "vi": "kênh mất kết nối",
-      "en": "channels disconnected"
-    }
-  },
-  "server": {
-    "title": {
-      "vi": "Thông tin Server",
-      "en": "Server Info"
-    },
-    "serverName": {
-      "vi": "Tên Server",
-      "en": "Host Name"
-    },
-    "runningSince": {
-      "vi": "Khởi động",
-      "en": "Start Time"
-    },
-    "uptime": {
-      "vi": "Uptime",
-      "en": "Uptime"
-    },
-    "version": {
-      "vi": "Phiên bản",
-      "en": "Version"
-    },
-    "memoryUsage": {
-      "vi": "Heap RAM",
-      "en": "Heap RAM"
-    },
-    "unused": {
-      "vi": "Chưa sử dụng",
-      "en": "Unused"
-    }
-  },
-  "health": {
-    "title": {
-      "vi": "Tình trạng Hệ thống",
-      "en": "System Health"
-    },
-    "error": {
-      "vi": "Lỗi kết nối Máy chủ",
-      "en": "Server Connection Error"
-    },
-    "try": {
-      "vi": "Mất kết nối với máy chủ Gateway",
-      "en": "Lost connection to Gateway Server"
-    },
-    "description": {
-      "vi": "Máy chủ đang hoạt động bình thường",
-      "en": "Server is operating normally"
-    }
-  },
-  "uptime": {
-    "vi": "Uptime máy chủ",
-    "en": "Server Uptime"
-  },
-  "notifications": {
-    "vi": "Thông báo hệ thống",
-    "en": "System Notifications"
-  },
-  "markAllRead": {
-    "vi": "Đánh dấu đã đọc tất cả",
-    "en": "Mark all as read"
-  },
-  "noNotify": {
-    "vi": "Không có thông báo mới",
-    "en": "No new notifications"
-  },
-  "seeAllHistory": {
-    "vi": "Xem toàn bộ lịch sử",
-    "en": "View all history"
-  }
+    "title":  {
+                  "vi":  "Tổng quan Hệ thống Gateway",
+                  "en":  "Gateway Dashboard Overview"
+              },
+    "stats":  {
+                  "totalInbound":  {
+                                       "vi":  "Điện văn SWIM (Inbound)",
+                                       "en":  "SWIM Messages (Inbound)"
+                                   },
+                  "totalOutbound":  {
+                                        "vi":  "Điện văn AMHS (Outbound)",
+                                        "en":  "AMHS Messages (Outbound)"
+                                    },
+                  "unrouted":  {
+                                   "vi":  "Điện văn lỗi tuyến (Unrouted)",
+                                   "en":  "Unrouted Queue"
+                               },
+                  "successRate":  {
+                                      "vi":  "Tỷ lệ chuyển đổi thành công",
+                                      "en":  "Conversion Success Rate"
+                                  }
+              },
+    "charts":  {
+                   "traffic":  {
+                                   "vi":  "Lưu lượng điện văn theo giờ",
+                                   "en":  "Hourly Message Traffic"
+                               },
+                   "distribution":  {
+                                        "vi":  "Phân bố loại điện văn",
+                                        "en":  "Message Type Distribution"
+                                    }
+               }
 }

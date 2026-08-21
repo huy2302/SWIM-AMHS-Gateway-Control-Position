@@ -32,7 +32,7 @@ const MessageView = () => {
     return () => window.removeEventListener("click", handleOutsideClick);
   }, []);
 
-  // Mode: AMQP (SWIM -> AMHS) hoặc X.400 (AMHS -> SWIM)
+  // Mode: AMQP (SWIM -> AMHS) or X.400 (AMHS -> SWIM)
   const [searchType, setSearchType] = useState("AMQP");
   const [rows, setRows] = useState([]);
   
@@ -49,7 +49,7 @@ const MessageView = () => {
     source: '',
   });
 
-  // Gọi API lấy dữ liệu điện văn
+  // Fetch messages API
   const fetchArchiveData = useCallback(async () => {
     setLoading(true);
     try {
@@ -79,7 +79,7 @@ const MessageView = () => {
         setTotalPages(0);
       }
     } catch (error) {
-      console.error("Lỗi khi fetch dữ liệu archive:", error);
+      console.error("Error fetching archive data:", error);
       setRows([]);
       setTotalElements(0);
       setTotalPages(0);
@@ -190,7 +190,7 @@ const MessageView = () => {
               }`}
             >
               <Inbox size={15} />
-              <span>SWIM → AMHS (IN)</span>
+              <span>{t("messages.tabs.amqp")}</span>
             </button>
 
             <button
@@ -206,14 +206,12 @@ const MessageView = () => {
               }`}
             >
               <Send size={15} />
-              <span>AMHS → SWIM (OUT)</span>
+              <span>{t("messages.tabs.x400")}</span>
             </button>
           </div>
 
-          {/* SINGLE UNIFIED SEARCH INPUT & STATUS SELECT */}
+          {/* SEARCH INPUT & STATUS SELECT */}
           <div className="flex flex-wrap items-center gap-2.5 flex-1 max-w-2xl justify-end">
-            
-            {/* 1 Ô TÌM KIẾM DUY NHẤT */}
             <div className="relative flex-1 min-w-[240px]">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -223,7 +221,7 @@ const MessageView = () => {
                   setSearchQuery(e.target.value);
                   setPage(0);
                 }}
-                placeholder="Tìm kiếm điện văn (Callsign, Địa chỉ, Mã tin, Nội dung...)"
+                placeholder={t("messages.toolbar.searchPlaceholder")}
                 className="w-full pl-9 pr-8 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 font-medium transition-all"
               />
               {searchQuery && (
@@ -241,14 +239,14 @@ const MessageView = () => {
 
             {/* Status Select */}
             <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0">
-              <span className="text-[10px] text-slate-500 font-bold">{t("messages.filters.status.label")}:</span>
+              <span className="text-[10px] text-slate-500 font-bold">{t("messages.toolbar.status")}</span>
               <select
                 value={filters.status}
                 onChange={(e) => {
                   setFilters((prev) => ({ ...prev, status: e.target.value }));
                   setPage(0);
                 }}
-                className="bg-transparent text-xs outline-none text-slate-800 font-bold cursor-pointer"
+                className="bg-transparent text-xs font-bold text-slate-700 outline-none cursor-pointer"
               >
                 <option value="">{t("messages.status.ALL")}</option>
                 {searchType === "AMQP" ? (
@@ -280,9 +278,8 @@ const MessageView = () => {
               <button
                 onClick={handleResetFilters}
                 className="px-2.5 py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 transition-colors font-medium cursor-pointer"
-                title="Xóa bộ lọc"
               >
-                Xóa lọc
+                {t("messages.toolbar.resetFilter")}
               </button>
             )}
           </div>
@@ -499,7 +496,7 @@ const MessageView = () => {
                     <div className="flex items-center gap-2">
                       <h3 className="font-bold text-base text-slate-900">{t("messages.drawer.title")} #{selectedItem.msgid}</h3>
                       <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                        {searchType === "AMQP" ? "SWIM → AMHS" : "AMHS → SWIM"}
+                        {searchType === "AMQP" ? t("messages.tabs.amqp") : t("messages.tabs.x400")}
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-500 font-mono mt-0.5">
@@ -514,7 +511,7 @@ const MessageView = () => {
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition-all cursor-pointer"
                   >
                     {isCopied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                    <span>{isCopied ? "Đã chép" : "Sao chép"}</span>
+                    <span>{isCopied ? t("messages.drawer.buttons.copied") : t("messages.drawer.buttons.copy")}</span>
                   </button>
                   <button
                     onClick={() => setSelectedItem(null)}
@@ -531,26 +528,26 @@ const MessageView = () => {
                 {/* METADATA CARDS GRID */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">Người phát (Originator)</span>
+                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">{t("messages.drawer.fields.origin")}</span>
                     <span className="font-mono font-bold text-sm text-slate-900">{selectedItem.origin || "-"}</span>
                   </div>
 
                   <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">Người nhận (Recipients)</span>
+                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">{t("messages.drawer.fields.address")}</span>
                     <span className="font-mono font-semibold text-xs text-slate-800 truncate" title={selectedItem.amhsRecipients || selectedItem.address}>
                       {selectedItem.amhsRecipients || selectedItem.address || "-"}
                     </span>
                   </div>
 
                   <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">Thời điểm tiếp nhận</span>
+                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">{t("messages.drawer.fields.time")}</span>
                     <span className="font-mono font-semibold text-xs text-slate-800">
                       {selectedItem.time ? new Date(selectedItem.time).toLocaleString() : "-"}
                     </span>
                   </div>
 
                   <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">Trạng thái xử lý</span>
+                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">{t("messages.drawer.fields.status")}</span>
                     <div>
                       {searchType === "AMQP" ? renderSwimStatus(selectedItem.status) : renderAmhsStatus(selectedItem.status)}
                     </div>
@@ -558,20 +555,49 @@ const MessageView = () => {
                 </div>
 
                 {/* ADDITIONAL FIELDS */}
-                <div className="p-3.5 bg-slate-50/80 border border-slate-200 rounded-xl grid grid-cols-3 gap-3 text-xs">
+                <div className="p-3.5 bg-slate-50/80 border border-slate-200 rounded-xl grid grid-cols-4 gap-3 text-xs">
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 block">Filing Time</span>
-                    <span className="font-mono font-semibold text-slate-800">{selectedItem.filingTime || "-"}</span>
+                    <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.filingTime")}</span>
+                    <span className="font-mono font-semibold text-slate-800">{selectedItem.filingTime || selectedItem.amhs_ats_ft || "-"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-slate-500 block">Body Part Type</span>
+                    <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.atsPriority")}</span>
+                    <span className="font-mono font-semibold text-slate-800">{selectedItem.atsPriority || selectedItem.amhsPriority || selectedItem.amhs_ats_pri || "-"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.optionalHeading")}</span>
+                    <span className="font-mono font-semibold text-slate-800 truncate block" title={selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}>{selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.bodyPartType")}</span>
                     <span className="font-mono font-semibold text-slate-800">{selectedItem.bodyPartType || selectedItem.bodyType || "ia5-text"}</span>
                   </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-500 block">Source / Topic</span>
-                    <span className="font-mono font-semibold text-slate-800 truncate block" title={selectedItem.source}>{selectedItem.source || "-"}</span>
-                  </div>
                 </div>
+
+                {(selectedItem.subject || selectedItem.ipmId || selectedItem.amhs_ipm_id) && (
+                  <div className="p-3.5 bg-slate-50/80 border border-slate-200 rounded-xl grid grid-cols-2 gap-3 text-xs">
+                    {selectedItem.subject && (
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.subject")}</span>
+                        <span className="font-mono font-semibold text-slate-800">{selectedItem.subject}</span>
+                      </div>
+                    )}
+                    {(selectedItem.ipmId || selectedItem.amhs_ipm_id) && (
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.ipmId")}</span>
+                        <span className="font-mono font-semibold text-slate-800">{selectedItem.ipmId || selectedItem.amhs_ipm_id}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {(selectedItem.rejectionReason || selectedItem.rejectionDiagnostic) && (
+                  <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex flex-col gap-1 text-xs text-rose-800 font-mono">
+                    <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">{t("messages.drawer.sections.rejectionInfo")}</span>
+                    <div>{t("messages.drawer.fields.rejectionReason")}: <strong>{selectedItem.rejectionReason}</strong></div>
+                    {selectedItem.rejectionDiagnostic && <div>{t("messages.drawer.fields.rejectionDiagnostic")}: <strong>{selectedItem.rejectionDiagnostic}</strong></div>}
+                  </div>
+                )}
 
                 {/* RAW CONTENT CODE BLOCK */}
                 <div className="flex flex-col gap-2 flex-1 min-h-[220px]">
@@ -584,7 +610,7 @@ const MessageView = () => {
 
                   <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-slate-50 flex-1 min-h-[180px] shadow-inner">
                     <pre className="p-4 text-slate-900 font-mono text-xs overflow-x-auto whitespace-pre-wrap leading-relaxed custom-scrollbar h-full max-h-[300px] font-semibold">
-                      {selectedItem.payloadContent || selectedItem.text || t("global.noData")}
+                      {selectedItem.payloadContent || selectedItem.text || "-"}
                     </pre>
                   </div>
                 </div>

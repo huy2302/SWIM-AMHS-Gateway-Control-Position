@@ -5,18 +5,18 @@
   },
   "tabs": {
     "amqp": {
-      "vi": "SWIM → AMHS",
-      "en": "SWIM → AMHS"
+      "vi": "SWIM → AMHS (IN)",
+      "en": "SWIM → AMHS (IN)"
     },
     "x400": {
-      "vi": "AMHS → SWIM",
-      "en": "AMHS → SWIM"
+      "vi": "AMHS → SWIM (OUT)",
+      "en": "AMHS → SWIM (OUT)"
     }
   },
   "toolbar": {
     "searchPlaceholder": {
-      "vi": "Tìm theo Callsign, Message ID, Origin, Addressee...",
-      "en": "Search Callsign, Message ID, Origin, Addressee..."
+      "vi": "Tìm kiếm điện văn (Callsign, Địa chỉ, Mã tin, Nội dung...)",
+      "en": "Search messages (Callsign, Address, Message ID, Content...)"
     },
     "status": {
       "vi": "Trạng thái:",
@@ -25,6 +25,10 @@
     "refresh": {
       "vi": "Làm mới",
       "en": "Refresh"
+    },
+    "resetFilter": {
+      "vi": "Xóa lọc",
+      "en": "Clear Filters"
     }
   },
   "table": {
@@ -119,12 +123,16 @@
     "CANCELLED": {
       "vi": "Cancelled",
       "en": "Cancelled"
+    },
+    "UNKNOWN": {
+      "vi": "Không xác định",
+      "en": "Unknown"
     }
   },
   "drawer": {
     "title": {
-      "vi": "Điện văn",
-      "en": "Message"
+      "vi": "Chi tiết điện văn",
+      "en": "Message Details"
     },
     "fields": {
       "messageId": {
@@ -132,38 +140,70 @@
         "en": "Message ID"
       },
       "origin": {
-        "vi": "Originator",
+        "vi": "Người phát (Originator)",
         "en": "Originator"
       },
       "address": {
-        "vi": "Addressee",
-        "en": "Addressee"
+        "vi": "Người nhận (Recipients)",
+        "en": "Recipients"
       },
       "time": {
+        "vi": "Thời điểm tiếp nhận",
+        "en": "Received Time"
+      },
+      "filingTime": {
         "vi": "Filing Time",
         "en": "Filing Time"
       },
       "priority": {
-        "vi": "Priority",
+        "vi": "Độ ưu tiên",
         "en": "Priority"
       },
+      "atsPriority": {
+        "vi": "Độ ưu tiên ATS",
+        "en": "ATS Priority"
+      },
+      "optionalHeading": {
+        "vi": "Tiêu đề phụ (OHI)",
+        "en": "Optional Heading (OHI)"
+      },
+      "ipmId": {
+        "vi": "Mã IPM ID",
+        "en": "IPM ID"
+      },
+      "bodyPartType": {
+        "vi": "Loại Body Part",
+        "en": "Body Part Type"
+      },
       "subject": {
-        "vi": "Subject",
+        "vi": "Tiêu đề",
         "en": "Subject"
       },
       "source": {
-        "vi": "Channel",
-        "en": "Channel"
+        "vi": "Nguồn / Topic",
+        "en": "Source / Topic"
       },
       "status": {
-        "vi": "Status",
-        "en": "Status"
+        "vi": "Trạng thái xử lý",
+        "en": "Processing Status"
+      },
+      "rejectionReason": {
+        "vi": "Lý do từ chối",
+        "en": "Rejection Reason"
+      },
+      "rejectionDiagnostic": {
+        "vi": "Mã chẩn đoán",
+        "en": "Diagnostic Code"
       }
     },
     "sections": {
       "rawMessage": {
         "vi": "Nội Dung Gốc",
         "en": "Raw Payload"
+      },
+      "rejectionInfo": {
+        "vi": "Thông tin từ chối",
+        "en": "Rejection Information"
       }
     },
     "buttons": {
@@ -183,19 +223,19 @@
   },
   "actions": {
     "retry": {
-      "vi": "Retry",
+      "vi": "Thử lại",
       "en": "Retry"
     },
     "resolve": {
-      "vi": "Resolve",
+      "vi": "Giải quyết",
       "en": "Resolve"
     },
     "cancel": {
-      "vi": "Cancel",
+      "vi": "Hủy bỏ",
       "en": "Cancel"
     },
     "delete": {
-      "vi": "Delete",
+      "vi": "Xóa",
       "en": "Delete"
     }
   },
