@@ -1,56 +1,156 @@
 {
-    "title":  {
-                  "vi":  "Cảnh báo \u0026 Sự cố",
-                  "en":  "Alerts \u0026 Incidents"
-              },
-    "subtitle":  {
-                     "vi":  "Theo dõi danh sách cảnh báo hệ thống theo thời gian thực",
-                     "en":  "Real-time system alerts monitoring"
-                 },
-    "search":  {
-                   "vi":  "Tìm kiếm cảnh báo...",
-                   "en":  "Search alerts..."
-               },
-    "severity":  {
-                     "vi":  "Mức độ:",
-                     "en":  "Severity:"
-                 },
-    "all":  {
-                "vi":  "Tất cả",
-                "en":  "All"
-            },
-    "critical":  {
-                     "vi":  "Nghiêm trọng (Critical)",
-                     "en":  "Critical"
-                 },
-    "warning":  {
-                    "vi":  "Cảnh báo (Warning)",
-                    "en":  "Warning"
-                },
-    "info":  {
-                 "vi":  "Thông tin (Info)",
-                 "en":  "Info"
-             },
-    "table":  {
-                  "time":  {
-                               "vi":  "Thời gian",
-                               "en":  "Timestamp"
-                           },
-                  "severity":  {
-                                   "vi":  "Mức độ",
-                                   "en":  "Severity"
-                               },
-                  "source":  {
-                                 "vi":  "Nguồn phát sinh",
-                                 "en":  "Source"
-                             },
-                  "message":  {
-                                  "vi":  "Nội dung cảnh báo",
-                                  "en":  "Alert Message"
-                              },
-                  "status":  {
-                                 "vi":  "Trạng thái",
-                                 "en":  "Status"
-                             }
-              }
+  "title": {
+    "vi": "Cảnh báo & Sự cố",
+    "en": "Alerts & Incidents"
+  },
+  "subtitle": {
+    "vi": "Theo dõi danh sách cảnh báo hệ thống theo thời gian thực",
+    "en": "Real-time system alerts monitoring"
+  },
+  "searchPlaceholder": {
+    "vi": "Tìm kiếm cảnh báo...",
+    "en": "Search alerts..."
+  },
+  "filterStatus": {
+    "ACTIVE": {
+      "vi": "Đang hoạt động",
+      "en": "Active"
+    },
+    "ACKNOWLEDGED": {
+      "vi": "Đã xác nhận",
+      "en": "Acknowledged"
+    },
+    "RESOLVED": {
+      "vi": "Đã xử lý",
+      "en": "Resolved"
+    },
+    "ALL": {
+      "vi": "Tất cả",
+      "en": "All"
+    }
+  },
+  "buttons": {
+    "bulkAck": {
+      "vi": "Xác nhận tất cả",
+      "en": "Bulk Acknowledge"
+    },
+    "bulkResolve": {
+      "vi": "Giải quyết tất cả",
+      "en": "Bulk Resolve"
+    }
+  },
+  "severity": {
+    "CRITICAL": {
+      "vi": "Nghiêm trọng",
+      "en": "Critical"
+    },
+    "ERROR": {
+      "vi": "Lỗi",
+      "en": "Error"
+    },
+    "WARNING": {
+      "vi": "Cảnh báo",
+      "en": "Warning"
+    },
+    "WARN": {
+      "vi": "Cảnh báo",
+      "en": "Warning"
+    },
+    "INFO": {
+      "vi": "Thông tin",
+      "en": "Info"
+    }
+  },
+  "table": {
+    "time": {
+      "vi": "Thời gian phát sinh",
+      "en": "Timestamp"
+    },
+    "level": {
+      "vi": "Mức độ",
+      "en": "Level"
+    },
+    "module": {
+      "vi": "Phân hệ / Loại cảnh báo",
+      "en": "Module / Alert Type"
+    },
+    "message": {
+      "vi": "Nội dung cảnh báo",
+      "en": "Alert Message"
+    },
+    "ackBy": {
+      "vi": "Người xác nhận",
+      "en": "Acknowledged By"
+    },
+    "resolvedAt": {
+      "vi": "Thời gian xử lý",
+      "en": "Resolved At"
+    },
+    "actions": {
+      "vi": "Thao tác",
+      "en": "Actions"
+    }
+  },
+  "actions": {
+    "ack": {
+      "vi": "Xác nhận",
+      "en": "Acknowledge"
+    },
+    "resolve": {
+      "vi": "Đã xử lý",
+      "en": "Resolve"
+    }
+  },
+  "state": {
+    "loading": {
+      "vi": "Đang tải danh sách cảnh báo...",
+      "en": "Loading alerts..."
+    },
+    "empty": {
+      "vi": "Không có cảnh báo nào.",
+      "en": "No alerts found."
+    },
+    "resolved": {
+      "vi": "Đã xong",
+      "en": "Resolved"
+    }
+  },
+  "messages": {
+    "loadError": {
+      "vi": "Tải danh sách cảnh báo thất bại",
+      "en": "Failed to load alerts"
+    },
+    "ackSuccess": {
+      "vi": "Đã xác nhận cảnh báo!",
+      "en": "Alert acknowledged!"
+    },
+    "ackFailed": {
+      "vi": "Xác nhận cảnh báo thất bại",
+      "en": "Failed to acknowledge alert"
+    },
+    "resolveSuccess": {
+      "vi": "Đã xử lý xong cảnh báo!",
+      "en": "Alert resolved!"
+    },
+    "resolveFailed": {
+      "vi": "Xử lý cảnh báo thất bại",
+      "en": "Failed to resolve alert"
+    },
+    "bulkAckSuccess": {
+      "vi": "Đã xác nhận tất cả cảnh báo!",
+      "en": "All alerts acknowledged!"
+    },
+    "bulkAckFailed": {
+      "vi": "Xác nhận hàng loạt thất bại",
+      "en": "Failed to bulk acknowledge alerts"
+    },
+    "bulkResolveSuccess": {
+      "vi": "Đã xử lý tất cả cảnh báo!",
+      "en": "All alerts resolved!"
+    },
+    "bulkResolveFailed": {
+      "vi": "Xử lý hàng loạt thất bại",
+      "en": "Failed to bulk resolve alerts"
+    }
+  }
 }
