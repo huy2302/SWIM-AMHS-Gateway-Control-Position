@@ -1,17 +1,13 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
 import {
   Search,
   XCircle,
-  MoreVertical,
-  RotateCcw,
-  CheckCircle,
-  Ban,
-  Trash2,
   Copy,
   Check,
-  FileText,
   Send,
-  Inbox
+  Inbox,
+  AlertCircle
 } from "lucide-react";
 import toast from "react-hot-toast";
 import DashboardLayout from "@/layout/DashboardLayout";
@@ -20,17 +16,74 @@ import TablePagination from "@/components/TablePagination";
 import { t } from "@/i18n/translator";
 
 const MessageView = () => {
-  const [activeMenuId, setActiveMenuId] = useState(null);
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const hasAutoOpenedRef = useRef(false);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
-  useEffect(() => {
-    const handleOutsideClick = () => setActiveMenuId(null);
-    window.addEventListener("click", handleOutsideClick);
-    return () => window.removeEventListener("click", handleOutsideClick);
-  }, []);
+  const handleCloseModal = () => {
+    hasAutoOpenedRef.current = true;
+    setSelectedItem(null);
+    setSelectedId(null);
+    window.history.replaceState({}, document.title);
+  };
+
+  const handleSelectMessage = async (row) => {
+    const rowId = row.msgid || row.id;
+    setSelectedId(rowId);
+    setSelectedItem(row);
+    try {
+      const fetchFunc = searchType === "AMQP" 
+        ? gatewayApi.getInboundMessageById 
+        : gatewayApi.getOutboundMessageById;
+      const res = await fetchFunc(rowId);
+      if (res && res.message) {
+        setSelectedItem(prev => ({
+          ...prev,
+          ...res.message,
+          dispatches: res.dispatches || []
+        }));
+      }
+    } catch (err) {
+      console.warn("Could not load extended detail for message:", err);
+    }
+  };
+
+  const isFailedStatus = (status, type) => {
+    if (type === "AMQP") return Number(status) === 4;
+    return Number(status) === 3;
+  };
+
+  const isUnroutedStatus = (status, type) => {
+    if (type === "AMQP") return Number(status) === 1;
+    return Number(status) === 4;
+  };
+
+  const getRejectionInfo = (item) => {
+    if (!item) return { rejReason: null, rejDiag: null, hasError: false };
+    const rejReason = 
+      item.rejectionReason || 
+      item.parsedAmqpProperties?.rejection_reason || 
+      item.parsedAmqpProperties?.rejectionReason || null;
+
+    const rejDiag = 
+      item.rejectionDiagnostic || 
+      item.parsedAmqpProperties?.rejection_note || 
+      item.parsedAmqpProperties?.rejectionDiagnostic ||
+      item.errorDesc ||
+      (item.dispatches?.find(d => d.lastError)?.lastError) || null;
+
+    const hasError = Boolean(
+      rejReason || 
+      rejDiag || 
+      (item.dispatches && item.dispatches.some(d => d.lastError || d.status === 'FAILED' || d.status === 'DEAD'))
+    );
+
+    return { rejReason, rejDiag, hasError };
+  };
 
   // Mode: AMQP (SWIM -> AMHS) or X.400 (AMHS -> SWIM)
   const [searchType, setSearchType] = useState("AMQP");
@@ -92,67 +145,42 @@ const MessageView = () => {
     fetchArchiveData();
   }, [fetchArchiveData]);
 
-  const handleRetry = async (id) => {
-    try {
-      if (searchType === "AMQP") {
-        await gatewayApi.retryInboundMessage(id);
-      } else {
-        await gatewayApi.retryOutboundMessage(id);
+  // Handle deep-linking navigation from Logs, Alerts, or Unrouted Queue
+  useEffect(() => {
+    const queryParam = searchParams.get("search") || location.state?.searchQuery;
+    const typeParam = searchParams.get("type") || location.state?.searchType;
+    
+    if (queryParam) {
+      setSearchQuery(queryParam);
+      if (typeParam && (typeParam === "AMQP" || typeParam === "X400")) {
+        setSearchType(typeParam);
       }
-      toast.success(t("messages.ops.retrySuccess"));
-      fetchArchiveData();
-    } catch (error) {
-      console.error("Retry failed:", error);
-      toast.error(t("messages.ops.retryFailed"));
+      setPage(0);
+      hasAutoOpenedRef.current = false;
     }
-  };
+  }, [location.state, searchParams]);
 
-  const handleResolve = async (id) => {
-    try {
-      if (searchType === "AMQP") {
-        await gatewayApi.resolveInboundMessage(id);
-      } else {
-        await gatewayApi.resolveOutboundMessage(id);
+  // Auto-open modal when navigating with autoOpen flag (run once only)
+  useEffect(() => {
+    if (!hasAutoOpenedRef.current && location.state?.autoOpen && rows.length > 0) {
+      const q = (location.state.searchQuery || searchParams.get("search") || "").trim().toLowerCase();
+      if (q) {
+        const match = rows.find(r => 
+          String(r.id || "").toLowerCase() === q ||
+          String(r.msgid || "").toLowerCase() === q ||
+          String(r.messageId || "").toLowerCase() === q ||
+          String(r.amhsid || "").toLowerCase() === q ||
+          String(r.ipmId || "").toLowerCase() === q ||
+          String(r.mtsId || "").toLowerCase() === q
+        ) || rows[0];
+        if (match) {
+          hasAutoOpenedRef.current = true;
+          handleSelectMessage(match);
+          window.history.replaceState({}, document.title);
+        }
       }
-      toast.success(t("messages.ops.resolveSuccess"));
-      fetchArchiveData();
-    } catch (error) {
-      console.error("Resolve failed:", error);
-      toast.error(t("messages.ops.resolveFailed"));
     }
-  };
-
-  const handleCancel = async (id) => {
-    try {
-      if (searchType === "AMQP") {
-        await gatewayApi.cancelInboundMessage(id);
-      } else {
-        await gatewayApi.cancelOutboundMessage(id);
-      }
-      toast.success(t("messages.ops.cancelSuccess"));
-      fetchArchiveData();
-    } catch (error) {
-      console.error("Cancel failed:", error);
-      toast.error(t("messages.ops.cancelFailed"));
-    }
-  };
-
-  const handleDeleteMessage = async (id) => {
-    if (!window.confirm(t("messages.ops.deleteConfirm"))) return;
-    try {
-      if (searchType === "AMQP") {
-        await gatewayApi.deleteInboundMessage(id);
-      } else {
-        await gatewayApi.deleteOutboundMessage(id);
-      }
-      toast.success(t("messages.ops.deleteSuccess"));
-      setSelectedId(null);
-      fetchArchiveData();
-    } catch (error) {
-      console.error("Delete failed:", error);
-      toast.error(t("messages.ops.deleteFailed"));
-    }
-  };
+  }, [rows, location.state, searchParams]);
 
   const handleResetFilters = () => {
     setSearchQuery("");
@@ -298,11 +326,11 @@ const MessageView = () => {
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.messageId")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.time")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.topic")}</th>
+                      <th className="px-4 py-3 font-semibold">{t("messages.table.columns.atsmhsLevel")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.origin")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.address")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.payload")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.status")}</th>
-                      <th className="px-4 py-3 font-semibold text-right">{t("messages.table.columns.actions")}</th>
                     </>
                   ) : (
                     <>
@@ -313,7 +341,6 @@ const MessageView = () => {
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.amhsId")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.payload")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.status")}</th>
-                      <th className="px-4 py-3 font-semibold text-right">{t("messages.table.columns.actions")}</th>
                     </>
                   )}
                 </tr>
@@ -321,13 +348,13 @@ const MessageView = () => {
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={10} className="text-center py-8 text-slate-400 font-medium">
+                    <td colSpan={searchType === "AMQP" ? 9 : 7} className="text-center py-8 text-slate-400 font-medium">
                       {t("messages.table.loading")}
                     </td>
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="text-center py-8 text-slate-400 font-medium">
+                    <td colSpan={searchType === "AMQP" ? 9 : 7} className="text-center py-8 text-slate-400 font-medium">
                       {t("messages.table.empty")}
                     </td>
                   </tr>
@@ -340,10 +367,7 @@ const MessageView = () => {
                     return (
                       <tr
                         key={rowId}
-                        onClick={() => {
-                          setSelectedId(rowId);
-                          setSelectedItem(row);
-                        }}
+                        onClick={() => handleSelectMessage(row)}
                         className={`cursor-pointer transition-all border-b border-slate-100 ${
                           isSelected
                             ? "bg-indigo-50/70 text-slate-900 font-semibold ring-1 ring-indigo-200"
@@ -356,53 +380,12 @@ const MessageView = () => {
                             <td className="px-4 py-3 font-mono text-[11px] max-w-[140px] truncate" title={row.messageId}>{row.messageId || "-"}</td>
                             <td className="px-4 py-3 whitespace-nowrap">{row.time ? new Date(row.time).toLocaleString() : "-"}</td>
                             <td className="px-4 py-3 font-mono text-[11px] text-slate-600">{row.source || "-"}</td>
+                            <td className="px-4 py-3 whitespace-nowrap">{renderAtsmhsLevel(row.atsmhsServiceLevel)}</td>
                             <td className="px-4 py-3 font-mono font-bold text-slate-800">{row.origin || "-"}</td>
                             <td className="px-4 py-3 font-mono text-[11px] max-w-[150px] truncate text-slate-600" title={row.amhsRecipients || row.address}>{row.amhsRecipients || row.address || "-"}</td>
-                            <td className="px-4 py-3 max-w-[240px] truncate font-mono text-[11px]" title={rawContent}>{rawContent}</td>
-                            <td className="px-4 py-3 whitespace-nowrap">{renderSwimStatus(row.status)}</td>
-                            <td className="px-4 py-3 text-right relative" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActiveMenuId(activeMenuId === rowId ? null : rowId);
-                                }}
-                                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                              >
-                                <MoreVertical size={15} />
-                              </button>
-                              {activeMenuId === rowId && (
-                                <div className="absolute right-4 mt-1 w-32 bg-white border border-slate-200 rounded-xl shadow-lg z-30 py-1.5 animate-zoom-in text-left">
-                                  <button
-                                    onClick={() => { handleRetry(rowId); setActiveMenuId(null); }}
-                                    className="w-full px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <RotateCcw size={13} className="text-blue-500" />
-                                    {t("messages.actions.retry")}
-                                  </button>
-                                  <button
-                                    onClick={() => { handleResolve(rowId); setActiveMenuId(null); }}
-                                    className="w-full px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <CheckCircle size={13} className="text-green-500" />
-                                    {t("messages.actions.resolve")}
-                                  </button>
-                                  <button
-                                    onClick={() => { handleCancel(rowId); setActiveMenuId(null); }}
-                                    className="w-full px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Ban size={13} className="text-amber-500" />
-                                    {t("messages.actions.cancel")}
-                                  </button>
-                                  <div className="h-px bg-slate-100 my-1" />
-                                  <button
-                                    onClick={() => { handleDeleteMessage(rowId); setActiveMenuId(null); }}
-                                    className="w-full px-3 py-1.5 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Trash2 size={13} className="text-rose-500" />
-                                    {t("messages.actions.delete")}
-                                  </button>
-                                </div>
-                              )}
+                            <td className="px-4 py-3 max-w-[220px] truncate font-mono text-[11px]" title={rawContent}>{rawContent}</td>
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              {renderSwimStatus(row.status)}
                             </td>
                           </>
                         ) : (
@@ -413,50 +396,8 @@ const MessageView = () => {
                             <td className="px-4 py-3 font-mono text-[11px] text-slate-600">{row.filingTime || "-"}</td>
                             <td className="px-4 py-3 font-mono text-[11px] max-w-[140px] truncate" title={row.amhsid}>{row.amhsid || "-"}</td>
                             <td className="px-4 py-3 max-w-[240px] truncate font-mono text-[11px]" title={rawContent}>{rawContent}</td>
-                            <td className="px-4 py-3 whitespace-nowrap">{renderAmhsStatus(row.status)}</td>
-                            <td className="px-4 py-3 text-right relative" onClick={(e) => e.stopPropagation()}>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setActiveMenuId(activeMenuId === rowId ? null : rowId);
-                                }}
-                                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
-                              >
-                                <MoreVertical size={15} />
-                              </button>
-                              {activeMenuId === rowId && (
-                                <div className="absolute right-4 mt-1 w-32 bg-white border border-slate-200 rounded-xl shadow-lg z-30 py-1.5 animate-zoom-in text-left">
-                                  <button
-                                    onClick={() => { handleRetry(rowId); setActiveMenuId(null); }}
-                                    className="w-full px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <RotateCcw size={13} className="text-blue-500" />
-                                    {t("messages.actions.retry")}
-                                  </button>
-                                  <button
-                                    onClick={() => { handleResolve(rowId); setActiveMenuId(null); }}
-                                    className="w-full px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <CheckCircle size={13} className="text-green-500" />
-                                    {t("messages.actions.resolve")}
-                                  </button>
-                                  <button
-                                    onClick={() => { handleCancel(rowId); setActiveMenuId(null); }}
-                                    className="w-full px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Ban size={13} className="text-amber-500" />
-                                    {t("messages.actions.cancel")}
-                                  </button>
-                                  <div className="h-px bg-slate-100 my-1" />
-                                  <button
-                                    onClick={() => { handleDeleteMessage(rowId); setActiveMenuId(null); }}
-                                    className="w-full px-3 py-1.5 text-[11px] font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <Trash2 size={13} className="text-rose-500" />
-                                    {t("messages.actions.delete")}
-                                  </button>
-                                </div>
-                              )}
+                            <td className="px-4 py-3 whitespace-nowrap">
+                              {renderAmhsStatus(row.status)}
                             </td>
                           </>
                         )}
@@ -483,134 +424,263 @@ const MessageView = () => {
 
         {/* CENTER DETAIL MODAL */}
         {selectedItem && (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in" onClick={() => setSelectedItem(null)}>
-            <div className="w-[720px] max-w-full bg-white max-h-[88vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-zoom-in border border-slate-200" onClick={(e) => e.stopPropagation()}>
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in" onClick={handleCloseModal}>
+            <div className="w-[860px] max-w-full bg-white max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-zoom-in border border-slate-200" onClick={(e) => e.stopPropagation()}>
               
               {/* MODAL HEADER */}
-              <div className="px-6 py-4 bg-white text-slate-900 border-b border-slate-200 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-slate-100 text-slate-700 rounded-xl border border-slate-200">
-                    <FileText size={20} />
+              <div className="px-6 py-4 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`p-2 rounded-xl flex items-center justify-center ${
+                    searchType === "AMQP" ? "bg-purple-100 text-purple-700" : "bg-sky-100 text-sky-700"
+                  }`}>
+                    {searchType === "AMQP" ? <Inbox size={20} /> : <Send size={20} />}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-base text-slate-900">{t("messages.drawer.title")} #{selectedItem.msgid}</h3>
-                      <span className="px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                        {searchType === "AMQP" ? t("messages.tabs.amqp") : t("messages.tabs.x400")}
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h3 className="font-bold text-base text-slate-900 m-0">
+                        {t("messages.drawer.title")} #{selectedItem.msgid}
+                      </h3>
+                      <span className={`px-2.5 py-0.5 rounded text-[11px] font-bold border ${
+                        searchType === "AMQP" 
+                          ? "bg-purple-50 text-purple-700 border-purple-200" 
+                          : "bg-sky-50 text-sky-700 border-sky-200"
+                      }`}>
+                        {searchType === "AMQP" ? "SWIM ➔ AMHS (IN)" : "AMHS ➔ SWIM (OUT)"}
                       </span>
+                      <div>
+                        {searchType === "AMQP" ? renderSwimStatus(selectedItem.status) : renderAmhsStatus(selectedItem.status)}
+                      </div>
                     </div>
-                    <p className="text-[11px] text-slate-500 font-mono mt-0.5">
-                      {selectedItem.messageId || selectedItem.amhsid || selectedItem.ipmId || "N/A"}
-                    </p>
+                    {(selectedItem.messageId || selectedItem.amhsid || selectedItem.ipmId) && (
+                      <p className="text-xs text-slate-500 font-mono mt-0.5 truncate max-w-lg" title={selectedItem.messageId || selectedItem.amhsid || selectedItem.ipmId}>
+                        ID: {selectedItem.messageId || selectedItem.amhsid || selectedItem.ipmId}
+                      </p>
+                    )}
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => handleCopy(selectedItem.payloadContent || selectedItem.text)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-200 transition-all cursor-pointer"
-                  >
-                    {isCopied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                    <span>{isCopied ? t("messages.drawer.buttons.copied") : t("messages.drawer.buttons.copy")}</span>
-                  </button>
-                  <button
-                    onClick={() => setSelectedItem(null)}
-                    className="p-1.5 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <XCircle size={20} />
-                  </button>
-                </div>
+                <button
+                  onClick={handleCloseModal}
+                  className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 rounded-lg text-sm font-bold transition-all cursor-pointer"
+                >
+                  <XCircle size={20} />
+                </button>
               </div>
 
               {/* MODAL BODY */}
-              <div className="p-6 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-5">
+              <div className="p-6 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-5 text-xs bg-slate-50/30">
                 
-                {/* METADATA CARDS GRID */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">{t("messages.drawer.fields.origin")}</span>
-                    <span className="font-mono font-bold text-sm text-slate-900">{selectedItem.origin || "-"}</span>
+                {/* 1. KEY METADATA SUMMARY BAR */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.origin")}:</span>
+                    <span className="font-mono font-bold text-slate-900 text-sm truncate" title={selectedItem.origin || "-"}>
+                      {selectedItem.origin || "-"}
+                    </span>
                   </div>
 
-                  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">{t("messages.drawer.fields.address")}</span>
-                    <span className="font-mono font-semibold text-xs text-slate-800 truncate" title={selectedItem.amhsRecipients || selectedItem.address}>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.address")}:</span>
+                    <span className="font-mono font-bold text-indigo-700 text-xs truncate" title={selectedItem.amhsRecipients || selectedItem.address || "-"}>
                       {selectedItem.amhsRecipients || selectedItem.address || "-"}
                     </span>
                   </div>
 
-                  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">{t("messages.drawer.fields.time")}</span>
-                    <span className="font-mono font-semibold text-xs text-slate-800">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.time")}:</span>
+                    <span className="font-mono font-semibold text-slate-800 text-xs truncate" title={selectedItem.time ? new Date(selectedItem.time).toLocaleString() : "-"}>
                       {selectedItem.time ? new Date(selectedItem.time).toLocaleString() : "-"}
                     </span>
                   </div>
 
-                  <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-xl flex flex-col gap-1">
-                    <span className="text-[10px] font-bold text-slate-500 tracking-wider">{t("messages.drawer.fields.status")}</span>
-                    <div>
-                      {searchType === "AMQP" ? renderSwimStatus(selectedItem.status) : renderAmhsStatus(selectedItem.status)}
-                    </div>
-                  </div>
-                </div>
-
-                {/* ADDITIONAL FIELDS */}
-                <div className="p-3.5 bg-slate-50/80 border border-slate-200 rounded-xl grid grid-cols-4 gap-3 text-xs">
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.filingTime")}</span>
-                    <span className="font-mono font-semibold text-slate-800">{selectedItem.filingTime || selectedItem.amhs_ats_ft || "-"}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.atsPriority")}</span>
-                    <span className="font-mono font-semibold text-slate-800">{selectedItem.atsPriority || selectedItem.amhsPriority || selectedItem.amhs_ats_pri || "-"}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.optionalHeading")}</span>
-                    <span className="font-mono font-semibold text-slate-800 truncate block" title={selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}>{selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.bodyPartType")}</span>
-                    <span className="font-mono font-semibold text-slate-800">{selectedItem.bodyPartType || selectedItem.bodyType || "ia5-text"}</span>
-                  </div>
-                </div>
-
-                {(selectedItem.subject || selectedItem.ipmId || selectedItem.amhs_ipm_id) && (
-                  <div className="p-3.5 bg-slate-50/80 border border-slate-200 rounded-xl grid grid-cols-2 gap-3 text-xs">
-                    {selectedItem.subject && (
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.subject")}</span>
-                        <span className="font-mono font-semibold text-slate-800">{selectedItem.subject}</span>
-                      </div>
-                    )}
-                    {(selectedItem.ipmId || selectedItem.amhs_ipm_id) && (
-                      <div>
-                        <span className="text-[10px] font-bold text-slate-500 block">{t("messages.drawer.fields.ipmId")}</span>
-                        <span className="font-mono font-semibold text-slate-800">{selectedItem.ipmId || selectedItem.amhs_ipm_id}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {(selectedItem.rejectionReason || selectedItem.rejectionDiagnostic) && (
-                  <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-xl flex flex-col gap-1 text-xs text-rose-800 font-mono">
-                    <span className="text-[10px] font-bold text-rose-600 uppercase tracking-wider">{t("messages.drawer.sections.rejectionInfo")}</span>
-                    <div>{t("messages.drawer.fields.rejectionReason")}: <strong>{selectedItem.rejectionReason}</strong></div>
-                    {selectedItem.rejectionDiagnostic && <div>{t("messages.drawer.fields.rejectionDiagnostic")}: <strong>{selectedItem.rejectionDiagnostic}</strong></div>}
-                  </div>
-                )}
-
-                {/* RAW CONTENT CODE BLOCK */}
-                <div className="flex flex-col gap-2 flex-1 min-h-[220px]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-700 tracking-wider">{t("messages.drawer.sections.rawMessage")}</span>
-                    <span className="text-[10px] font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                      {(selectedItem.payloadContent || selectedItem.text || "").length} bytes
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.atsPriority")}:</span>
+                    <span className="font-mono font-bold text-slate-800 text-xs">
+                      {selectedItem.atsPriority || selectedItem.amhsPriority || selectedItem.amhs_ats_pri || "NORMAL"}
                     </span>
                   </div>
+                </div>
 
-                  <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-slate-50 flex-1 min-h-[180px] shadow-inner">
-                    <pre className="p-4 text-slate-900 font-mono text-xs overflow-x-auto whitespace-pre-wrap leading-relaxed custom-scrollbar h-full max-h-[300px] font-semibold">
-                      {selectedItem.payloadContent || selectedItem.text || "-"}
+                {/* 2. REJECTION / NDR / DISPATCH ERROR SECTION (NẾU CÓ LỖI) */}
+                {(() => {
+                  const { rejReason, rejDiag, hasError } = getRejectionInfo(selectedItem);
+                  if (!hasError) return null;
+
+                  const rawSource = selectedItem.rejectionSource || selectedItem.errorSource;
+                  let originLabel = t("messages.drawer.fields.partySwim") || "Phía SWIM";
+                  let originBadge = "bg-purple-100 text-purple-900 border-purple-300";
+
+                  if (rawSource === "AMHS") {
+                    originLabel = t("messages.drawer.fields.partyAmhs") || "Phía AMHS";
+                    originBadge = "bg-sky-100 text-sky-900 border-sky-300";
+                  } else if (rawSource === "SWIM") {
+                    originLabel = t("messages.drawer.fields.partySwim") || "Phía SWIM";
+                    originBadge = "bg-purple-100 text-purple-900 border-purple-300";
+                  } else if (searchType === "X.400") {
+                    originLabel = t("messages.drawer.fields.partyAmhs") || "Phía AMHS";
+                    originBadge = "bg-sky-100 text-sky-900 border-sky-300";
+                  }
+
+                  return (
+                    <div className="bg-rose-50/90 border border-rose-200 rounded-xl p-4 flex flex-col gap-3 shadow-2xs">
+                      <div className="flex items-center justify-between border-b border-rose-200/80 pb-2 flex-wrap gap-2">
+                        <div className="flex items-center gap-2">
+                          <AlertCircle size={16} className="text-rose-600 shrink-0" />
+                          <span className="font-bold text-rose-900 uppercase tracking-wider text-[11px]">
+                            {t("messages.drawer.sections.rejectionInfo")}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-slate-600 font-medium text-xs">
+                            {t("messages.drawer.fields.errorOrigin")}:
+                          </span>
+                          <span className={`px-2.5 py-0.5 rounded text-xs font-bold border ${originBadge}`}>
+                            {originLabel}
+                          </span>
+                          {rejReason && (
+                            <span className="bg-white text-rose-900 border border-rose-300 px-2 py-0.5 rounded text-xs font-mono font-bold">
+                              {rejReason}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {rejDiag && (
+                        <div className="bg-white p-3 rounded-lg border border-rose-200 text-xs text-rose-900 leading-relaxed font-sans shadow-2xs">
+                          <strong className="font-mono text-rose-950 block mb-1">
+                            {t("messages.drawer.fields.rejectionDiagnostic") || "Chẩn đoán lỗi"}:
+                          </strong>
+                          <span>{rejDiag}</span>
+                        </div>
+                      )}
+                      {selectedItem.supplementaryInfo && (
+                        <div className="bg-white p-3 rounded-lg border border-rose-200 text-xs text-slate-700 leading-relaxed font-sans shadow-2xs">
+                          <strong className="font-mono text-slate-900 block mb-1">
+                            Thông tin bổ sung (Supplementary Info):
+                          </strong>
+                          <span>{selectedItem.supplementaryInfo}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {/* 3. PROTOCOL & TECHNICAL METADATA SECTION */}
+                <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs flex flex-col">
+                  <div className="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200 font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center justify-between">
+                    <span>{t("messages.drawer.sections.technicalInfo")}</span>
+                  </div>
+
+                  <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2.5 text-xs">
+                    {searchType === "AMQP" ? (
+                      <>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.messageId") || "Message ID"}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.messageId || "-"}>{selectedItem.messageId || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ipmId")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}>{selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.filingTime")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.filingTime || selectedItem.amhs_ats_ft || "-"}>{selectedItem.filingTime || selectedItem.amhs_ats_ft || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.atsmhsServiceLevel")}:</span>
+                          <div className="shrink-0">{renderAtsmhsLevel(selectedItem.atsmhsServiceLevel)}</div>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.contentType")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.contentType || "text/plain"}>{selectedItem.contentType || "text/plain"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.bodyPartType")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.bodyPartType || selectedItem.bodyType || "ia5-text"}>{selectedItem.bodyPartType || selectedItem.bodyType || "ia5-text"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.optionalHeading")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}>{selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}</span>
+                        </div>
+                        {selectedItem.subject && (
+                          <div className="md:col-span-2 flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                            <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.subject")}:</span>
+                            <span className="font-mono font-semibold text-slate-800 text-right truncate flex-1" title={selectedItem.subject}>{selectedItem.subject}</span>
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.amhsId")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.amhsid || "-"}>{selectedItem.amhsid || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ipmId")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}>{selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.filingTime")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.filingTime || selectedItem.amhs_ats_ft || "-"}>{selectedItem.filingTime || selectedItem.amhs_ats_ft || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.x400ContentType")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={formatX400ContentType(selectedItem.x400ContentType)}>{formatX400ContentType(selectedItem.x400ContentType)}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.bodyPartType")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.bodyPartType || selectedItem.bodyType || "ia5-text"}>{selectedItem.bodyPartType || selectedItem.bodyType || "ia5-text"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.originEit")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.originEit || "-"}>{selectedItem.originEit || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.numberOfAttachment")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={String(selectedItem.numberOfAttachment !== null && selectedItem.numberOfAttachment !== undefined ? selectedItem.numberOfAttachment : "-")}>
+                            {selectedItem.numberOfAttachment !== null && selectedItem.numberOfAttachment !== undefined ? selectedItem.numberOfAttachment : "-"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.optionalHeading")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}>{selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}</span>
+                        </div>
+                        {selectedItem.subject && (
+                          <div className="md:col-span-2 flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                            <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.subject")}:</span>
+                            <span className="font-mono font-semibold text-slate-800 text-right truncate flex-1" title={selectedItem.subject}>{selectedItem.subject}</span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4. RAW MESSAGE CONTENT */}
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+                      {t("messages.drawer.sections.rawMessage")}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-mono text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200 shadow-2xs">
+                        {(selectedItem.payloadContent || selectedItem.text || "").length} bytes
+                      </span>
+                      <button
+                        onClick={() => handleCopy(selectedItem.payloadContent || selectedItem.text)}
+                        className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 cursor-pointer bg-white hover:bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200 transition-all shadow-2xs flex items-center gap-1.5"
+                      >
+                        {isCopied ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+                        <span>{isCopied ? t("messages.drawer.buttons.copied") : t("messages.drawer.buttons.copy")}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-slate-50 shadow-inner">
+                    <pre
+                      className="p-4 font-mono text-xs overflow-x-auto whitespace-pre-wrap leading-relaxed custom-scrollbar max-h-64 select-all font-semibold"
+                      style={{ backgroundColor: '#f8fafc', color: '#0f172a' }}
+                    >
+                      {selectedItem.payloadContent || selectedItem.text || "— Không có nội dung payload —"}
                     </pre>
                   </div>
                 </div>
@@ -618,10 +688,14 @@ const MessageView = () => {
               </div>
 
               {/* MODAL FOOTER */}
-              <div className="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <span className="text-slate-500 text-xs font-medium">
+                  {searchType === "AMQP" ? "Luồng chuyển đổi: SWIM ➔ AMHS" : "Luồng chuyển đổi: AMHS ➔ SWIM"}
+                </span>
+
                 <button
-                  onClick={() => setSelectedItem(null)}
-                  className="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold rounded-lg transition-all cursor-pointer shadow-xs"
+                  onClick={handleCloseModal}
+                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg shadow-xs cursor-pointer text-xs transition-all active:scale-95"
                 >
                   {t("messages.drawer.buttons.close")}
                 </button>
@@ -634,6 +708,35 @@ const MessageView = () => {
       </div>
     </DashboardLayout>
   );
+};
+
+const renderAtsmhsLevel = (level) => {
+  if (!level) return <span className="text-slate-400 font-mono">-</span>;
+  const isExtended = String(level).toUpperCase().includes("EXTENDED");
+  return (
+    <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
+      isExtended ? "bg-purple-100 text-purple-700 border border-purple-200" : "bg-blue-100 text-blue-700 border border-blue-200"
+    }`}>
+      {level}
+    </span>
+  );
+};
+
+const formatX400ContentType = (type) => {
+  if (type === undefined || type === null || type === '') return "-";
+  const num = Number(type);
+  switch (num) {
+    case 22:
+      return "22 (IPM-1988)";
+    case 2:
+      return "2 (IPM-1984)";
+    case 35:
+      return "35 (EDI)";
+    case 0:
+      return "0 (Unidentified)";
+    default:
+      return String(type);
+  }
 };
 
 const renderAmhsStatus = (status) => {

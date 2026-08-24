@@ -1,18 +1,134 @@
 {
-    "title":  {
-                  "vi":  "Cài đặt Ứng dụng",
-                  "en":  "Application Settings"
-              },
-    "language":  {
-                     "vi":  "Ngôn ngữ hiển thị",
-                     "en":  "Display Language"
-                 },
-    "theme":  {
-                  "vi":  "Giao diện",
-                  "en":  "Color Theme"
-              },
-    "autoRefresh":  {
-                        "vi":  "Tự động làm mới dữ liệu",
-                        "en":  "Auto-refresh Interval"
-                    }
+  "title": {
+    "vi": "Cài đặt & Tài khoản",
+    "en": "Settings & Account"
+  },
+  "subtitle": {
+    "vi": "Quản lý thông tin tài khoản, bảo mật mật khẩu và ngôn ngữ hiển thị",
+    "en": "Manage account information, security credentials, and display language"
+  },
+  "tabs": {
+    "profile": {
+      "vi": "Hồ sơ tài khoản",
+      "en": "Profile"
+    },
+    "security": {
+      "vi": "Bảo mật & Mật khẩu",
+      "en": "Security"
+    }
+  },
+  "profile": {
+    "title": {
+      "vi": "Thông tin tài khoản",
+      "en": "Account Information"
+    },
+    "desc": {
+      "vi": "Chi tiết định danh người dùng và phiên đăng nhập hiện tại",
+      "en": "User identity details and current active session information"
+    },
+    "username": {
+      "vi": "Tên đăng nhập (Username)",
+      "en": "Username"
+    },
+    "role": {
+      "vi": "Vai trò hệ thống (Role)",
+      "en": "System Role"
+    },
+    "roleAdmin": {
+      "vi": "Quản trị viên (Administrator)",
+      "en": "Administrator"
+    },
+    "roleUser": {
+      "vi": "Người vận hành (Operator)",
+      "en": "Operator"
+    },
+    "status": {
+      "vi": "Trạng thái tài khoản",
+      "en": "Account Status"
+    },
+    "active": {
+      "vi": "Đang hoạt động",
+      "en": "Active"
+    },
+    "sessionExpires": {
+      "vi": "Thời hạn phiên đăng nhập",
+      "en": "Session Validity"
+    },
+    "sessionActive": {
+      "vi": "Phiên đang kết nối",
+      "en": "Active Session"
+    },
+    "logoutBtn": {
+      "vi": "Đăng xuất khỏi hệ thống",
+      "en": "Sign Out"
+    }
+  },
+  "security": {
+    "title": {
+      "vi": "Đổi mật khẩu tài khoản",
+      "en": "Change Account Password"
+    },
+    "desc": {
+      "vi": "Cập nhật mật khẩu định kỳ để nâng cao tính bảo mật cho hệ thống Gateway",
+      "en": "Regularly update your password to enhance security on the Gateway system"
+    },
+    "oldPassword": {
+      "vi": "Mật khẩu hiện tại",
+      "en": "Current Password"
+    },
+    "oldPasswordPlaceholder": {
+      "vi": "Nhập mật khẩu hiện tại...",
+      "en": "Enter current password..."
+    },
+    "newPassword": {
+      "vi": "Mật khẩu mới",
+      "en": "New Password"
+    },
+    "newPasswordPlaceholder": {
+      "vi": "Nhập mật khẩu mới (tối thiểu 6 ký tự)...",
+      "en": "Enter new password (min 6 characters)..."
+    },
+    "confirmPassword": {
+      "vi": "Xác nhận mật khẩu mới",
+      "en": "Confirm New Password"
+    },
+    "confirmPasswordPlaceholder": {
+      "vi": "Nhập lại mật khẩu mới để xác nhận...",
+      "en": "Re-enter new password to confirm..."
+    },
+    "submit": {
+      "vi": "Cập nhật mật khẩu",
+      "en": "Update Password"
+    },
+    "submitting": {
+      "vi": "Đang xử lý...",
+      "en": "Updating..."
+    },
+    "errorEmpty": {
+      "vi": "Vui lòng nhập đầy đủ các trường mật khẩu!",
+      "en": "Please fill in all password fields!"
+    },
+    "errorMismatch": {
+      "vi": "Mật khẩu xác nhận không khớp!",
+      "en": "Confirm password does not match!"
+    },
+    "errorLength": {
+      "vi": "Mật khẩu mới phải có ít nhất 6 ký tự!",
+      "en": "New password must be at least 6 characters!"
+    },
+    "success": {
+      "vi": "Đổi mật khẩu thành công!",
+      "en": "Password updated successfully!"
+    }
+  },
+  "preferences": {
+    "language": {
+      "vi": "Ngôn ngữ hiển thị",
+      "en": "Display Language"
+    },
+    "languageDesc": {
+      "vi": "Chọn ngôn ngữ hiển thị trên toàn bộ hệ thống Control Position.",
+      "en": "Select the display language across the Control Position system."
+    }
+  }
 }

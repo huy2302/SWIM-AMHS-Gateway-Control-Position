@@ -4,14 +4,36 @@
     "en": "Alerts & Incidents"
   },
   "subtitle": {
-    "vi": "Theo dõi danh sách cảnh báo hệ thống theo thời gian thực",
-    "en": "Real-time system alerts monitoring"
+    "vi": "Theo dõi và xử lý các cảnh báo hệ thống thời gian thực",
+    "en": "Monitor and manage real-time system alerts"
   },
   "searchPlaceholder": {
-    "vi": "Tìm kiếm cảnh báo...",
-    "en": "Search alerts..."
+    "vi": "Tìm theo nội dung, loại cảnh báo, phân hệ...",
+    "en": "Search by message, alert type, module..."
+  },
+  "stats": {
+    "active": {
+      "vi": "Chưa xử lý (Active)",
+      "en": "Active Alerts"
+    },
+    "acknowledged": {
+      "vi": "Đã tiếp nhận (Ack)",
+      "en": "Acknowledged"
+    },
+    "resolved": {
+      "vi": "Đã khắc phục (Resolved)",
+      "en": "Resolved"
+    },
+    "total": {
+      "vi": "Tổng số cảnh báo",
+      "en": "Total Alerts"
+    }
   },
   "filterStatus": {
+    "ALL": {
+      "vi": "Tất cả",
+      "en": "All"
+    },
     "ACTIVE": {
       "vi": "Đang hoạt động",
       "en": "Active"
@@ -23,10 +45,6 @@
     "RESOLVED": {
       "vi": "Đã xử lý",
       "en": "Resolved"
-    },
-    "ALL": {
-      "vi": "Tất cả",
-      "en": "All"
     }
   },
   "buttons": {
@@ -37,6 +55,10 @@
     "bulkResolve": {
       "vi": "Giải quyết tất cả",
       "en": "Bulk Resolve"
+    },
+    "refresh": {
+      "vi": "Làm mới",
+      "en": "Refresh"
     }
   },
   "severity": {
@@ -62,8 +84,12 @@
     }
   },
   "table": {
+    "id": {
+      "vi": "ID",
+      "en": "ID"
+    },
     "time": {
-      "vi": "Thời gian phát sinh",
+      "vi": "Thời gian",
       "en": "Timestamp"
     },
     "level": {
@@ -71,16 +97,20 @@
       "en": "Level"
     },
     "module": {
-      "vi": "Phân hệ / Loại cảnh báo",
-      "en": "Module / Alert Type"
+      "vi": "Phân hệ",
+      "en": "Module"
     },
     "message": {
       "vi": "Nội dung cảnh báo",
       "en": "Alert Message"
     },
+    "status": {
+      "vi": "Trạng thái",
+      "en": "Status"
+    },
     "ackBy": {
-      "vi": "Người xác nhận",
-      "en": "Acknowledged By"
+      "vi": "Người nhận",
+      "en": "Ack By"
     },
     "resolvedAt": {
       "vi": "Thời gian xử lý",
@@ -113,6 +143,48 @@
     "resolved": {
       "vi": "Đã xong",
       "en": "Resolved"
+    }
+  },
+  "modal": {
+    "title": {
+      "vi": "Chi tiết Cảnh báo",
+      "en": "Alert Details"
+    },
+    "time": {
+      "vi": "Thời gian phát sinh",
+      "en": "Timestamp"
+    },
+    "level": {
+      "vi": "Mức độ nghiêm trọng",
+      "en": "Severity Level"
+    },
+    "module": {
+      "vi": "Phân hệ / Nguồn",
+      "en": "Module / Source"
+    },
+    "status": {
+      "vi": "Trạng thái",
+      "en": "Status"
+    },
+    "message": {
+      "vi": "Nội dung chi tiết",
+      "en": "Message Detail"
+    },
+    "ackBy": {
+      "vi": "Người tiếp nhận",
+      "en": "Acknowledged By"
+    },
+    "resolvedAt": {
+      "vi": "Thời gian hoàn tất xử lý",
+      "en": "Resolved At"
+    },
+    "close": {
+      "vi": "Đóng",
+      "en": "Close"
+    },
+    "viewMessage": {
+      "vi": "Xem điện văn liên quan",
+      "en": "View Related Message"
     }
   },
   "messages": {

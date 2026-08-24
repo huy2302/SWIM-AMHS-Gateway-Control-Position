@@ -29,8 +29,8 @@
       "en": "System is operating normally"
     },
     "description": {
-      "vi": "Tất cả các dịch vụ kết nối đang chạy ổn định",
-      "en": "All connected services are running smoothly"
+      "vi": "Tất cả các dịch vụ đã kết nối thành công",
+      "en": "All connected services are connect successfully"
     },
     "error": {
       "vi": "Hệ thống gặp sự cố kết nối",

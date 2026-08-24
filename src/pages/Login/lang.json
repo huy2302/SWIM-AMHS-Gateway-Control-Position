@@ -1,38 +1,66 @@
 {
-    "title":  {
-                  "vi":  "Đăng nhập Control Position",
-                  "en":  "Control Position Login"
-              },
-    "subtitle":  {
-                     "vi":  "Hệ thống AMHS - SWIM Gateway Management",
-                     "en":  "AMHS - SWIM Gateway Management System"
-                 },
-    "username":  {
-                     "vi":  "Tên tài khoản",
-                     "en":  "Username"
-                 },
-    "usernamePlaceholder":  {
-                                "vi":  "Nhập tên đăng nhập...",
-                                "en":  "Enter username..."
-                            },
-    "password":  {
-                     "vi":  "Mật khẩu",
-                     "en":  "Password"
-                 },
-    "passwordPlaceholder":  {
-                                "vi":  "Nhập mật khẩu...",
-                                "en":  "Enter password..."
-                            },
-    "loginButton":  {
-                        "vi":  "Đăng nhập",
-                        "en":  "Sign In"
-                    },
-    "loggingIn":  {
-                      "vi":  "Đang đăng nhập...",
-                      "en":  "Signing in..."
-                  },
-    "failed":  {
-                   "vi":  "Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản!",
-                   "en":  "Login failed. Please check your credentials!"
-               }
+    "title": {
+        "vi": "Đăng nhập Control Position",
+        "en": "Control Position Login"
+    },
+    "subtitle": {
+        "vi": "Hệ thống AMHS - SWIM Gateway Management",
+        "en": "AMHS - SWIM Gateway Management System"
+    },
+    "details": {
+        "vi": "Cổng thông tin quản trị giám sát",
+        "en": "Monitoring Administration Portal"
+    },
+    "details2": {
+        "vi": "Hệ thống giám sát & quản lý kết nối giữa AMHS và SWIM",
+        "en": "Monitoring & management system connecting AMHS and SWIM"
+    },
+    "username": {
+        "vi": "Tên tài khoản",
+        "en": "Username"
+    },
+    "usernamePlaceholder": {
+        "vi": "Nhập tên đăng nhập...",
+        "en": "Enter username..."
+    },
+    "password": {
+        "vi": "Mật khẩu",
+        "en": "Password"
+    },
+    "passwordPlaceholder": {
+        "vi": "Nhập mật khẩu...",
+        "en": "Enter password..."
+    },
+    "login": {
+        "vi": "Đăng nhập",
+        "en": "Sign In"
+    },
+    "loginButton": {
+        "vi": "Đăng nhập",
+        "en": "Sign In"
+    },
+    "signin": {
+        "vi": "Đang đăng nhập...",
+        "en": "Signing in..."
+    },
+    "loggingIn": {
+        "vi": "Đang đăng nhập...",
+        "en": "Signing in..."
+    },
+    "remember": {
+        "vi": "Ghi nhớ đăng nhập",
+        "en": "Remember me"
+    },
+    "forgot": {
+        "vi": "Quên mật khẩu",
+        "en": "Forgot password"
+    },
+    "company": {
+        "vi": "Tổng công ty Quản lý bay Việt Nam",
+        "en": "Vietnam Air Traffic Management Corporation"
+    },
+    "failed": {
+        "vi": "Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản!",
+        "en": "Login failed. Please check your credentials!"
+    }
 }

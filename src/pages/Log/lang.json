@@ -1,7 +1,7 @@
 {
   "title": {
-    "vi": "Nhật ký Hệ thống",
-    "en": "System Logs"
+    "vi": "Nhật ký Chuyển đổi Điện văn (Traffic Logs)",
+    "en": "Traffic Conversion Logs"
   },
   "search": {
     "vi": "Tìm kiếm nhật ký...",
@@ -26,9 +26,21 @@
       "vi": "Thành công",
       "en": "SUCCESS"
     },
+    "OK": {
+      "vi": "Thành công",
+      "en": "OK"
+    },
     "FAILED": {
       "vi": "Thất bại",
       "en": "FAILED"
+    },
+    "REJECT": {
+      "vi": "Từ chối",
+      "en": "REJECT"
+    },
+    "ERROR": {
+      "vi": "Lỗi",
+      "en": "ERROR"
     },
     "PENDING": {
       "vi": "Đang xử lý",
@@ -42,9 +54,21 @@
       "vi": "Đã phát hành",
       "en": "PUBLISHED"
     },
+    "TRANSFORMED": {
+      "vi": "Đã chuyển đổi",
+      "en": "TRANSFORMED"
+    },
     "UNROUTED": {
       "vi": "Chưa định tuyến",
       "en": "UNROUTED"
+    },
+    "RESOLVED": {
+      "vi": "Đã giải quyết",
+      "en": "RESOLVED"
+    },
+    "CANCELLED": {
+      "vi": "Đã hủy",
+      "en": "CANCELLED"
     }
   },
   "actionTaken": {
@@ -109,14 +133,62 @@
       "en": "Clear Filter"
     },
     "copy": {
-      "vi": "Sao chép tất cả",
-      "en": "Copy All"
+      "vi": "Sao chép",
+      "en": "Copy"
+    },
+    "direction": {
+      "vi": "Hướng:",
+      "en": "Direction:"
+    },
+    "status": {
+      "vi": "Trạng thái:",
+      "en": "Status:"
+    },
+    "timeRange": {
+      "vi": "Thời gian:",
+      "en": "Time Range:"
+    },
+    "allTime": {
+      "vi": "Toàn bộ thời gian",
+      "en": "All Time"
+    },
+    "today": {
+      "vi": "Hôm nay",
+      "en": "Today"
+    },
+    "last24h": {
+      "vi": "24 giờ qua",
+      "en": "Last 24 Hours"
+    },
+    "last7d": {
+      "vi": "7 ngày qua",
+      "en": "Last 7 Days"
+    },
+    "allDirections": {
+      "vi": "Tất cả hướng",
+      "en": "All Directions"
+    },
+    "allStatuses": {
+      "vi": "Tất cả trạng thái",
+      "en": "All Statuses"
+    },
+    "refresh": {
+      "vi": "Làm mới",
+      "en": "Refresh"
+    },
+    "autoRefresh": {
+      "vi": "Tự động làm mới",
+      "en": "Auto Refresh"
+    },
+    "totalRecords": {
+      "vi": "Tổng số bản ghi",
+      "en": "Total Records"
     }
   },
   "filter": {
     "searchPlaceholder": {
-      "vi": "Tìm theo Mã tin, Địa chỉ, Tiêu đề hoặc Nội dung...",
-      "en": "Search by ID, Address, Subject or Content..."
+      "vi": "Tìm theo Mã tin, IPM ID, MTS ID, Người gửi, Hành động, Nội dung...",
+      "en": "Search by Message ID, IPM ID, MTS ID, Origin, Action, Content..."
     }
   },
   "table": {
@@ -144,6 +216,10 @@
       "vi": "Hướng",
       "en": "Direction"
     },
+    "identifier": {
+      "vi": "Mã định danh (Message/MTS ID)",
+      "en": "Identifier (Message/MTS ID)"
+    },
     "mtsId": {
       "vi": "MTS ID",
       "en": "MTS ID"
@@ -153,7 +229,7 @@
       "en": "IPM ID"
     },
     "type": {
-      "vi": "Loại điện văn",
+      "vi": "Loại",
       "en": "Type"
     },
     "prio": {
@@ -164,6 +240,10 @@
       "vi": "Địa chỉ gửi",
       "en": "Originator"
     },
+    "actionTaken": {
+      "vi": "Hành động xử lý",
+      "en": "Action Taken"
+    },
     "status": {
       "vi": "Trạng thái",
       "en": "Status"
@@ -171,34 +251,114 @@
   },
   "empty": {
     "title": {
-      "vi": "Không có bản ghi nhật ký nào phù hợp.",
+      "vi": "Không tìm thấy bản ghi nhật ký nào phù hợp.",
       "en": "No logs matching criteria."
+    },
+    "subtitle": {
+      "vi": "Hãy thử thay đổi từ khóa tìm kiếm hoặc đặt lại các bộ lọc.",
+      "en": "Try adjusting your search keyword or reset filters."
+    },
+    "resetBtn": {
+      "vi": "Đặt lại bộ lọc",
+      "en": "Reset Filters"
     }
   },
   "modal": {
     "title": {
-      "vi": "Chi tiết Nhật ký",
-      "en": "Log Detail"
+      "vi": "Chi tiết Nhật ký Chuyển đổi",
+      "en": "Conversion Log Detail"
+    },
+    "overview": {
+      "vi": "Tổng quan",
+      "en": "Overview"
+    },
+    "technicalInfo": {
+      "vi": "Thông tin kỹ thuật & Định danh",
+      "en": "Technical & Protocol Info"
     },
     "direction": {
-      "vi": "Hướng điện văn",
-      "en": "DIRECTION"
+      "vi": "Hướng & Giao thức",
+      "en": "Direction & Protocol"
     },
     "status": {
-      "vi": "Trạng thái",
-      "en": "STATUS"
+      "vi": "Trạng thái xử lý",
+      "en": "Status"
     },
     "origin": {
       "vi": "Địa chỉ gửi (Originator)",
-      "en": "ORIGINATOR"
+      "en": "Originator"
     },
     "convertedTime": {
       "vi": "Thời gian chuyển đổi",
-      "en": "CONVERTED TIME"
+      "en": "Converted Time"
     },
-    "nonDeliveryReason": {
-      "vi": "Lý do không giao được (NDR)",
-      "en": "NON-DELIVERY REASON"
+    "referenceId": {
+      "vi": "Mã bản tin gốc (Ref ID)",
+      "en": "Reference Message ID"
+    },
+    "actionTaken": {
+      "vi": "Hành động xử lý",
+      "en": "Action Taken"
+    },
+    "priority": {
+      "vi": "Độ ưu tiên (ATS Priority)",
+      "en": "ATS Priority"
+    },
+    "filingTime": {
+      "vi": "Filing Time",
+      "en": "Filing Time"
+    },
+    "ohi": {
+      "vi": "Tiêu đề phụ (OHI)",
+      "en": "Optional Heading (OHI)"
+    },
+    "subject": {
+      "vi": "Tiêu đề (Subject)",
+      "en": "Subject"
+    },
+    "mtsId": {
+      "vi": "MTS ID",
+      "en": "MTS ID"
+    },
+    "ipmId": {
+      "vi": "IPM ID",
+      "en": "IPM ID"
+    },
+    "amqpMessageId": {
+      "vi": "Mã tin AMQP",
+      "en": "AMQP Message ID"
+    },
+    "ndrSection": {
+      "vi": "Thông tin lỗi & Báo cáo không giao được (NDR)",
+      "en": "Rejection & Non-Delivery Report (NDR)"
+    },
+    "errorOrigin": {
+      "vi": "Nguồn lỗi",
+      "en": "Error Origin"
+    },
+    "partySwim": {
+      "vi": "Phía SWIM",
+      "en": "SWIM Side"
+    },
+    "partyAmhs": {
+      "vi": "Phía AMHS",
+      "en": "AMHS Side"
+    },
+    "rejectionReason": {
+      "vi": "Lý do từ chối (Reason)",
+      "en": "Rejection Reason"
+    },
+    "rejectionDiagnostic": {
+      "vi": "Chẩn đoán chi tiết (Diagnostic)",
+      "en": "Rejection Diagnostic"
+    },
+    "supplementaryInfo": {
+      "vi": "Thông tin bổ sung",
+      "en": "Supplementary Info"
+    },
+    "remark": {
+      "vi": "Ghi chú hệ thống (Remark)",
+      "en": "System Remark"
     },
     "rawContent": {
       "vi": "Nội dung chi tiết điện văn",
@@ -219,6 +379,10 @@
     "close": {
       "vi": "Đóng",
       "en": "Close"
+    },
+    "viewMessage": {
+      "vi": "Xem bản tin liên quan",
+      "en": "View Related Message"
     }
   }
 }

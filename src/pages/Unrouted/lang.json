@@ -205,6 +205,22 @@
         "vi": "Thời Gian",
         "en": "Time"
       },
+      "atsmhsServiceLevel": {
+        "vi": "Mức Dịch Vụ ATSMHS",
+        "en": "ATSMHS Service Level"
+      },
+      "addressingSource": {
+        "vi": "Nguồn Định Tuyến",
+        "en": "Addressing Source"
+      },
+      "rejectionReason": {
+        "vi": "Lý Do Từ Chối",
+        "en": "Rejection Reason"
+      },
+      "rejectionDiagnostic": {
+        "vi": "Chẩn Đoán Chi Tiết Lỗi",
+        "en": "Diagnostic Detail"
+      },
       "errorType": {
         "vi": "Loại Lỗi",
         "en": "Error Type"

@@ -6,13 +6,15 @@ import { authApi } from "../api/authApi";
 import { useAuth } from "./AuthContext";
 import { t } from "@/i18n/translator";
 
+import { useLanguageStore } from "../store/languageStore";
+
 export default function LoginCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [language, setLanguage] = useState(localStorage.getItem("language") || "en");
+  const { language, setLanguage } = useLanguageStore();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,10 +25,8 @@ export default function LoginCard() {
 
   const handleChangeLang = (e) => {
     const lang = e.target.value;
-
     setLanguage(lang);
-    localStorage.setItem("language", lang);
-  }
+  };
   useEffect(() => {
     if (authApi.isAuthenticated()) {
       navigate(from, { replace: true });
@@ -167,7 +167,7 @@ export default function LoginCard() {
           disabled={loading}
         >
           <span className="relative z-20">
-            {loading ? t("login.signin") : t("login.title")}
+            {loading ? t("login.signin") : t("login.login")}
           </span>
         </button>
         {error && (

@@ -1,84 +1,92 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layout/DashboardLayout";
-import { AlertOctagon, CheckCircle2, ShieldAlert, Eye, Search, BellRing, RefreshCw } from "lucide-react";
+import { Search, RefreshCw, X, Check, ExternalLink } from "lucide-react";
 import gatewayApi from "@/api/gatewayApi";
 import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
 
 export default function AlertsView() {
-  const [alerts, setAlerts] = useState([]);
+  const navigate = useNavigate();
+  const [allAlertsList, setAllAlertsList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState("ACTIVE"); // ACTIVE, ACKNOWLEDGED, RESOLVED, ALL
+  const [statusFilter, setStatusFilter] = useState("ALL"); // ALL, ACTIVE, ACKNOWLEDGED, RESOLVED
   const [searchKeyword, setSearchKeyword] = useState("");
   const [page, setPage] = useState(0);
+  const [selectedAlert, setSelectedAlert] = useState(null);
   const pageSize = 10;
 
+  // Reset page when filter or search changes
   useEffect(() => {
     setPage(0);
   }, [statusFilter, searchKeyword]);
 
-  const [stats, setStats] = useState({
-    activeCount: 0,
-    ackCount: 0,
-    resolvedCount: 0,
-  });
-
-  // Fetch Alerts
+  // Fetch all alerts from backend
   const fetchAlerts = useCallback(async () => {
     try {
       setLoading(true);
-      let response = [];
-      const apiStatus = statusFilter === "ACTIVE" ? "NEW" : statusFilter;
-      if (statusFilter === "ALL") {
-        response = await gatewayApi.getAlerts();
-      } else {
-        response = await gatewayApi.getAlertsByStatus(apiStatus);
-      }
-
-      const allAlerts = (statusFilter === "ALL") ? response : await gatewayApi.getAlerts();
-      setStats({
-        activeCount: (allAlerts || []).filter(a => a.status === "NEW" || a.status === "ACTIVE").length,
-        ackCount: (allAlerts || []).filter(a => a.status === "ACKNOWLEDGED").length,
-        resolvedCount: (allAlerts || []).filter(a => a.status === "RESOLVED").length,
-      });
-
-      // Map backend properties to match frontend expectations
-      let mapped = (response || []).map(a => ({
+      const response = await gatewayApi.getAlerts();
+      const rawList = Array.isArray(response) ? response : [];
+      
+      const mapped = rawList.map((a) => ({
         ...a,
         status: a.status === "NEW" ? "ACTIVE" : a.status,
-        timeRaised: a.createdAt,
-        module: a.alertType,
+        timeRaised: a.createdAt || a.timeRaised,
+        module: a.alertType || a.module || "-",
       }));
 
-      // Filter locally based on search keyword
-      let filtered = mapped;
-      if (searchKeyword.trim()) {
-        filtered = filtered.filter(
-          (a) =>
-            a.message?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-            a.alertType?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
-            a.module?.toLowerCase().includes(searchKeyword.toLowerCase())
-        );
-      }
-      setAlerts(filtered);
+      // Sort by newest first
+      mapped.sort((a, b) => new Date(b.timeRaised || 0) - new Date(a.timeRaised || 0));
+
+      setAllAlertsList(mapped);
     } catch (error) {
       console.error("Error fetching alerts:", error);
       toast.error(t("alerts.messages.loadError"));
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, searchKeyword]);
+  }, []);
 
   useEffect(() => {
     fetchAlerts();
   }, [fetchAlerts]);
+
+  // Calculate statistics directly from the loaded list
+  const activeCount = allAlertsList.filter((a) => a.status === "ACTIVE" || a.status === "NEW").length;
+  const ackCount = allAlertsList.filter((a) => a.status === "ACKNOWLEDGED").length;
+  const resolvedCount = allAlertsList.filter((a) => a.status === "RESOLVED").length;
+
+  // Filter alerts by status and search keyword
+  const filteredAlerts = allAlertsList.filter((a) => {
+    // Status filter
+    if (statusFilter !== "ALL") {
+      if (statusFilter === "ACTIVE" && a.status !== "ACTIVE" && a.status !== "NEW") return false;
+      if (statusFilter === "ACKNOWLEDGED" && a.status !== "ACKNOWLEDGED") return false;
+      if (statusFilter === "RESOLVED" && a.status !== "RESOLVED") return false;
+    }
+
+    // Search filter
+    if (searchKeyword.trim()) {
+      const q = searchKeyword.toLowerCase();
+      const matchMessage = (a.message || "").toLowerCase().includes(q);
+      const matchModule = (a.module || "").toLowerCase().includes(q);
+      const matchSeverity = (a.severity || "").toLowerCase().includes(q);
+      const matchAck = (a.acknowledgedBy || "").toLowerCase().includes(q);
+      if (!matchMessage && !matchModule && !matchSeverity && !matchAck) return false;
+    }
+
+    return true;
+  });
 
   // Acknowledge Alert
   const handleAcknowledge = async (id) => {
     try {
       await gatewayApi.acknowledgeAlert(id);
       toast.success(t("alerts.messages.ackSuccess"));
+      if (selectedAlert?.id === id) {
+        setSelectedAlert((prev) => prev ? { ...prev, status: "ACKNOWLEDGED" } : null);
+      }
       fetchAlerts();
     } catch (error) {
       console.error("Failed to ack alert:", error);
@@ -91,6 +99,9 @@ export default function AlertsView() {
     try {
       await gatewayApi.resolveAlert(id);
       toast.success(t("alerts.messages.resolveSuccess"));
+      if (selectedAlert?.id === id) {
+        setSelectedAlert((prev) => prev ? { ...prev, status: "RESOLVED", resolvedAt: new Date().toISOString() } : null);
+      }
       fetchAlerts();
     } catch (error) {
       console.error("Failed to resolve alert:", error);
@@ -128,76 +139,155 @@ export default function AlertsView() {
     }
   };
 
+  // Extract message ID from alert object or message text
+  const extractMessageId = (alert) => {
+    if (!alert) return null;
+    if (alert.messageId) return String(alert.messageId);
+    if (alert.relatedId) return String(alert.relatedId);
+    if (alert.entityId) return String(alert.entityId);
+    // Match patterns like "Message ID #1234", "message_id: 123", "msgId: 123", or numbers
+    const match = (alert.message || "").match(/(?:message[_\s-]?id|msgid|id)[\s:#]+([a-zA-Z0-9_-]+)/i);
+    if (match && match[1]) return match[1];
+    return null;
+  };
+
+  // Navigate directly to Message View
+  const handleNavigateToMessage = (alert, e) => {
+    if (e) e.stopPropagation();
+    if (!alert) return;
+    const msgId = extractMessageId(alert);
+    navigate("/messages", {
+      state: {
+        searchQuery: msgId || alert.module || "",
+        autoOpen: true
+      }
+    });
+  };
+
+  // Helper badge for severity
+  const getSeverityBadge = (severity) => {
+    const sev = (severity || "").toUpperCase();
+    if (sev === "CRITICAL" || sev === "ERROR") {
+      return (
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 border border-rose-200 text-rose-700">
+          {t(`alerts.severity.${sev}`) || sev}
+        </span>
+      );
+    }
+    if (sev === "WARNING" || sev === "WARN") {
+      return (
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 border border-amber-200 text-amber-700">
+          {t(`alerts.severity.${sev}`) || sev}
+        </span>
+      );
+    }
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 border border-blue-200 text-blue-700">
+        {t(`alerts.severity.${sev}`) || sev || "INFO"}
+      </span>
+    );
+  };
+
+  // Helper badge for status
+  const getStatusBadge = (status) => {
+    if (status === "ACTIVE" || status === "NEW") {
+      return (
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-50 border border-rose-200 text-rose-700">
+          {t("alerts.filterStatus.ACTIVE")}
+        </span>
+      );
+    }
+    if (status === "ACKNOWLEDGED") {
+      return (
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 border border-amber-200 text-amber-700">
+          {t("alerts.filterStatus.ACKNOWLEDGED")}
+        </span>
+      );
+    }
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-700">
+        {t("alerts.filterStatus.RESOLVED")}
+      </span>
+    );
+  };
+
+  const paginatedAlerts = filteredAlerts.slice(page * pageSize, (page + 1) * pageSize);
+
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 max-w-7xl mx-auto py-1">
+        
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* COMPACT STAT CARDS */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          
+          {/* Active Card */}
           <div
             onClick={() => setStatusFilter("ACTIVE")}
-            className={`cursor-pointer p-5 rounded-xl border flex items-center gap-4 transition-all hover:scale-[1.01] hover:shadow-xs shadow-xs ${
+            className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
               statusFilter === "ACTIVE"
-                ? "bg-red-50 border-red-200 text-red-700"
-                : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                ? "bg-rose-50/80 border-rose-300 shadow-xs"
+                : "bg-white border-slate-200 hover:border-slate-300"
             }`}
           >
-            <div className={`p-3 rounded-lg ${statusFilter === "ACTIVE" ? "bg-red-100/80" : "bg-slate-50"}`}>
-              <AlertOctagon size={24} />
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              {t("alerts.stats.active")}
             </div>
-            <div>
-              <div className="text-xs font-bold tracking-wider">{t("alerts.filterStatus.ACTIVE")}</div>
-              <div className="text-2xl font-extrabold text-slate-900 mt-1">{stats.activeCount}</div>
+            <div className="text-xl font-extrabold text-rose-700 mt-1">
+              {activeCount}
             </div>
           </div>
 
+          {/* Acknowledged Card */}
           <div
             onClick={() => setStatusFilter("ACKNOWLEDGED")}
-            className={`cursor-pointer p-5 rounded-xl border flex items-center gap-4 transition-all hover:scale-[1.01] hover:shadow-xs shadow-xs ${
+            className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
               statusFilter === "ACKNOWLEDGED"
-                ? "bg-amber-50 border-amber-200 text-amber-700"
-                : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                ? "bg-amber-50/80 border-amber-300 shadow-xs"
+                : "bg-white border-slate-200 hover:border-slate-300"
             }`}
           >
-            <div className={`p-3 rounded-lg ${statusFilter === "ACKNOWLEDGED" ? "bg-amber-100/80" : "bg-slate-50"}`}>
-              <Eye size={24} />
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              {t("alerts.stats.acknowledged")}
             </div>
-            <div>
-              <div className="text-xs font-bold tracking-wider">{t("alerts.filterStatus.ACKNOWLEDGED")}</div>
-              <div className="text-2xl font-extrabold text-slate-900 mt-1">{stats.ackCount}</div>
+            <div className="text-xl font-extrabold text-amber-700 mt-1">
+              {ackCount}
             </div>
           </div>
 
+          {/* Resolved Card */}
           <div
             onClick={() => setStatusFilter("RESOLVED")}
-            className={`cursor-pointer p-5 rounded-xl border flex items-center gap-4 transition-all hover:scale-[1.01] hover:shadow-xs shadow-xs ${
+            className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
               statusFilter === "RESOLVED"
-                ? "bg-green-50 border-green-200 text-green-700"
-                : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                ? "bg-emerald-50/80 border-emerald-300 shadow-xs"
+                : "bg-white border-slate-200 hover:border-slate-300"
             }`}
           >
-            <div className={`p-3 rounded-lg ${statusFilter === "RESOLVED" ? "bg-green-100/80" : "bg-slate-50"}`}>
-              <CheckCircle2 size={24} />
+            <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              {t("alerts.stats.resolved")}
             </div>
-            <div>
-              <div className="text-xs font-bold tracking-wider">{t("alerts.filterStatus.RESOLVED")}</div>
-              <div className="text-2xl font-extrabold text-slate-900 mt-1">{stats.resolvedCount}</div>
+            <div className="text-xl font-extrabold text-emerald-700 mt-1">
+              {resolvedCount}
             </div>
           </div>
+
         </div>
 
-        {/* Toolbar & Status tab */}
-        <div className="bg-white border border-slate-200 p-4 rounded-xl flex flex-wrap justify-between items-center gap-4 shadow-xs">
+        {/* TOOLBAR */}
+        <div className="bg-white border border-slate-200 p-3 rounded-xl flex flex-wrap justify-between items-center gap-3 shadow-xs">
+          
+          {/* Status Tabs & Bulk actions */}
           <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
-              {["ACTIVE", "ACKNOWLEDGED", "RESOLVED", "ALL"].map((st) => (
+            <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+              {["ALL", "ACTIVE", "ACKNOWLEDGED", "RESOLVED"].map((st) => (
                 <button
                   key={st}
                   onClick={() => setStatusFilter(st)}
-                  className={`px-3 py-1.5 rounded-md text-[10px] font-bold  transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                     statusFilter === st
-                      ? "bg-white text-indigo-700 shadow-sm border border-slate-200/50"
-                      : "text-slate-500 hover:text-slate-850"
+                      ? "bg-white text-blue-600 shadow-xs"
+                      : "text-slate-500 hover:text-slate-800"
                   }`}
                 >
                   {t(`alerts.filterStatus.${st}`) || st}
@@ -206,115 +296,141 @@ export default function AlertsView() {
             </div>
 
             {/* Bulk actions */}
-            {stats.activeCount > 0 && (
+            {activeCount > 0 && (
               <button
                 onClick={handleBulkAcknowledge}
-                className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/60 rounded-lg text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 h-[34px] shadow-xs"
+                className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg text-xs font-bold transition-colors cursor-pointer"
               >
-                <Eye size={12} />
-                {t("alerts.buttons.bulkAck")}
+                {t("alerts.buttons.bulkAck")} ({activeCount})
               </button>
             )}
 
-            {(stats.activeCount > 0 || stats.ackCount > 0) && (
+            {(activeCount > 0 || ackCount > 0) && (
               <button
                 onClick={handleBulkResolve}
-                className="px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 border border-green-200/60 rounded-lg text-[10px] font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5 h-[34px] shadow-xs"
+                className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold transition-colors cursor-pointer"
               >
-                <CheckCircle2 size={12} />
-                {t("alerts.buttons.bulkResolve")}
+                {t("alerts.buttons.bulkResolve")} ({activeCount + ackCount})
               </button>
             )}
           </div>
 
-          <div className="flex items-center gap-2 w-full max-w-sm justify-end">
-            <div className="relative flex-1 max-w-xs">
+          {/* Search & Refresh */}
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <div className="relative flex-1 sm:w-64">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder={t("alerts.searchPlaceholder")}
-                className="w-full bg-slate-50 border border-slate-300 rounded-lg pl-10 pr-4 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
+                className="w-full pl-8 pr-7 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:border-blue-600 focus:bg-white transition-colors"
               />
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              {searchKeyword && (
+                <button
+                  onClick={() => setSearchKeyword("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </div>
+
             <button
               onClick={fetchAlerts}
-              className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-lg hover:text-slate-900 shadow-xs active:scale-95 transition-all cursor-pointer flex items-center justify-center h-8 w-8"
-              title="Refresh alerts"
+              className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 rounded-lg transition-colors cursor-pointer"
+              title={t("alerts.buttons.refresh")}
             >
-              <RefreshCw size={14} />
+              <RefreshCw size={14} className={loading ? "animate-spin text-blue-600" : ""} />
             </button>
           </div>
+
         </div>
 
-        {/* Table of Alerts */}
+        {/* ALERTS TABLE */}
         <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
-              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200 font-bold tracking-wider">
+              <thead className="bg-slate-50 text-slate-500 border-b border-slate-200 font-bold">
                 <tr>
-                  <th className="p-4">{t("alerts.table.time")}</th>
-                  <th className="p-4">{t("alerts.table.level")}</th>
-                  <th className="p-4">{t("alerts.table.module")}</th>
-                  <th className="p-4">{t("alerts.table.message")}</th>
-                  <th className="p-4">{t("alerts.table.ackBy")}</th>
-                  <th className="p-4">{t("alerts.table.resolvedAt")}</th>
-                  <th className="p-4 text-right">{t("alerts.table.actions")}</th>
+                  <th className="py-3 px-4 w-40">{t("alerts.table.time")}</th>
+                  <th className="py-3 px-4 w-28">{t("alerts.table.level")}</th>
+                  <th className="py-3 px-4 w-36">{t("alerts.table.module")}</th>
+                  <th className="py-3 px-4">{t("alerts.table.message")}</th>
+                  <th className="py-3 px-4 w-28">{t("alerts.table.status")}</th>
+                  <th className="py-3 px-4 w-32">{t("alerts.table.ackBy")}</th>
+                  <th className="py-3 px-4 text-right w-36">{t("alerts.table.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {loading ? (
+                {loading && allAlertsList.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="p-10 text-center text-slate-400">
-                      <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500 mb-2"></div>
+                      <div className="inline-block animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent mb-2"></div>
                       <div>{t("alerts.state.loading")}</div>
                     </td>
                   </tr>
-                ) : alerts.length === 0 ? (
+                ) : filteredAlerts.length === 0 ? (
                   <tr>
-                    <td colSpan="7" className="p-10 text-center text-slate-500">
+                    <td colSpan="7" className="p-10 text-center text-slate-400">
                       {t("alerts.state.empty")}
                     </td>
                   </tr>
                 ) : (
-                  alerts.slice(page * pageSize, (page + 1) * pageSize).map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="p-4 text-slate-500">
+                  paginatedAlerts.map((row) => (
+                    <tr
+                      key={row.id}
+                      onClick={() => setSelectedAlert(row)}
+                      className="hover:bg-slate-50/80 transition-colors cursor-pointer"
+                    >
+                      {/* Timestamp */}
+                      <td className="py-3 px-4 text-slate-500 whitespace-nowrap font-mono text-[11px]">
                         {row.timeRaised ? new Date(row.timeRaised).toLocaleString() : "-"}
                       </td>
-                      <td className="p-4">
-                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
-                          row.severity === "CRITICAL" || row.severity === "ERROR"
-                            ? "bg-red-50 text-red-700 border-red-200/60"
-                            : row.severity === "WARNING" || row.severity === "WARN"
-                            ? "bg-amber-50 text-amber-700 border-amber-200/60"
-                            : "bg-blue-50 text-blue-700 border-blue-200/60"
-                        }`}>
-                          {t("alerts.severity." + row.severity) || row.severity || "WARNING"}
-                        </span>
+
+                      {/* Severity Level */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {getSeverityBadge(row.severity)}
                       </td>
-                      <td className="p-4 font-bold text-slate-800">{row.module || "-"}</td>
-                      <td className="p-4 text-slate-600 break-words max-w-sm">{row.message || "-"}</td>
-                      <td className="p-4 text-slate-500">
-                        {row.acknowledgedBy ? (
-                          <span className="flex items-center gap-1.5 text-amber-600 font-semibold">
-                            <Eye size={12} />
-                            <span>{row.acknowledgedBy}</span>
+
+                      {/* Module */}
+                      <td className="py-3 px-4 font-bold text-slate-800 whitespace-nowrap">
+                        {row.module || "-"}
+                      </td>
+
+                      {/* Message with hover title and deep link */}
+                      <td className="py-3 px-4 text-slate-700 font-medium">
+                        <div className="flex items-center justify-between gap-2 group max-w-md">
+                          <span className="truncate" title={row.message}>
+                            {row.message || "-"}
                           </span>
-                        ) : (
-                          "-"
-                        )}
+                          <button
+                            onClick={(e) => handleNavigateToMessage(row, e)}
+                            title={t("alerts.modal.viewMessage")}
+                            className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-blue-600 hover:bg-blue-50 transition-all cursor-pointer shrink-0"
+                          >
+                            <ExternalLink size={12} />
+                          </button>
+                        </div>
                       </td>
-                      <td className="p-4 text-slate-500">
-                        {row.resolvedAt ? new Date(row.resolvedAt).toLocaleString() : "-"}
+
+                      {/* Status */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {getStatusBadge(row.status)}
                       </td>
-                      <td className="p-4 text-right">
-                        <div className="flex justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+
+                      {/* Ack By */}
+                      <td className="py-3 px-4 text-slate-500 whitespace-nowrap text-[11px]">
+                        {row.acknowledgedBy || "-"}
+                      </td>
+
+                      {/* Row Actions */}
+                      <td className="py-3 px-4 text-right whitespace-nowrap">
+                        <div className="flex justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
                           {row.status === "ACTIVE" && (
                             <button
                               onClick={() => handleAcknowledge(row.id)}
-                              className="px-2.5 py-1.5 rounded-lg bg-amber-50 hover:bg-amber-100 border border-amber-200/60 text-amber-700 font-bold text-[10px] transition-colors cursor-pointer active:scale-95"
+                              className="px-2.5 py-1 rounded bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 font-bold text-[11px] transition-colors cursor-pointer"
                             >
                               {t("alerts.actions.ack")}
                             </button>
@@ -322,15 +438,14 @@ export default function AlertsView() {
                           {(row.status === "ACTIVE" || row.status === "ACKNOWLEDGED") && (
                             <button
                               onClick={() => handleResolve(row.id)}
-                              className="px-2.5 py-1.5 rounded-lg bg-green-50 hover:bg-green-100 border border-green-200/60 text-green-700 font-bold text-[10px] transition-colors cursor-pointer active:scale-95"
+                              className="px-2.5 py-1 rounded bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold text-[11px] transition-colors cursor-pointer"
                             >
                               {t("alerts.actions.resolve")}
                             </button>
                           )}
                           {row.status === "RESOLVED" && (
-                            <span className="text-green-600 font-semibold text-[10px] flex items-center gap-1">
-                              <CheckCircle2 size={12} />
-                              <span>{t("alerts.state.resolved")}</span>
+                            <span className="text-emerald-600 font-semibold text-[11px]">
+                              {t("alerts.state.resolved")}
                             </span>
                           )}
                         </div>
@@ -341,13 +456,145 @@ export default function AlertsView() {
               </tbody>
             </table>
           </div>
+
+          {/* Table Pagination */}
           <TablePagination
             page={page}
-            totalPages={Math.ceil(alerts.length / pageSize)}
+            totalPages={Math.ceil(filteredAlerts.length / pageSize)}
             onPageChange={setPage}
-            totalItems={alerts.length}
+            totalItems={filteredAlerts.length}
           />
         </div>
+
+        {/* ALERT DETAIL MODAL */}
+        {selectedAlert && (
+          <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+            <div className="bg-white border border-slate-200 rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-150">
+              
+              {/* Modal Header */}
+              <div className="px-5 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-slate-800">
+                    {t("alerts.modal.title")} #{selectedAlert.id}
+                  </span>
+                  {getSeverityBadge(selectedAlert.severity)}
+                </div>
+                <button
+                  onClick={() => setSelectedAlert(null)}
+                  className="text-slate-400 hover:text-slate-600 cursor-pointer p-1 rounded-md hover:bg-slate-200/60"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-5 overflow-y-auto space-y-4 text-xs">
+                
+                {/* Meta Grid */}
+                <div className="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                      {t("alerts.modal.time")}
+                    </span>
+                    <span className="font-mono text-slate-700 font-medium">
+                      {selectedAlert.timeRaised ? new Date(selectedAlert.timeRaised).toLocaleString() : "-"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                      {t("alerts.modal.module")}
+                    </span>
+                    <span className="font-bold text-slate-800">
+                      {selectedAlert.module || "-"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                      {t("alerts.modal.status")}
+                    </span>
+                    <div className="mt-0.5">{getStatusBadge(selectedAlert.status)}</div>
+                  </div>
+
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                      {t("alerts.modal.ackBy")}
+                    </span>
+                    <span className="text-slate-700 font-medium">
+                      {selectedAlert.acknowledgedBy || "-"}
+                    </span>
+                  </div>
+
+                  {selectedAlert.resolvedAt && (
+                    <div className="col-span-2">
+                      <span className="text-slate-400 block text-[10px] uppercase font-bold">
+                        {t("alerts.modal.resolvedAt")}
+                      </span>
+                      <span className="font-mono text-slate-700 font-medium">
+                        {new Date(selectedAlert.resolvedAt).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Message Detail Box */}
+                <div>
+                  <span className="text-slate-500 font-bold block mb-1.5">
+                    {t("alerts.modal.message")}
+                  </span>
+                  <div className="border border-slate-300 bg-slate-50 rounded-lg p-3 shadow-inner">
+                    <pre
+                      className="font-mono text-xs whitespace-pre-wrap leading-relaxed select-all"
+                      style={{ backgroundColor: "#f8fafc", color: "#0f172a" }}
+                    >
+                      {selectedAlert.message || "-"}
+                    </pre>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-5 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => handleNavigateToMessage(selectedAlert, e)}
+                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-lg font-bold text-xs transition-colors cursor-pointer"
+                  >
+                    {t("alerts.modal.viewMessage")}
+                  </button>
+
+                  {selectedAlert.status === "ACTIVE" && (
+                    <button
+                      onClick={() => handleAcknowledge(selectedAlert.id)}
+                      className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded-lg font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      {t("alerts.actions.ack")}
+                    </button>
+                  )}
+                  {(selectedAlert.status === "ACTIVE" || selectedAlert.status === "ACKNOWLEDGED") && (
+                    <button
+                      onClick={() => handleResolve(selectedAlert.id)}
+                      className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-lg font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      {t("alerts.actions.resolve")}
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setSelectedAlert(null)}
+                  className="px-4 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 rounded-lg font-bold text-xs transition-colors cursor-pointer"
+                >
+                  {t("alerts.modal.close")}
+                </button>
+              </div>
+
+            </div>
+          </div>
+        )}
+
       </div>
     </DashboardLayout>
   );

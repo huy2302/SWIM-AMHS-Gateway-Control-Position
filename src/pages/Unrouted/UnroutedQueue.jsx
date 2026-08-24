@@ -475,8 +475,8 @@ export default function UnroutedQueue() {
                       </td>
                       <td className="p-4 font-mono text-sm font-bold text-blue-600">{row.origin || "-"}</td>
                       <td className="p-4 text-slate-700 text-sm">{row.priority || "NORMAL"}</td>
-                      <td className="p-4 text-red-655 font-semibold break-words max-w-xs text-sm">
-                        {row.errorDesc || "NO_MATCHING_ROUTING_RULE"}
+                      <td className="p-4 text-red-655 font-semibold break-words max-w-xs text-sm" title={row.rejectionDiagnostic || row.rejectionReason || row.errorDesc || "NO_MATCHING_ROUTING_RULE"}>
+                        {row.rejectionDiagnostic || row.rejectionReason || row.errorDesc || "NO_MATCHING_ROUTING_RULE"}
                       </td>
                       <td className="p-4 text-right relative" onClick={(e) => e.stopPropagation()}>
                         <button
@@ -616,12 +616,39 @@ export default function UnroutedQueue() {
                     <div className="text-slate-800 break-all text-[11px] font-mono font-medium mt-0.5">{detailMessage.time ? new Date(detailMessage.time).toLocaleString() : "N/A"}</div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 p-3 bg-red-50/50 border border-red-150 rounded-xl relative shadow-xs md:col-span-3">
+                  {detailMessage.atsmhsServiceLevel && (
+                    <div className="flex flex-col gap-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl relative shadow-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-400 font-bold tracking-wider">{t("unrouted.dialog.fields.atsmhsServiceLevel")}</span>
+                        <button onClick={() => handleCopy(detailMessage.atsmhsServiceLevel)} className="text-indigo-600 hover:text-indigo-500 cursor-pointer" title="Copy"><Copy size={12} /></button>
+                      </div>
+                      <div className="text-indigo-700 break-all text-[11px] font-mono font-bold mt-0.5">{detailMessage.atsmhsServiceLevel}</div>
+                    </div>
+                  )}
+
+                  {detailMessage.addressingSource && (
+                    <div className="flex flex-col gap-1.5 p-3 bg-slate-50 border border-slate-200 rounded-xl relative shadow-xs">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-400 font-bold tracking-wider">{t("unrouted.dialog.fields.addressingSource")}</span>
+                        <button onClick={() => handleCopy(detailMessage.addressingSource)} className="text-indigo-600 hover:text-indigo-500 cursor-pointer" title="Copy"><Copy size={12} /></button>
+                      </div>
+                      <div className="text-slate-800 break-all text-[11px] font-mono font-medium mt-0.5">{detailMessage.addressingSource}</div>
+                    </div>
+                  )}
+
+                  <div className="flex flex-col gap-1.5 p-3 bg-red-50/60 border border-red-200 rounded-xl relative shadow-xs md:col-span-2">
                     <div className="flex justify-between items-center">
                       <span className="text-[10px] text-red-700 font-bold tracking-wider">{t("unrouted.dialog.fields.errorType")}</span>
-                      <button onClick={() => handleCopy(detailMessage.errorDesc)} className="text-red-700 hover:text-red-650 cursor-pointer" title="Copy"><Copy size={12} /></button>
+                      <button onClick={() => handleCopy(detailMessage.rejectionDiagnostic || detailMessage.rejectionReason || detailMessage.errorDesc || "NO_MATCHING_ROUTING_RULE")} className="text-red-700 hover:text-red-650 cursor-pointer" title="Copy"><Copy size={12} /></button>
                     </div>
-                    <div className="text-red-700 break-all text-[11px] font-mono font-bold mt-0.5">{detailMessage.errorDesc || "NO_MATCHING_ROUTING_RULE"}</div>
+                    <div className="text-red-800 break-all text-[11px] font-mono font-bold mt-0.5">
+                      {detailMessage.rejectionReason && (
+                        <span className="bg-red-100 text-red-800 px-1.5 py-0.5 rounded mr-2 font-mono text-[10px] border border-red-300">
+                          {detailMessage.rejectionReason}
+                        </span>
+                      )}
+                      {detailMessage.rejectionDiagnostic || detailMessage.errorDesc || "NO_MATCHING_ROUTING_RULE"}
+                    </div>
                   </div>
                 </div>
 
@@ -632,15 +659,18 @@ export default function UnroutedQueue() {
                       {t("unrouted.dialog.fields.rawMessage")}
                     </span>
                     <button
-                      onClick={() => handleCopy(detailMessage.text)}
+                      onClick={() => handleCopy(detailMessage.payloadContent || detailMessage.text)}
                       className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer"
                     >
                       {t("messages.modal.buttons.copy")}
                     </button>
                   </div>
-                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-inner max-h-48 overflow-y-auto custom-scrollbar">
-                    <pre className="text-slate-800 text-[12px] whitespace-pre-wrap font-mono leading-relaxed">
-                      {detailMessage.text || "N/A"}
+                  <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-slate-50 shadow-inner max-h-56">
+                    <pre
+                      className="p-4 text-[12px] whitespace-pre-wrap font-mono leading-relaxed custom-scrollbar max-h-56 overflow-y-auto font-semibold"
+                      style={{ backgroundColor: '#f8fafc', color: '#0f172a' }}
+                    >
+                      {detailMessage.payloadContent || detailMessage.text || "N/A"}
                     </pre>
                   </div>
                 </div>

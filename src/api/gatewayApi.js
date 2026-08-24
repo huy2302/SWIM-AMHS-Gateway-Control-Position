@@ -140,9 +140,17 @@ const gatewayApi = {
     return axiosClient.get('/messages/inbound', { params });
   },
 
+  getInboundMessageById: (msgid) => {
+    return axiosClient.get(`/messages/inbound/${msgid}`);
+  },
+
   getAllAmhsMessages: (params) => {
     // Lấy toàn bộ điện văn đã lưu trữ (có phân trang/lọc)
     return axiosClient.get('/messages/outbound', { params });
+  },
+
+  getOutboundMessageById: (msgid) => {
+    return axiosClient.get(`/messages/outbound/${msgid}`);
   },
 
   getSystemEvents: (params) => {

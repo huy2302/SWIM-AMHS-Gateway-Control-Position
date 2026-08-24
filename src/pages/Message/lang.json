@@ -49,6 +49,10 @@
         "vi": "Nguồn",
         "en": "TOPIC / SOURCE"
       },
+      "atsmhsLevel": {
+        "vi": "Mức Dịch Vụ",
+        "en": "ATSMHS Level"
+      },
       "origin": {
         "vi": "Người Phát",
         "en": "Originator"
@@ -156,54 +160,110 @@
         "en": "Filing Time"
       },
       "priority": {
-        "vi": "Độ ưu tiên",
+        "vi": "Ưu tiên",
         "en": "Priority"
       },
       "atsPriority": {
-        "vi": "Độ ưu tiên ATS",
-        "en": "ATS Priority"
+        "vi": "Ưu tiên",
+        "en": "Priority"
       },
       "optionalHeading": {
-        "vi": "Tiêu đề phụ (OHI)",
-        "en": "Optional Heading (OHI)"
+        "vi": "OHI",
+        "en": "OHI"
       },
       "ipmId": {
-        "vi": "Mã IPM ID",
+        "vi": "IPM ID",
         "en": "IPM ID"
       },
       "bodyPartType": {
-        "vi": "Loại Body Part",
-        "en": "Body Part Type"
+        "vi": "Body Part",
+        "en": "Body Part"
       },
       "subject": {
         "vi": "Tiêu đề",
         "en": "Subject"
       },
       "source": {
-        "vi": "Nguồn / Topic",
-        "en": "Source / Topic"
+        "vi": "Nguồn",
+        "en": "Source"
       },
       "status": {
-        "vi": "Trạng thái xử lý",
-        "en": "Processing Status"
+        "vi": "Trạng thái",
+        "en": "Status"
+      },
+      "atsmhsServiceLevel": {
+        "vi": "Mức ATSMHS",
+        "en": "ATSMHS Level"
+      },
+      "addressingSource": {
+        "vi": "Nguồn tuyến",
+        "en": "Source"
+      },
+      "contentType": {
+        "vi": "Content-Type",
+        "en": "Content-Type"
+      },
+      "x400ContentType": {
+        "vi": "X.400 Type",
+        "en": "X.400 Type"
+      },
+      "originEit": {
+        "vi": "EIT",
+        "en": "EIT"
+      },
+      "numberOfAttachment": {
+        "vi": "Đính kèm",
+        "en": "Attachments"
+      },
+      "amhsDeliveryReport": {
+        "vi": "Báo cáo AMHS",
+        "en": "Delivery Report"
+      },
+      "amhsId": {
+        "vi": "MTS ID",
+        "en": "MTS ID"
       },
       "rejectionReason": {
-        "vi": "Lý do từ chối",
-        "en": "Rejection Reason"
+        "vi": "Mã lỗi",
+        "en": "Reason"
       },
       "rejectionDiagnostic": {
-        "vi": "Mã chẩn đoán",
-        "en": "Diagnostic Code"
+        "vi": "Chi tiết lỗi",
+        "en": "Diagnostic"
+      },
+      "errorOrigin": {
+        "vi": "Nguồn lỗi",
+        "en": "Error Origin"
+      },
+      "partySwim": {
+        "vi": "Phía SWIM",
+        "en": "SWIM Side"
+      },
+      "partyAmhs": {
+        "vi": "Phía AMHS",
+        "en": "AMHS Side"
       }
     },
     "sections": {
+      "generalInfo": {
+        "vi": "Địa Chỉ & Định Tuyến",
+        "en": "Addressing & Routing"
+      },
+      "technicalInfo": {
+        "vi": "Thông Số Kỹ Thuật",
+        "en": "Technical Details"
+      },
+      "dispatchInfo": {
+        "vi": "Lệnh Gửi (Dispatches)",
+        "en": "Dispatches"
+      },
       "rawMessage": {
-        "vi": "Nội Dung Gốc",
-        "en": "Raw Payload"
+        "vi": "Nội Dung Điện Văn",
+        "en": "Message Content"
       },
       "rejectionInfo": {
-        "vi": "Thông tin từ chối",
-        "en": "Rejection Information"
+        "vi": "Lỗi / Báo Cáo NDR",
+        "en": "Error & NDR"
       }
     },
     "buttons": {
