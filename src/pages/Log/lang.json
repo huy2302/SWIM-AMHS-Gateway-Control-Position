@@ -34,9 +34,9 @@
       "vi": "Thất bại",
       "en": "FAILED"
     },
-    "REJECT": {
+    "REJECTED": {
       "vi": "Từ chối",
-      "en": "REJECT"
+      "en": "REJECTED"
     },
     "ERROR": {
       "vi": "Lỗi",

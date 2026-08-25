@@ -83,7 +83,7 @@ const getStatusStyle = (status) => {
     case "ROUTING_FAILED":
       return "bg-amber-50 text-amber-700 border-amber-200/80";
     case "ERROR":
-    case "REJECT":
+    case "REJECTED":
     case "FAILED":
     case "VALIDATION_FAILED":
     case "TRANSFORMATION_FAILED":
@@ -112,7 +112,7 @@ const isErrorStatus = (status) => {
   return [
     'FAILED',
     'ERROR',
-    'REJECT',
+    'REJECTED',
     'VALIDATION_FAILED',
     'ROUTING_FAILED',
     'TRANSFORMATION_FAILED',
@@ -358,7 +358,7 @@ const FullLogView = () => {
                 <option value="ALL">{t("log.toolbar.allStatuses")}</option>
                 <option value="SUCCESS">{t("log.status.SUCCESS")}</option>
                 <option value="FAILED">{t("log.status.FAILED")}</option>
-                <option value="REJECT">{t("log.status.REJECT")}</option>
+                <option value="REJECTED">{t("log.status.REJECTED")}</option>
                 <option value="UNROUTED">{t("log.status.UNROUTED")}</option>
                 <option value="PENDING">{t("log.status.PENDING")}</option>
                 <option value="ERROR">{t("log.status.ERROR")}</option>
