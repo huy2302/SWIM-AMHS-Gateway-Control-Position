@@ -53,7 +53,7 @@ const MessageView = () => {
   };
 
   const isFailedStatus = (status, type) => {
-    if (type === "AMQP") return Number(status) === 4;
+    if (type === "AMQP") return Number(status) === 4 || Number(status) === 11;
     return Number(status) === 3;
   };
 
@@ -282,8 +282,8 @@ const MessageView = () => {
                     <option value="0">{t("messages.status.PENDING")}</option>
                     <option value="1">{t("messages.status.UNROUTED")}</option>
                     <option value="2">{t("messages.status.TRANSFORMED")}</option>
-                    <option value="3">{t("messages.status.DELIVERED")}</option>
-                    <option value="4">{t("messages.status.FAILED")}</option>
+                    <option value="10">{t("messages.status.DELIVERED")}</option>
+                    <option value="11">{t("messages.status.FAILED")}</option>
                     <option value="5">{t("messages.status.RESOLVED")}</option>
                     <option value="6">{t("messages.status.CANCELLED")}</option>
                   </>
@@ -766,6 +766,8 @@ const renderSwimStatus = (status) => {
     2: { label: 'TRANSFORMED', className: 'bg-blue-50 text-blue-700 border border-blue-200' },
     3: { label: 'DELIVERED', className: 'bg-green-50 text-green-700 border border-green-200' },
     4: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
+    10: { label: 'DELIVERED', className: 'bg-green-50 text-green-700 border border-green-200' },
+    11: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
     5: { label: 'RESOLVED', className: 'bg-teal-50 text-teal-700 border border-teal-200' },
     6: { label: 'CANCELLED', className: 'bg-slate-50 text-slate-700 border border-slate-200' },
   };
