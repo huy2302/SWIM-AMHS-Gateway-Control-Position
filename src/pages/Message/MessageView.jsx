@@ -57,7 +57,7 @@ const MessageView = () => {
         blob = new Blob([content], { type: item.contentType || "text/plain" });
       }
 
-      const fileName = item.ftbpFileName || (item.bodyType === "ftbp" ? "attachment.bin" : "message.txt");
+      const fileName = item.ftbpFileName || (item.messageId ? `${item.messageId}.bin` : "data.bin");
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -433,10 +433,10 @@ const MessageView = () => {
                             <td className="px-4 py-3 font-mono font-bold text-slate-800">{row.origin || "-"}</td>
                             <td className="px-4 py-3 font-mono text-[11px] max-w-[150px] truncate text-slate-600" title={row.amhsRecipients || row.address}>{row.amhsRecipients || row.address || "-"}</td>
                             <td className="px-4 py-3 max-w-[220px] truncate font-mono text-[11px]" title={rawContent}>
-                              {(row.bodyType === "ftbp" || row.ftbpFileName) ? (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold max-w-full truncate" title={row.ftbpFileName || "FTBP Attachment"}>
+                              {row.ftbpFileName ? (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold max-w-full truncate" title={row.ftbpFileName}>
                                   <Paperclip size={11} className="shrink-0 text-amber-600" />
-                                  <span className="truncate">{row.ftbpFileName || "FTBP File"}</span>
+                                  <span className="truncate">{row.ftbpFileName}</span>
                                 </span>
                               ) : (
                                 rawContent
@@ -454,10 +454,10 @@ const MessageView = () => {
                             <td className="px-4 py-3 font-mono text-[11px] text-slate-600">{row.filingTime || "-"}</td>
                             <td className="px-4 py-3 font-mono text-[11px] max-w-[140px] truncate" title={row.amhsid}>{row.amhsid || "-"}</td>
                             <td className="px-4 py-3 max-w-[240px] truncate font-mono text-[11px]" title={rawContent}>
-                              {(row.bodyType === "ftbp" || row.ftbpFileName) ? (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold max-w-full truncate" title={row.ftbpFileName || "FTBP Attachment"}>
+                              {row.ftbpFileName ? (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold max-w-full truncate" title={row.ftbpFileName}>
                                   <Paperclip size={11} className="shrink-0 text-amber-600" />
-                                  <span className="truncate">{row.ftbpFileName || "FTBP File"}</span>
+                                  <span className="truncate">{row.ftbpFileName}</span>
                                 </span>
                               ) : (
                                 rawContent
@@ -747,7 +747,7 @@ const MessageView = () => {
                 </div>
 
                 {/* FTBP ATTACHMENT CARD */}
-                {(selectedItem.bodyType === "ftbp" || selectedItem.ftbpFileName) && (
+                {selectedItem.ftbpFileName && (
                   <div className="flex flex-col gap-2">
                     <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
                       <Paperclip size={13} className="text-amber-600" />
@@ -759,8 +759,8 @@ const MessageView = () => {
                           <FileText size={20} />
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-slate-900 text-xs truncate" title={selectedItem.ftbpFileName || "attachment.bin"}>
-                            {selectedItem.ftbpFileName || "attachment.bin"}
+                          <p className="font-semibold text-slate-900 text-xs truncate" title={selectedItem.ftbpFileName}>
+                            {selectedItem.ftbpFileName}
                           </p>
                           <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
                             {selectedItem.ftbpObjectSize && (
