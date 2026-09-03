@@ -215,6 +215,18 @@
         "vi": "Đính kèm",
         "en": "Attachments"
       },
+      "ftbpFileName": {
+        "vi": "Tên file đính kèm",
+        "en": "Attachment Name"
+      },
+      "ftbpObjectSize": {
+        "vi": "Kích thước file",
+        "en": "File Size"
+      },
+      "ftbpLastMod": {
+        "vi": "Thời gian sửa đổi",
+        "en": "Last Modified"
+      },
       "amhsDeliveryReport": {
         "vi": "Báo cáo AMHS",
         "en": "Delivery Report"
@@ -264,6 +276,10 @@
       "rejectionInfo": {
         "vi": "Lỗi / Báo Cáo NDR",
         "en": "Error & NDR"
+      },
+      "attachmentInfo": {
+        "vi": "Tệp Đính Kèm (FTBP)",
+        "en": "Attachment (FTBP)"
       }
     },
     "buttons": {
@@ -278,6 +294,10 @@
       "copied": {
         "vi": "Đã sao chép",
         "en": "Copied"
+      },
+      "download": {
+        "vi": "Tải tệp đính kèm",
+        "en": "Download File"
       }
     }
   },
@@ -357,6 +377,14 @@
     "copySuccess": {
       "vi": "Đã sao chép vào bộ nhớ tạm",
       "en": "Copied to clipboard"
+    },
+    "downloadSuccess": {
+      "vi": "Đã tải tệp đính kèm thành công",
+      "en": "Attachment downloaded successfully"
+    },
+    "downloadFailed": {
+      "vi": "Không thể tải tệp đính kèm",
+      "en": "Failed to download attachment"
     }
   }
 }

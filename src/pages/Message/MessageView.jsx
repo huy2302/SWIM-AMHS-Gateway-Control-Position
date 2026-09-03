@@ -7,7 +7,10 @@ import {
   Check,
   Send,
   Inbox,
-  AlertCircle
+  AlertCircle,
+  Paperclip,
+  Download,
+  FileText
 } from "lucide-react";
 import toast from "react-hot-toast";
 import DashboardLayout from "@/layout/DashboardLayout";
@@ -23,6 +26,52 @@ const MessageView = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+
+  const formatFileSize = (bytes) => {
+    if (!bytes || isNaN(bytes)) return "-";
+    const num = Number(bytes);
+    if (num < 1024) return `${num} B`;
+    if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)} KB`;
+    return `${(num / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
+  const handleDownloadAttachment = (item) => {
+    try {
+      const content = item.payloadContent || item.text || "";
+      if (!content) {
+        toast.error(t("messages.toast.downloadFailed"));
+        return;
+      }
+      let blob;
+      try {
+        const cleanBase64 = content.replace(/\s+/g, '');
+        const byteCharacters = atob(cleanBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const mimeType = item.contentType?.split(';')[0]?.trim() || "application/octet-stream";
+        blob = new Blob([byteArray], { type: mimeType });
+      } catch {
+        blob = new Blob([content], { type: item.contentType || "text/plain" });
+      }
+
+      const fileName = item.ftbpFileName || (item.bodyType === "ftbp" ? "attachment.bin" : "message.txt");
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(t("messages.toast.downloadSuccess"));
+    } catch (err) {
+      console.error("Failed to download attachment:", err);
+      toast.error(t("messages.toast.downloadFailed"));
+    }
+  };
 
   const handleCloseModal = () => {
     hasAutoOpenedRef.current = true;
@@ -383,7 +432,16 @@ const MessageView = () => {
                             <td className="px-4 py-3 whitespace-nowrap">{renderAtsmhsLevel(row.atsmhsServiceLevel)}</td>
                             <td className="px-4 py-3 font-mono font-bold text-slate-800">{row.origin || "-"}</td>
                             <td className="px-4 py-3 font-mono text-[11px] max-w-[150px] truncate text-slate-600" title={row.amhsRecipients || row.address}>{row.amhsRecipients || row.address || "-"}</td>
-                            <td className="px-4 py-3 max-w-[220px] truncate font-mono text-[11px]" title={rawContent}>{rawContent}</td>
+                            <td className="px-4 py-3 max-w-[220px] truncate font-mono text-[11px]" title={rawContent}>
+                              {(row.bodyType === "ftbp" || row.ftbpFileName) ? (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold max-w-full truncate" title={row.ftbpFileName || "FTBP Attachment"}>
+                                  <Paperclip size={11} className="shrink-0 text-amber-600" />
+                                  <span className="truncate">{row.ftbpFileName || "FTBP File"}</span>
+                                </span>
+                              ) : (
+                                rawContent
+                              )}
+                            </td>
                             <td className="px-4 py-3 whitespace-nowrap">
                               {renderSwimStatus(row.status)}
                             </td>
@@ -395,7 +453,16 @@ const MessageView = () => {
                             <td className="px-4 py-3 font-mono font-bold text-slate-800">{row.origin || "-"}</td>
                             <td className="px-4 py-3 font-mono text-[11px] text-slate-600">{row.filingTime || "-"}</td>
                             <td className="px-4 py-3 font-mono text-[11px] max-w-[140px] truncate" title={row.amhsid}>{row.amhsid || "-"}</td>
-                            <td className="px-4 py-3 max-w-[240px] truncate font-mono text-[11px]" title={rawContent}>{rawContent}</td>
+                            <td className="px-4 py-3 max-w-[240px] truncate font-mono text-[11px]" title={rawContent}>
+                              {(row.bodyType === "ftbp" || row.ftbpFileName) ? (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-semibold max-w-full truncate" title={row.ftbpFileName || "FTBP Attachment"}>
+                                  <Paperclip size={11} className="shrink-0 text-amber-600" />
+                                  <span className="truncate">{row.ftbpFileName || "FTBP File"}</span>
+                                </span>
+                              ) : (
+                                rawContent
+                              )}
+                            </td>
                             <td className="px-4 py-3 whitespace-nowrap">
                               {renderAmhsStatus(row.status)}
                             </td>
@@ -601,6 +668,18 @@ const MessageView = () => {
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.optionalHeading")}:</span>
                           <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}>{selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}</span>
                         </div>
+                        {selectedItem.ftbpFileName && (
+                          <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                            <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ftbpFileName")}:</span>
+                            <span className="font-mono font-semibold text-amber-700 truncate text-right flex-1" title={selectedItem.ftbpFileName}>{selectedItem.ftbpFileName}</span>
+                          </div>
+                        )}
+                        {selectedItem.ftbpObjectSize && (
+                          <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                            <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ftbpObjectSize")}:</span>
+                            <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1">{formatFileSize(selectedItem.ftbpObjectSize)} ({selectedItem.ftbpObjectSize} bytes)</span>
+                          </div>
+                        )}
                         {selectedItem.subject && (
                           <div className="md:col-span-2 flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                             <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.subject")}:</span>
@@ -644,6 +723,18 @@ const MessageView = () => {
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.optionalHeading")}:</span>
                           <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}>{selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}</span>
                         </div>
+                        {selectedItem.ftbpFileName && (
+                          <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                            <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ftbpFileName")}:</span>
+                            <span className="font-mono font-semibold text-amber-700 truncate text-right flex-1" title={selectedItem.ftbpFileName}>{selectedItem.ftbpFileName}</span>
+                          </div>
+                        )}
+                        {selectedItem.ftbpObjectSize && (
+                          <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                            <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ftbpObjectSize")}:</span>
+                            <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1">{formatFileSize(selectedItem.ftbpObjectSize)} ({selectedItem.ftbpObjectSize} bytes)</span>
+                          </div>
+                        )}
                         {selectedItem.subject && (
                           <div className="md:col-span-2 flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                             <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.subject")}:</span>
@@ -654,6 +745,44 @@ const MessageView = () => {
                     )}
                   </div>
                 </div>
+
+                {/* FTBP ATTACHMENT CARD */}
+                {(selectedItem.bodyType === "ftbp" || selectedItem.ftbpFileName) && (
+                  <div className="flex flex-col gap-2">
+                    <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                      <Paperclip size={13} className="text-amber-600" />
+                      {t("messages.drawer.sections.attachmentInfo")}
+                    </span>
+                    <div className="bg-gradient-to-r from-amber-50/70 to-orange-50/40 border border-amber-200/90 rounded-xl p-3.5 flex items-center justify-between gap-4 shadow-2xs">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-lg bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 shrink-0">
+                          <FileText size={20} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-slate-900 text-xs truncate" title={selectedItem.ftbpFileName || "attachment.bin"}>
+                            {selectedItem.ftbpFileName || "attachment.bin"}
+                          </p>
+                          <div className="flex items-center gap-2 text-[11px] text-slate-500 mt-0.5">
+                            {selectedItem.ftbpObjectSize && (
+                              <span>{formatFileSize(selectedItem.ftbpObjectSize)}</span>
+                            )}
+                            {selectedItem.ftbpObjectSize && selectedItem.ftbpLastMod && <span>•</span>}
+                            {selectedItem.ftbpLastMod && (
+                              <span>Mod: {selectedItem.ftbpLastMod}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDownloadAttachment(selectedItem)}
+                        className="px-3 py-1.5 bg-white hover:bg-amber-50 text-amber-800 border border-amber-300 rounded-lg font-semibold text-xs transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95"
+                      >
+                        <Download size={13} />
+                        <span>{t("messages.drawer.buttons.download")}</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {/* 4. RAW MESSAGE CONTENT */}
                 <div className="flex flex-col gap-2">
