@@ -841,11 +841,30 @@ const MessageView = () => {
 
 const renderAtsmhsLevel = (level) => {
   if (!level) return <span className="text-slate-400 font-mono">-</span>;
-  const isExtended = String(level).toUpperCase().includes("EXTENDED");
+  const upper = String(level).toUpperCase();
+  if (upper.includes("EXTENDED")) {
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-purple-100 text-purple-700 border border-purple-200">
+        {level}
+      </span>
+    );
+  }
+  if (upper.includes("CONTENT")) {
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-amber-100 text-amber-800 border border-amber-200">
+        {level}
+      </span>
+    );
+  }
+  if (upper.includes("RECIPIENT")) {
+    return (
+      <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-teal-100 text-teal-800 border border-teal-200">
+        {level}
+      </span>
+    );
+  }
   return (
-    <span className={`px-2 py-0.5 rounded text-[10px] font-bold font-mono ${
-      isExtended ? "bg-purple-100 text-purple-700 border border-purple-200" : "bg-blue-100 text-blue-700 border border-blue-200"
-    }`}>
+    <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-blue-100 text-blue-700 border border-blue-200">
       {level}
     </span>
   );
