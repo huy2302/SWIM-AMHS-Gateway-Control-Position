@@ -560,10 +560,22 @@ const MessageView = () => {
                     </span>
                   </div>
 
+                  {/* CTSW001: doc 047 yeu cau kiem tra priority o CA HAI noi - application
+                      property amhs_ats_pri (ma chu ATS) va AMQP header priority (so 0-9,
+                      Table 3/5). Hien ca hai canh nhau de doi chieu duoc ngay. */}
                   <div className="flex flex-col min-w-0">
                     <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.atsPriority")}:</span>
                     <span className="font-mono font-bold text-slate-800 text-xs">
                       {selectedItem.atsPriority || selectedItem.amhsPriority || selectedItem.amhs_ats_pri || "NORMAL"}
+                      {(() => {
+                        const amqpPri = searchType === "AMQP" ? selectedItem.priority : selectedItem.swimPriority;
+                        if (amqpPri === null || amqpPri === undefined) return null;
+                        return (
+                          <span className="ml-1.5 font-semibold text-slate-500">
+                            / AMQP {amqpPri}
+                          </span>
+                        );
+                      })()}
                     </span>
                   </div>
                 </div>
@@ -680,6 +692,20 @@ const MessageView = () => {
                             <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1">{formatFileSize(selectedItem.ftbpObjectSize)} ({selectedItem.ftbpObjectSize} bytes)</span>
                           </div>
                         )}
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.swimPriority")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1">
+                            {selectedItem.priority !== null && selectedItem.priority !== undefined ? selectedItem.priority : "-"}
+                          </span>
+                        </div>
+                        {selectedItem.amqpProperties && (
+                          <div className="md:col-span-2 flex flex-col gap-1 py-1 border-b border-slate-100 min-w-0">
+                            <span className="text-slate-500 font-medium">{t("messages.drawer.fields.amqpProperties")}:</span>
+                            <pre className="font-mono text-[11px] text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-2 m-0 max-h-40 overflow-auto whitespace-pre-wrap break-all">
+                              {selectedItem.amqpProperties}
+                            </pre>
+                          </div>
+                        )}
                         {selectedItem.subject && (
                           <div className="md:col-span-2 flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                             <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.subject")}:</span>
@@ -723,6 +749,38 @@ const MessageView = () => {
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.optionalHeading")}:</span>
                           <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}>{selectedItem.optionalHeading || selectedItem.amhs_ats_ohi || "-"}</span>
                         </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.swimPriority")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1">
+                            {selectedItem.swimPriority !== null && selectedItem.swimPriority !== undefined ? selectedItem.swimPriority : "-"}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.contentEncoding")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.bodyPartCharset || "-"}>{selectedItem.bodyPartCharset || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.messageSigned")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.messageSigned || "-"}>{selectedItem.messageSigned || "-"}</span>
+                        </div>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.deliveryReport")}:</span>
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1">
+                            {selectedItem.amhsDeliveryReport === true ? t("messages.drawer.fields.drRequested") : "-"}
+                          </span>
+                        </div>
+                        {selectedItem.amhsTtl && (
+                          <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                            <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.amhsTtl")}:</span>
+                            <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.amhsTtl}>{new Date(selectedItem.amhsTtl).toLocaleString()}</span>
+                          </div>
+                        )}
+                        {selectedItem.amhsRegisteredId && (
+                          <div className="md:col-span-2 flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
+                            <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.registeredId")}:</span>
+                            <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.amhsRegisteredId}>{selectedItem.amhsRegisteredId}</span>
+                          </div>
+                        )}
                         {selectedItem.ftbpFileName && (
                           <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                             <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ftbpFileName")}:</span>

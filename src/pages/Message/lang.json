@@ -167,6 +167,38 @@
         "vi": "Ưu tiên",
         "en": "Priority"
       },
+      "swimPriority": {
+        "vi": "Ưu tiên AMQP (header)",
+        "en": "AMQP priority (header)"
+      },
+      "contentEncoding": {
+        "vi": "Bộ mã ký tự",
+        "en": "Content encoding"
+      },
+      "messageSigned": {
+        "vi": "Chữ ký bản tin",
+        "en": "Message signed"
+      },
+      "deliveryReport": {
+        "vi": "Yêu cầu DR",
+        "en": "Delivery report"
+      },
+      "drRequested": {
+        "vi": "Có yêu cầu",
+        "en": "Requested"
+      },
+      "amhsTtl": {
+        "vi": "Hạn chuyển giao",
+        "en": "Latest delivery time"
+      },
+      "registeredId": {
+        "vi": "Registered identifier",
+        "en": "Registered identifier"
+      },
+      "amqpProperties": {
+        "vi": "AMQP properties (thô)",
+        "en": "AMQP properties (raw)"
+      },
       "optionalHeading": {
         "vi": "OHI",
         "en": "OHI"
