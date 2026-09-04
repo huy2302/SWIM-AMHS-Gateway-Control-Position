@@ -200,10 +200,6 @@ const gatewayApi = {
     return axiosClient.put(`/users/${id}/deactivate`);
   },
 
-  getMessageTypes: () => {
-    return axiosClient.get('/metadata/message-types');
-  },
-
   // --- 6. UNROUTED QUEUE & STATISTICS (Quản lý hàng đợi định tuyến lỗi) ---
   getUnroutedMessages: (params) => {
     return axiosClient.get('/addressing/unrouted', { params });

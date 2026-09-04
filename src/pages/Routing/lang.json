@@ -42,10 +42,6 @@
       "vi": "Loại Điện Văn",
       "en": "Msg Type"
     },
-    "detectPattern": {
-      "vi": "Detect Pattern",
-      "en": "Detect Pattern"
-    },
     "sendTopic": {
       "vi": "Topic Phát",
       "en": "Send Topic"
@@ -161,14 +157,14 @@
   },
   "form": {
     "a2s": {
-      "messageType": {
+      "recipients": {
         "label": {
-          "vi": "Loại điện văn (Message Type)",
-          "en": "Message Type"
+          "vi": "Địa chỉ AFTN người nhận",
+          "en": "AFTN Recipient Addresses"
         },
         "placeholder": {
-          "vi": "Nhập loại điện văn (ví dụ: FPL, METAR...)",
-          "en": "e.g. FPL, METAR..."
+          "vi": "Nhập địa chỉ AFTN (VVTSZTZX) hoặc tiền tố (VVTS*)",
+          "en": "AFTN address (VVTSZTZX) or prefix (VVTS*)"
         },
         "addButton": {
           "vi": "Thêm",
@@ -217,16 +213,6 @@
         "placeholder": {
           "vi": "Nhập danh sách địa chỉ người nhận...",
           "en": "Enter AMHS recipients..."
-        }
-      },
-      "originator": {
-        "label": {
-          "vi": "Địa chỉ người phát (Originator)",
-          "en": "Originator Address"
-        },
-        "placeholder": {
-          "vi": "Nhập địa chỉ người phát...",
-          "en": "Enter originator address..."
         }
       },
       "priority": {

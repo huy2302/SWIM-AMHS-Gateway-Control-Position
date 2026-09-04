@@ -25,32 +25,25 @@ const createTimestamp = () => new Date().toISOString();
 
 const createA2SRule = () => ({
   id: `a2s-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
-  originator: "",
-  destination: "",
-  msgType: "FPL",
-  messageType: "FPL",
-  detectPattern: "",
-  domain: "FIXM",
+  recipients: "",
   topic: "",
+  sendTopic: "",
   priority: 100,
   active: true,
   createdAt: createTimestamp(),
   updatedAt: createTimestamp(),
 });
 
-const A2S_MESSAGE_TYPES = [
-  "METAR",
-  "SPECI",
-  "TAF",
-  "SIGMET",
-  "AIRMET",
-  "FPL",
-  "DEP",
-  "ARR",
-  "DLA",
-  "CNL",
-  "CHG",
-  "NOTAM",
+// Gợi ý địa chỉ AFTN cho ô nhập - chỉ là danh sách gợi ý, người dùng gõ địa chỉ khác vẫn được.
+// Lấy từ các recipient đã xuất hiện thực tế trong gwout_dispatch.
+const A2S_KNOWN_RECIPIENTS = [
+  "VVTSZTZX",
+  "VVNBZTZX",
+  "VVHHZTZX",
+  "VVHHZPZX",
+  "VVTSOPTB",
+  "VVTSMHSA",
+  "VVTSSWIM",
 ];
 
 
@@ -61,7 +54,6 @@ const createS2ARule = () => ({
   sendTopic: "",
   domain: "",
   msgType: "",
-  originator: "",
   destination: "",
   priority: 100,
   filingTime: "CURRENT_TIME",
@@ -76,12 +68,7 @@ const createS2ARule = () => ({
 const normalizeA2sApiRule = (rule) => ({
   id: rule.id || `a2s-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
   direction: "OUT",
-  originator: rule.amhsOriginator ?? rule.originator ?? "",
-  destination: rule.amhsDestination ?? rule.destination ?? "",
-  msgType: rule.messageType ?? rule.amhsMsgType ?? rule.msgType ?? "",
-  messageType: rule.messageType ?? rule.amhsMsgType ?? rule.msgType ?? "",
-  detectPattern: rule.detectPattern ?? rule.detect_pattern ?? "",
-  domain: rule.swimDomain ?? rule.domain ?? "",
+  recipients: rule.recipients ?? "",
   topic: rule.sendTopic ?? rule.swimTopic ?? rule.topic ?? "",
   sendTopic: rule.sendTopic ?? rule.swimTopic ?? rule.topic ?? "",
   priority: rule.priority ?? 100,
@@ -100,7 +87,6 @@ const normalizeS2aApiRule = (rule) => ({
   sendTopic: rule.sendTopic ?? rule.amhsTopic ?? "",
   domain: rule.swimDomain ?? rule.domain ?? "",
   msgType: rule.messageType ?? rule.msgType ?? "",
-  originator: rule.amhsOriginator ?? rule.originator ?? "",
   destination: rule.recipients ?? rule.amhsDestination ?? rule.destination ?? "",
   priority: rule.priority ?? 100,
   filingTime: rule.amhsFilingTimeMode ?? rule.filingTime ?? "CURRENT_TIME",
@@ -121,11 +107,10 @@ const RoutingView = () => {
   const [statusType, setStatusType] = useState(null);
   const [editingRule, setEditingRule] = useState(null); // Rule đang được edit
   const [editFormData, setEditFormData] = useState({}); // Data của form edit
-  const [msgTypeInput, setMsgTypeInput] = useState("");
+  const [recipientInput, setRecipientInput] = useState("");
   const [filterMessageType, setFilterMessageType] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [originatorError, setOriginatorError] = useState(""); // Originator validation error
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteRule, setDeleteRule] = useState(null);
   const [deletePassword, setDeletePassword] = useState("");
@@ -236,30 +221,26 @@ const RoutingView = () => {
 
   const handleEditRule = (rule) => {
     setEditingRule(rule);
-    setOriginatorError("");
     if (activeTab === "A2S") {
       setEditFormData({
         id: rule.id,
         direction: "OUT",
-        msgType: rule.messageType || rule.msgType || "",
-        msgTypeList: (rule.messageType || rule.msgType || "")
-          .split(",")
+        recipientList: (rule.recipients || "")
+          .split(/[,;\s]+/)
           .map((item) => item.trim())
           .filter(Boolean),
-        detectPattern: rule.detectPattern || rule.detect_pattern || "",
         topic: rule.topic || "",
         priority: rule.priority ?? 100,
         active: rule.active ?? true,
         note: rule.description || "",
       });
-      setMsgTypeInput("");
+      setRecipientInput("");
     } else {
       setEditFormData({
         id: rule.id,
         direction: "IN",
         receiveTopic: rule.receiveTopic || rule.topic || "",
         recipients: rule.destination || "",
-        originator: rule.originator || "",
         priority: rule.priority ?? 100,
         active: rule.active ?? true,
         note: rule.description || "",
@@ -280,17 +261,17 @@ const RoutingView = () => {
     }
     setEditingRule(null);
     setEditFormData({});
-    setMsgTypeInput("");
+    setRecipientInput("");
   };
 
   const filterRuleList = (rules, mode) => {
     const query = searchQuery.trim().toLowerCase();
 
     return rules.filter((rule) => {
-      if (filterMessageType) {
-        const values = (mode === "A2S"
-          ? (rule.messageType || rule.msgType || "")
-          : (rule.msgType || ""))
+      // Rule A2S định tuyến theo địa chỉ recipient nên không còn message type để lọc;
+      // bộ lọc này chỉ còn ý nghĩa với chiều S2A.
+      if (filterMessageType && mode !== "A2S") {
+        const values = (rule.msgType || "")
           .split(",")
           .map((item) => item.trim().toUpperCase())
           .filter(Boolean);
@@ -308,10 +289,10 @@ const RoutingView = () => {
 
       if (query) {
         const haystack = [
+          rule.recipients || "",
           rule.messageType || rule.msgType || "",
           rule.topic || "",
           rule.sendTopic || rule.topic || "",
-          rule.originator || "",
           rule.destination || "",
           rule.receiveTopic || "",
           rule.description || rule.note || "",
@@ -335,28 +316,28 @@ const RoutingView = () => {
     setEditFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addA2sMsgType = (value) => {
+  const addA2sRecipient = (value) => {
     const normalized = (value || "").toUpperCase().trim();
     if (!normalized) return;
 
     setEditFormData((prev) => {
-      const list = Array.from(new Set([...(prev.msgTypeList || []), normalized]));
-      return { ...prev, msgTypeList: list };
+      const list = Array.from(new Set([...(prev.recipientList || []), normalized]));
+      return { ...prev, recipientList: list };
     });
-    setMsgTypeInput("");
+    setRecipientInput("");
   };
 
-  const removeA2sMsgType = (type) => {
+  const removeA2sRecipient = (type) => {
     setEditFormData((prev) => ({
       ...prev,
-      msgTypeList: (prev.msgTypeList || []).filter((item) => item !== type),
+      recipientList: (prev.recipientList || []).filter((item) => item !== type),
     }));
   };
 
-  const handleA2sMsgTypeKeyDown = (event) => {
+  const handleA2sRecipientKeyDown = (event) => {
     if (event.key === "Enter" || event.key === ",") {
       event.preventDefault();
-      addA2sMsgType(msgTypeInput);
+      addA2sRecipient(recipientInput);
     }
   };
 
@@ -373,13 +354,11 @@ const RoutingView = () => {
     };
 
     if (activeTab === "A2S") {
-      payload.messageType = (editFormData.msgTypeList || []).join(",");
-      payload.detectPattern = editFormData.detectPattern || "";
+      payload.recipients = (editFormData.recipientList || []).join(",");
       payload.sendTopic = editFormData.topic || "";
     } else {
       payload.receiveTopic = editFormData.receiveTopic || "";
       payload.recipients = editFormData.recipients || "";
-      payload.originator = editFormData.originator || "";
     }
 
     try {
@@ -396,7 +375,7 @@ const RoutingView = () => {
       // không còn là draft cần dọn nữa.
       setEditingRule(null);
       setEditFormData({});
-      setMsgTypeInput("");
+      setRecipientInput("");
       // Refetch từ BE thay vì tin state local: rule mới tạo đang mang id giả (client-generated),
       // nếu không đồng bộ lại, sửa/xoá tiếp rule đó ngay sau khi tạo sẽ gọi API bằng id sai.
       await fetchRoutingConfigs();
@@ -522,8 +501,7 @@ const RoutingView = () => {
                   <th className="p-3.5">{t("routing.table.id")}</th>
                   {activeTab === "A2S" ? (
                     <>
-                      <th className="p-3.5">{t("routing.table.messageType")}</th>
-                      <th className="p-3.5">{t("routing.table.detectPattern")}</th>
+                      <th className="p-3.5">{t("routing.table.recipients")}</th>
                       <th className="p-3.5">{t("routing.table.sendTopic")}</th>
                       <th className="p-3.5">{t("routing.table.note")}</th>
                       <th className="p-3.5">{t("routing.table.priority")}</th>
@@ -551,8 +529,7 @@ const RoutingView = () => {
                       onClick={() => handleEditRule(rule)}
                     >
                       <td className="p-3.5 font-bold text-slate-900">{rule.id}</td>
-                      <td className="p-3.5 text-slate-700">{rule.messageType || rule.msgType}</td>
-                      <td className="p-3.5 text-slate-600 font-mono font-bold text-indigo-600">{rule.detectPattern || "-"}</td>
+                      <td className="p-3.5 text-slate-600 font-mono font-bold text-indigo-600">{rule.recipients || "-"}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.sendTopic || rule.topic}</td>
                       <td className="p-3.5 text-slate-600 max-w-[220px] truncate" title={rule.description || rule.note || ""}>{rule.description || rule.note || "-"}</td>
                       <td className="p-3.5 font-semibold text-indigo-650">{rule.priority ?? 100}</td>
@@ -628,15 +605,13 @@ const RoutingView = () => {
         activeTab={activeTab}
         editingRule={editingRule}
         editFormData={editFormData}
-        msgTypeInput={msgTypeInput}
-        originatorError={originatorError}
-        setMsgTypeInput={setMsgTypeInput}
-        setOriginatorError={setOriginatorError}
+        recipientInput={recipientInput}
+        setRecipientInput={setRecipientInput}
         handleCloseEdit={handleCloseEdit}
         handleEditFormChange={handleEditFormChange}
-        handleA2sMsgTypeKeyDown={handleA2sMsgTypeKeyDown}
-        addA2sMsgType={addA2sMsgType}
-        removeA2sMsgType={removeA2sMsgType}
+        handleA2sRecipientKeyDown={handleA2sRecipientKeyDown}
+        addA2sRecipient={addA2sRecipient}
+        removeA2sRecipient={removeA2sRecipient}
         handleSaveEditRule={handleSaveEditRule}
         t={t}
       />
@@ -737,15 +712,13 @@ const RuleEditorModal = memo(({
   activeTab,
   editingRule,
   editFormData,
-  msgTypeInput,
-  originatorError,
-  setMsgTypeInput,
-  setOriginatorError,
+  recipientInput,
+  setRecipientInput,
   handleCloseEdit,
   handleEditFormChange,
-  handleA2sMsgTypeKeyDown,
-  addA2sMsgType,
-  removeA2sMsgType,
+  handleA2sRecipientKeyDown,
+  addA2sRecipient,
+  removeA2sRecipient,
   handleSaveEditRule,
   t,
 }) => {
@@ -788,14 +761,14 @@ const RuleEditorModal = memo(({
         <div className="p-5 space-y-4 overflow-y-auto flex-1 custom-scrollbar text-xs">
           {activeTab === "A2S" ? (
             <>
-              {/* Message Type */}
+              {/* Recipients (địa chỉ AFTN người nhận) */}
               <div className="space-y-1.5">
                 <label className="block font-bold text-slate-600 tracking-wider">
-                  {t("routing.form.a2s.messageType.label")} *
+                  {t("routing.form.a2s.recipients.label")} *
                 </label>
                 <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
                   <div className="flex flex-wrap gap-1.5 mb-2">
-                    {(editFormData.msgTypeList || []).map((type) => (
+                    {(editFormData.recipientList || []).map((type) => (
                       <span
                         key={type}
                         className="inline-flex items-center gap-1.5 bg-white text-indigo-700 font-bold px-2 py-0.5 rounded-md border border-slate-200 shadow-2xs"
@@ -803,7 +776,7 @@ const RuleEditorModal = memo(({
                         {type}
                         <button
                           type="button"
-                          onClick={() => removeA2sMsgType(type)}
+                          onClick={() => removeA2sRecipient(type)}
                           className="text-slate-400 hover:text-red-600 font-bold cursor-pointer"
                         >
                           ×
@@ -814,44 +787,28 @@ const RuleEditorModal = memo(({
                   <div className="flex gap-2 items-center">
                     <input
                       type="text"
-                      list="a2s-msg-types"
-                      value={msgTypeInput}
-                      onChange={(e) => setMsgTypeInput(e.target.value)}
-                      onKeyDown={handleA2sMsgTypeKeyDown}
-                      placeholder={t("routing.form.a2s.messageType.placeholder")}
+                      list="a2s-recipients"
+                      value={recipientInput}
+                      onChange={(e) => setRecipientInput(e.target.value)}
+                      onKeyDown={handleA2sRecipientKeyDown}
+                      placeholder={t("routing.form.a2s.recipients.placeholder")}
                       className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                     />
                     <button
                       type="button"
-                      onClick={() => addA2sMsgType(msgTypeInput)}
+                      onClick={() => addA2sRecipient(recipientInput)}
                       className="px-3.5 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition cursor-pointer"
                     >
-                      {t("routing.form.a2s.messageType.addButton")}
+                      {t("routing.form.a2s.recipients.addButton")}
                     </button>
                   </div>
-                  <datalist id="a2s-msg-types">
-                    {A2S_MESSAGE_TYPES.map((type) => (
+                  <datalist id="a2s-recipients">
+                    {A2S_KNOWN_RECIPIENTS.map((type) => (
                       <option key={type} value={type} />
                     ))}
                   </datalist>
                 </div>
               </div>
-
-              {/* Detect Pattern */}
-              <div className="space-y-1.5">
-                <label className="block font-bold text-slate-600 tracking-wider">
-                  Detect Pattern *
-                </label>
-                <input
-                  type="text"
-                  value={editFormData.detectPattern || ""}
-                  onChange={(e) => handleEditFormChange("detectPattern", e.target.value)}
-                  placeholder="e.g. METAR  or SA  or TAF "
-                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono font-medium outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
-                />
-                
-              </div>
-
               {/* Send Topic */}
               <div className="space-y-1.5">
                 <label className="block font-bold text-slate-600 tracking-wider">
@@ -951,26 +908,6 @@ const RuleEditorModal = memo(({
                   className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
                 />
               </div>
-
-              <div className="space-y-1.5">
-                <label className="block font-bold text-slate-600 tracking-wider">
-                  {t("routing.form.s2a.originator.label")}
-                </label>
-                <input
-                  type="text"
-                  value={editFormData.originator || ""}
-                  onChange={(e) => {
-                    handleEditFormChange("originator", e.target.value);
-                    setOriginatorError("");
-                  }}
-                  placeholder={t("routing.form.s2a.originator.placeholder")}
-                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
-                />
-                {originatorError && (
-                  <p className="text-red-500 text-xxs font-bold">{originatorError}</p>
-                )}
-              </div>
-
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="block font-bold text-slate-600 tracking-wider">
