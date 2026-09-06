@@ -22,6 +22,7 @@ import LoginPage from "./pages/Login/LoginPage";
 import UserManagement from "./pages/User/UserManagement";
 import UnroutedQueue from "./pages/Unrouted/UnroutedQueue";
 import AlertsView from "./pages/Alerts/AlertsView";
+import ControlTrafficView from "./pages/ControlTraffic/ControlTrafficView";
 import Settings from "./pages/Settings/Settings";
 
 /**
@@ -87,6 +88,7 @@ function App() {
             <Route path="system-events" element={<SystemEvents />} />
             <Route path="unrouted" element={<UnroutedQueue />} />
             <Route path="alerts" element={<AlertsView />} />
+            <Route path="control-traffic" element={<ControlTrafficView />} />
             <Route path="settings" element={<Settings />} />
 
             <Route element={<RequireAdmin />}>

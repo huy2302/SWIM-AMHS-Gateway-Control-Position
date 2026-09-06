@@ -75,6 +75,10 @@
     "admin": {
       "vi": "Cấu hình",
       "en": "Admin Configurations"
+    },
+    "controlTraffic": {
+      "vi": "Phản hồi AMHS",
+      "en": "AMHS Feedback"
     }
   },
   "serverMonitor": {

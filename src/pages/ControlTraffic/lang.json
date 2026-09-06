@@ -1,0 +1,57 @@
+{
+  "title": { "vi": "Phản hồi AMHS", "en": "AMHS Feedback" },
+  "subtitle": {
+    "vi": "Thông báo và báo cáo bay ngược về cho điện văn đã gửi sang AMHS",
+    "en": "Notifications and reports returned for messages sent to AMHS"
+  },
+  "tabs": {
+    "ipn": { "vi": "Thông báo (RN / NRN)", "en": "Notifications (RN / NRN)" },
+    "report": { "vi": "Báo cáo (DR / NDR)", "en": "Reports (DR / NDR)" }
+  },
+  "stats": {
+    "rn": { "vi": "RN — đã đọc", "en": "RN — read" },
+    "nrn": { "vi": "NRN — không đọc", "en": "NRN — not read" },
+    "dr": { "vi": "DR — đã giao", "en": "DR — delivered" },
+    "ndr": { "vi": "NDR — không giao được", "en": "NDR — undeliverable" }
+  },
+  "filter": {
+    "all": { "vi": "Tất cả", "en": "All" },
+    "search": { "vi": "Tìm theo địa chỉ, IPM-Id, MTS-Id...", "en": "Search by address, IPM-Id, MTS-Id..." }
+  },
+  "ipnColumns": {
+    "id": { "vi": "ID", "en": "ID" },
+    "type": { "vi": "Loại", "en": "Type" },
+    "orAddress": { "vi": "Bên gửi", "en": "Originator" },
+    "subjectIpmId": { "vi": "IPM-Id điện văn gốc", "en": "Subject IPM-Id" },
+    "subjectMtsId": { "vi": "MTS-Id điện văn gốc", "en": "Subject MTS-Id" },
+    "receiptTime": { "vi": "Thời điểm nhận", "en": "Receipt time" },
+    "nonReceiptReason": { "vi": "Lý do không đọc", "en": "Non-receipt reason" },
+    "receivedAt": { "vi": "Về lúc", "en": "Received at" },
+    "status": { "vi": "Trạng thái", "en": "Status" }
+  },
+  "reportColumns": {
+    "id": { "vi": "ID", "en": "ID" },
+    "type": { "vi": "Loại", "en": "Type" },
+    "recipient": { "vi": "Người nhận", "en": "Recipient" },
+    "gwinId": { "vi": "Điện văn gốc", "en": "Source message" },
+    "subjectMtsId": { "vi": "MTS-Id điện văn gốc", "en": "Subject MTS-Id" },
+    "reasonCode": { "vi": "Mã lý do", "en": "Reason code" },
+    "diagnosticCode": { "vi": "Mã chẩn đoán", "en": "Diagnostic code" },
+    "supplementaryInfo": { "vi": "Thông tin thêm", "en": "Supplementary info" },
+    "receivedAt": { "vi": "Về lúc", "en": "Received at" },
+    "status": { "vi": "Trạng thái", "en": "Status" }
+  },
+  "empty": {
+    "ipn": {
+      "vi": "Chưa có thông báo nào. Bảng mtcu_ipn do AMHS Component ghi.",
+      "en": "No notifications yet. Table mtcu_ipn is written by the AMHS Component."
+    },
+    "report": {
+      "vi": "Chưa có báo cáo nào. Bảng mtcu_report do AMHS Component ghi.",
+      "en": "No reports yet. Table mtcu_report is written by the AMHS Component."
+    }
+  },
+  "diagnosticEmpty": { "vi": "(để trống)", "en": "(empty)" },
+  "refresh": { "vi": "Tải lại", "en": "Refresh" },
+  "loadError": { "vi": "Không tải được dữ liệu phản hồi AMHS", "en": "Failed to load AMHS feedback" }
+}

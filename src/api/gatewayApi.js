@@ -296,6 +296,20 @@ const gatewayApi = {
     return axiosClient.delete(`/messages/outbound/${id}`);
   },
 
+  // --- PHAN HOI AMHS: IPN (RN/NRN) va Report (DR/NDR) bay nguoc ve ---
+  // EUR Doc 047 §2.2.1.1 cam chuyen sang moi truong SWIM, nen Control Position la dich duy nhat.
+  getIncomingIpn: (type) => {
+    return axiosClient.get('/control-traffic/ipn', { params: type ? { type } : {} });
+  },
+
+  getIncomingReports: (type) => {
+    return axiosClient.get('/control-traffic/report', { params: type ? { type } : {} });
+  },
+
+  getControlTrafficSummary: () => {
+    return axiosClient.get('/control-traffic/summary');
+  },
+
   // --- 10. SYSTEM MAINTENANCE & DIAGNOSTICS (Bảo trì và chẩn đoán) ---
   deleteOldData: () => {
     return axiosClient.delete('/admin/data/old', { data: {} });

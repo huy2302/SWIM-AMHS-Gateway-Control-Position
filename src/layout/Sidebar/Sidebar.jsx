@@ -10,7 +10,8 @@ import {
   History,
   Users,
   Settings,
-  AlertCircle
+  AlertCircle,
+  MailWarning
 } from "lucide-react";
 import { useState } from "react";
 import ServerMonitor from "@/components/ServerMonitor";
@@ -135,6 +136,19 @@ export default function Sidebar() {
             <Unplug size={17} />
             <span className={`menu-label ${collapsed ? "collapsed" : ""}`}>
               {t("sidebar.menu.unrouted")}
+            </span>
+          </NavLink>
+
+          <NavLink
+            to="/control-traffic"
+            className={({ isActive }) =>
+              isActive ? "menu-item active" : "menu-item"
+            }
+            title={collapsed ? t("sidebar.menu.controlTraffic") : ""}
+          >
+            <MailWarning size={17} />
+            <span className={`menu-label `}>
+              {t("sidebar.menu.controlTraffic")}
             </span>
           </NavLink>
 
