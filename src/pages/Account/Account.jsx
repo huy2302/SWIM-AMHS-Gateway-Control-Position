@@ -477,7 +477,7 @@ export default function Account() {
                     value={formData.configJson ? (JSON.parse(formData.configJson).vpn || "") : ""}
                     onChange={(e) => {
                       let parsed = {};
-                      try { parsed = JSON.parse(formData.configJson || "{}"); } catch(ex){}
+                      try { parsed = JSON.parse(formData.configJson || "{}"); } catch { /* configJson hỏng - dùng object rỗng */ }
                       setFormData({...formData, configJson: JSON.stringify({...parsed, vpn: e.target.value})});
                     }}
                   />

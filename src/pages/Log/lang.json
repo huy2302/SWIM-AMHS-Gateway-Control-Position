@@ -168,6 +168,18 @@
       "vi": "Tất cả hướng",
       "en": "All Directions"
     },
+    "directionIn": {
+      "vi": "SWIM → AMHS (IN)",
+      "en": "SWIM → AMHS (IN)"
+    },
+    "directionOut": {
+      "vi": "AMHS → SWIM (OUT)",
+      "en": "AMHS → SWIM (OUT)"
+    },
+    "loading": {
+      "vi": "Đang tải nhật ký chuyển đổi...",
+      "en": "Loading conversion log..."
+    },
     "allStatuses": {
       "vi": "Tất cả trạng thái",
       "en": "All Statuses"

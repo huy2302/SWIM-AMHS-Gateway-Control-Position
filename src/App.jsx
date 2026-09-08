@@ -15,7 +15,8 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { AuthProvider, useAuth } from "./components/AuthContext";
+import { AuthProvider } from "./components/AuthProvider";
+import { useAuth } from "./components/auth-context";
 import SystemEvents from "./pages/SystemEvents/SystemEventsView";
 import { authApi } from "./api/authApi";
 import LoginPage from "./pages/Login/LoginPage";

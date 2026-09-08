@@ -102,7 +102,7 @@ const RoutingView = () => {
   const [a2sRules, setA2sRules] = useState([]);
   const [s2aRules, setS2aRules] = useState([]);
   const [loadingRoutes, setLoadingRoutes] = useState(false);
-  const [saving, setSaving] = useState(false);
+
   const [statusMessage, setStatusMessage] = useState(null);
   const [statusType, setStatusType] = useState(null);
   const [editingRule, setEditingRule] = useState(null); // Rule đang được edit
@@ -130,7 +130,6 @@ const RoutingView = () => {
 
     try {
       const { a2s, s2a } = await gatewayApi.getRoutings();
-      console.log("Fetched routing configs:", a2s);
       setA2sRules(Array.isArray(a2s) ? a2s.map(normalizeA2sApiRule) : []);
       setS2aRules(Array.isArray(s2a) ? s2a.map(normalizeS2aApiRule) : []);
     } catch (error) {
@@ -194,7 +193,7 @@ const RoutingView = () => {
       }
 
       showSuccessToast(t("routing.toast.deleteSuccess"), toast);
-      setStatusMessage(`✓ Rule ${deleteRule.id} ${t("routing.toast.deleteSuccess")}`);
+      setStatusMessage(`Rule ${deleteRule.id} ${t("routing.toast.deleteSuccess")}`);
       setStatusType("success");
       setShowDeleteModal(false);
       setDeleteRule(null);
@@ -369,7 +368,7 @@ const RoutingView = () => {
       }
 
       showSuccessToast(t("routing.toast.saveSuccess"), toast);
-      setStatusMessage(`✓ Rule ${editingRule.id} ${t("routing.toast.saveSuccess")}`);
+      setStatusMessage(`Rule ${editingRule.id} ${t("routing.toast.saveSuccess")}`);
       setStatusType("success");
       // Đóng edit mode trực tiếp (không qua handleCloseEdit) vì rule đã lưu thành công,
       // không còn là draft cần dọn nữa.
@@ -522,7 +521,7 @@ const RoutingView = () => {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {activeTab === "A2S" ? (
-                  displayedA2sRules.slice(page * pageSize, (page + 1) * pageSize).map((rule, index) => (
+                  displayedA2sRules.slice(page * pageSize, (page + 1) * pageSize).map((rule) => (
                     <tr 
                       key={rule.id} 
                       className="hover:bg-slate-50/70 transition-colors cursor-pointer"
@@ -551,7 +550,7 @@ const RoutingView = () => {
                     </tr>
                   ))
                 ) : (
-                  displayedS2aRules.slice(page * pageSize, (page + 1) * pageSize).map((rule, index) => (
+                  displayedS2aRules.slice(page * pageSize, (page + 1) * pageSize).map((rule) => (
                     <tr 
                       key={rule.id} 
                       className="hover:bg-slate-50/70 transition-colors cursor-pointer"
@@ -779,7 +778,7 @@ const RuleEditorModal = memo(({
                           onClick={() => removeA2sRecipient(type)}
                           className="text-slate-400 hover:text-red-600 font-bold cursor-pointer"
                         >
-                          ×
+                          <X size={12} />
                         </button>
                       </span>
                     ))}

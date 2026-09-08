@@ -1,6 +1,6 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { useLanguageStore } from '../store/languageStore';
+import { t } from '@/i18n/translator';
 
 const getBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
@@ -18,7 +18,7 @@ const axiosClient = axios.create({
 const decodeJwtPayload = (token) => {
   try {
     return JSON.parse(atob(token.split('.')[1]));
-  } catch (err) {
+  } catch {
     return null;
   }
 };
@@ -53,7 +53,7 @@ export const authUtils = {
       try {
         const parsed = JSON.parse(authData);
         if (parsed?.token) return parsed;
-      } catch (e) {}
+      } catch { /* localStorage hỏng - thử nguồn token khác bên dưới */ }
     }
     const token = localStorage.getItem('token');
     const userStr = localStorage.getItem('user');
@@ -61,7 +61,7 @@ export const authUtils = {
       try {
         const user = userStr ? JSON.parse(userStr) : null;
         return { token, user };
-      } catch (e) {
+      } catch {
         return { token, user: null };
       }
     }
@@ -147,10 +147,9 @@ axiosClient.interceptors.response.use(
     }
 
     if (error.response?.status === 403) {
-      const lang = (useLanguageStore.getState().language || 'en').split('-')[0];
       const message =
         error.response?.data?.message || error.response?.data?.error ||
-        (lang === 'vi' ? 'Bạn không có quyền thực hiện thao tác này' : 'You do not have permission to perform this action');
+        t('global.errors.forbidden');
       toast.error(message);
       return Promise.reject(error);
     }
@@ -177,7 +176,7 @@ axiosClient.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${refreshResponse.token}`;
         return axiosClient(originalRequest);
-      } catch (refreshError) {
+      } catch {
         authUtils.removeAuth();
         if (window.location.pathname !== '/login') {
           window.location.href = '/login';

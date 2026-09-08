@@ -101,16 +101,6 @@ const MessageView = () => {
     }
   };
 
-  const isFailedStatus = (status, type) => {
-    if (type === "AMQP") return Number(status) === 4 || Number(status) === 11;
-    return Number(status) === 3;
-  };
-
-  const isUnroutedStatus = (status, type) => {
-    if (type === "AMQP") return Number(status) === 1;
-    return Number(status) === 4;
-  };
-
   const getRejectionInfo = (item) => {
     if (!item) return { rejReason: null, rejDiag: null, hasError: false };
     const rejReason = 
@@ -122,7 +112,6 @@ const MessageView = () => {
       item.rejectionDiagnostic || 
       item.parsedAmqpProperties?.rejection_note || 
       item.parsedAmqpProperties?.rejectionDiagnostic ||
-      item.errorDesc ||
       (item.dispatches?.find(d => d.lastError)?.lastError) || null;
 
     const hasError = Boolean(
@@ -512,7 +501,7 @@ const MessageView = () => {
                           ? "bg-purple-50 text-purple-700 border-purple-200" 
                           : "bg-sky-50 text-sky-700 border-sky-200"
                       }`}>
-                        {searchType === "AMQP" ? "SWIM ➔ AMHS (IN)" : "AMHS ➔ SWIM (OUT)"}
+                        {searchType === "AMQP" ? t("messages.tabs.amqp") : t("messages.tabs.x400")}
                       </span>
                       <div>
                         {searchType === "AMQP" ? renderSwimStatus(selectedItem.status) : renderAmhsStatus(selectedItem.status)}
@@ -586,17 +575,17 @@ const MessageView = () => {
                   if (!hasError) return null;
 
                   const rawSource = selectedItem.rejectionSource || selectedItem.errorSource;
-                  let originLabel = t("messages.drawer.fields.partySwim") || "Phía SWIM";
+                  let originLabel = t("messages.drawer.fields.partySwim");
                   let originBadge = "bg-purple-100 text-purple-900 border-purple-300";
 
                   if (rawSource === "AMHS") {
-                    originLabel = t("messages.drawer.fields.partyAmhs") || "Phía AMHS";
+                    originLabel = t("messages.drawer.fields.partyAmhs");
                     originBadge = "bg-sky-100 text-sky-900 border-sky-300";
                   } else if (rawSource === "SWIM") {
-                    originLabel = t("messages.drawer.fields.partySwim") || "Phía SWIM";
+                    originLabel = t("messages.drawer.fields.partySwim");
                     originBadge = "bg-purple-100 text-purple-900 border-purple-300";
                   } else if (searchType === "X.400") {
-                    originLabel = t("messages.drawer.fields.partyAmhs") || "Phía AMHS";
+                    originLabel = t("messages.drawer.fields.partyAmhs");
                     originBadge = "bg-sky-100 text-sky-900 border-sky-300";
                   }
 
@@ -626,7 +615,7 @@ const MessageView = () => {
                       {rejDiag && (
                         <div className="bg-white p-3 rounded-lg border border-rose-200 text-xs text-rose-900 leading-relaxed font-sans shadow-2xs">
                           <strong className="font-mono text-rose-950 block mb-1">
-                            {t("messages.drawer.fields.rejectionDiagnostic") || "Chẩn đoán lỗi"}:
+                            {t("messages.drawer.fields.rejectionDiagnostic")}:
                           </strong>
                           <span>{rejDiag}</span>
                         </div>
@@ -634,7 +623,7 @@ const MessageView = () => {
                       {selectedItem.supplementaryInfo && (
                         <div className="bg-white p-3 rounded-lg border border-rose-200 text-xs text-slate-700 leading-relaxed font-sans shadow-2xs">
                           <strong className="font-mono text-slate-900 block mb-1">
-                            Thông tin bổ sung (Supplementary Info):
+                            {t("messages.drawer.fields.supplementaryInfo")}:
                           </strong>
                           <span>{selectedItem.supplementaryInfo}</span>
                         </div>
@@ -653,7 +642,7 @@ const MessageView = () => {
                     {searchType === "AMQP" ? (
                       <>
                         <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
-                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.messageId") || "Message ID"}:</span>
+                          <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.messageId")}:</span>
                           <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.messageId || "-"}>{selectedItem.messageId || "-"}</span>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
@@ -824,9 +813,8 @@ const MessageView = () => {
                             {selectedItem.ftbpObjectSize && (
                               <span>{formatFileSize(selectedItem.ftbpObjectSize)}</span>
                             )}
-                            {selectedItem.ftbpObjectSize && selectedItem.ftbpLastMod && <span>•</span>}
                             {selectedItem.ftbpLastMod && (
-                              <span>Mod: {selectedItem.ftbpLastMod}</span>
+                              <span>{t("messages.drawer.fields.ftbpLastMod")}: {selectedItem.ftbpLastMod}</span>
                             )}
                           </div>
                         </div>
@@ -867,7 +855,7 @@ const MessageView = () => {
                       className="p-4 font-mono text-xs overflow-x-auto whitespace-pre-wrap leading-relaxed custom-scrollbar max-h-64 select-all font-semibold"
                       style={{ backgroundColor: '#f8fafc', color: '#0f172a' }}
                     >
-                      {selectedItem.payloadContent || selectedItem.text || "— Không có nội dung payload —"}
+                      {selectedItem.payloadContent || selectedItem.text || t("messages.drawer.fields.noPayload")}
                     </pre>
                   </div>
                 </div>
@@ -877,7 +865,7 @@ const MessageView = () => {
               {/* MODAL FOOTER */}
               <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
                 <span className="text-slate-500 text-xs font-medium">
-                  {searchType === "AMQP" ? "Luồng chuyển đổi: SWIM ➔ AMHS" : "Luồng chuyển đổi: AMHS ➔ SWIM"}
+                  {searchType === "AMQP" ? t("messages.drawer.fields.conversionFlowIn") : t("messages.drawer.fields.conversionFlowOut")}
                 </span>
 
                 <button

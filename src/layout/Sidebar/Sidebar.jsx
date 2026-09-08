@@ -17,7 +17,7 @@ import { useState } from "react";
 import ServerMonitor from "@/components/ServerMonitor";
 import { NavLink } from "react-router-dom";
 import { t } from "@/i18n/translator";
-import { useAuth } from "@/components/AuthContext";
+import { useAuth } from "@/components/auth-context";
 
 export default function Sidebar() {
   const { user } = useAuth();

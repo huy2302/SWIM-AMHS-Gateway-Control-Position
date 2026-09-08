@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/layout/DashboardLayout";
-import { useAuth } from "@/components/AuthContext";
+import { useAuth } from "@/components/auth-context";
 import { authApi } from "@/api/authApi";
 import { useLanguageStore } from "@/store/languageStore";
 import { t } from "@/i18n/translator";
@@ -72,11 +72,8 @@ export default function Settings() {
 
   const handleLanguageChange = (newLang) => {
     setLanguage(newLang);
-    toast.success(
-      newLang === "vi"
-        ? "Đã đổi ngôn ngữ sang Tiếng Việt"
-        : "Language switched to English"
-    );
+    // Gọi t() SAU setLanguage để thông báo hiện bằng chính ngôn ngữ vừa chọn
+    toast.success(t("settings.preferences.languageChanged"));
   };
 
   const handleLogout = () => {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { UserRound, User, Settings, LogOut } from "lucide-react";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./auth-context";
 import { useNavigate } from 'react-router-dom';
 import { t } from "@/i18n/translator";
 

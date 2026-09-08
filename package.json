@@ -14,7 +14,6 @@
     "@emotion/styled": "^11.14.1",
     "@mui/x-data-grid": "^9.4.0",
     "@reduxjs/toolkit": "^2.11.2",
-    "@stomp/stompjs": "^7.3.0",
     "axios": "^1.15.0",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.20",
@@ -27,7 +26,6 @@
     "react-router-dom": "^7.13.2",
     "recharts": "^3.8.1",
     "simplebar-react": "^3.3.2",
-    "sockjs-client": "^1.6.1",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

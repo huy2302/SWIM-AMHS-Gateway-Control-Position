@@ -11,7 +11,6 @@ const gatewayApi = {
   },
 
   updateAccount: async (uuid, account) => {
-    console.log("Updating account with UUID:", uuid, "Data:", account);
     try {
       const response = await axiosClient.put(`/accounts/${uuid}`, account, {
         headers: {
@@ -298,12 +297,9 @@ const gatewayApi = {
 
   // --- PHAN HOI AMHS: IPN (RN/NRN) va Report (DR/NDR) bay nguoc ve ---
   // EUR Doc 047 §2.2.1.1 cam chuyen sang moi truong SWIM, nen Control Position la dich duy nhat.
-  getIncomingIpn: (type) => {
-    return axiosClient.get('/control-traffic/ipn', { params: type ? { type } : {} });
-  },
-
-  getIncomingReports: (type) => {
-    return axiosClient.get('/control-traffic/report', { params: type ? { type } : {} });
+  // Ca 4 loai RN/NRN/DR/NDR nam chung bang cp, loc bang tham so type.
+  getAmhsFeedback: (type) => {
+    return axiosClient.get('/control-traffic/feedback', { params: type ? { type } : {} });
   },
 
   getControlTrafficSummary: () => {

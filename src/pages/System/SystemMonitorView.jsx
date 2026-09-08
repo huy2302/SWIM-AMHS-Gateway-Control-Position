@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   XAxis,
   YAxis,
@@ -18,48 +18,10 @@ import DashboardLayout from "@/layout/DashboardLayout";
 import { useSelector } from "react-redux";
 import { t } from "@/i18n/translator";
 
-const generateData = () =>
-  [...Array(20)].map((_, i) => ({
-    time: i,
-    processCpuLoad: 0,
-    systemCpuLoad: 0,
-    heapUsedMb: 0,
-    totalPhysicalMemoryMb: 0,
-    totalRamPercent: 0,
-    mysqlConnections: 0,
-    mysqlCpu: 0,
-    upTime: null
-  }));
-
-const toChartPoint = (gatewayCp, mysql, prevTime) => {
-  const now = new Date();
-  const timeLabel = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-
-  return {
-    time: prevTime + 1,
-    timeLabel,
-    processCpuLoad: Number(gatewayCp?.processCpuLoad ?? 0),
-    systemCpuLoad: Number(gatewayCp?.systemCpuLoad ?? 0),
-    heapUsedMb: Number(gatewayCp?.heapUsedMb ?? 0),
-    totalPhysicalMemoryMb: Number(gatewayCp?.totalPhysicalMemoryMb ?? 0),
-    usedPhysicalMemoryMb: Number(gatewayCp?.usedPhysicalMemoryMb ?? 0),
-    totalRamPercent: Number(gatewayCp?.totalRamPercent ?? 0),
-    mysqlConnections: Number(mysql?.connections ?? 0),
-    mysqlCpu: Number(mysql?.cpuPercent ?? 0),
-    upTime: Number(gatewayCp?.serviceUptimeSec ?? 0)
-  };
-};
-
 const SystemMonitorView = () => {
-  const [data, setData] = useState(generateData());
-  const { GatewayProcess, Mysql } = useSelector((state) => state.system);
-  
-  useEffect(() => {
-    setData((prev) => [
-      ...prev.slice(1),
-      toChartPoint(GatewayProcess, Mysql, prev[prev.length - 1]?.time ?? 0),
-    ]);
-  }, [GatewayProcess, Mysql]);
+  // Chuỗi thời gian được tích luỹ trong systemSlice mỗi lần lấy mẫu thành công,
+  // component chỉ đọc ra để vẽ.
+  const { GatewayProcess, Mysql, history: data } = useSelector((state) => state.system);
 
   return (
     <DashboardLayout>
@@ -83,7 +45,7 @@ const SystemMonitorView = () => {
               <XAxis dataKey="timeLabel" hide />
               <YAxis stroke="#94a3b8" fontSize={10} unit="%" domain={[0, 100]} />
               <Legend verticalAlign="top" align="right" iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px", paddingBottom: "10px" }} />
-              <Tooltip labelFormatter={(label) => `Thời gian: ${label}`} contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} />
+              <Tooltip labelFormatter={(label) => `${t("systemMonitor.info.chartTime")}: ${label}`} contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} />
               <Area type="monotone" dataKey="processCpuLoad" name={t("systemMonitor.charts.cpu.legend.process")} stroke="#ef4444" strokeWidth={2} fill="url(#colorCpu)" isAnimationActive={false} />
               <Area type="monotone" dataKey="systemCpuLoad" name={t("systemMonitor.charts.cpu.legend.system")} stroke="#3b82f6" strokeWidth={2} fill="url(#colorSystem)" isAnimationActive={false} />
             </AreaChart>
@@ -105,7 +67,7 @@ const SystemMonitorView = () => {
               <XAxis dataKey="timeLabel" hide />
               <YAxis stroke="#94a3b8" fontSize={10} domain={[0, GatewayProcess?.totalPhysicalMemoryMb || 16384]} />
               <Legend verticalAlign="top" align="right" iconType="circle" iconSize={8} wrapperStyle={{ fontSize: "11px", paddingBottom: "10px" }} />
-              <Tooltip labelFormatter={(label) => `Thời gian: ${label}`} contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} />
+              <Tooltip labelFormatter={(label) => `${t("systemMonitor.info.chartTime")}: ${label}`} contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} />
               <Area type="monotone" dataKey="heapUsedMb" name={t("systemMonitor.charts.memory.legend.process")} stroke="#f59e0b" strokeWidth={2} fill="url(#colorHeap)" isAnimationActive={false} />
               <Area type="monotone" dataKey="usedPhysicalMemoryMb" name={t("systemMonitor.charts.memory.legend.system")} stroke="#8b5cf6" strokeWidth={2} fill="url(#colorSysMem)" isAnimationActive={false} />
             </AreaChart>
@@ -131,13 +93,13 @@ const SystemMonitorView = () => {
                 allowDecimals={false} 
               />
               <Tooltip 
-                labelFormatter={(label) => `Thời gian: ${label}`}
+                labelFormatter={(label) => `${t("systemMonitor.info.chartTime")}: ${label}`}
                 contentStyle={{ backgroundColor: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "8px", fontSize: "11px" }} 
               />
               <Area 
                 type="monotone" 
                 dataKey="mysqlConnections" 
-                name="Số kết nối MySQL" 
+                name={t("systemMonitor.info.mysql.connSeries")} 
                 stroke="#3b82f6" 
                 strokeWidth={2} 
                 fill="url(#colorMysqlConn)" 
@@ -269,7 +231,7 @@ const ChartCard = ({ title, children, color, type, card }) => {
             <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.connections ?? 0}</p>
           </div>
           <div>
-            <h4 className="text-[9px] font-bold tracking-wider text-slate-400">Giới hạn Max</h4>
+            <h4 className="text-[9px] font-bold tracking-wider text-slate-400">{t("systemMonitor.info.mysql.maxConn")}</h4>
             <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.maxConnections ?? 100}</p>
           </div>
           <div>
@@ -284,7 +246,7 @@ const ChartCard = ({ title, children, color, type, card }) => {
             <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.cpuPercent >= 0 ? `${card.cpuPercent.toFixed(2)}%` : "0.00%"}</p>
           </div>
           <div>
-            <h4 className="text-[9px] font-bold tracking-wider text-slate-400">RAM Sử dụng DB</h4>
+            <h4 className="text-[9px] font-bold tracking-wider text-slate-400">{t("systemMonitor.info.mysql.dbRamUsage")}</h4>
             <p className="text-sm font-mono font-extrabold text-slate-800 mt-0.5">{card?.ramPercent >= 0 ? `${card.ramPercent.toFixed(2)}%` : "0.00%"}</p>
           </div>
         </div>

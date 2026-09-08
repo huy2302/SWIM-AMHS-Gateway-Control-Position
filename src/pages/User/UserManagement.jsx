@@ -4,7 +4,7 @@ import { Plus, Edit2, Trash2, Shield, UserCheck, UserX, Search, X, Users, Check 
 import gatewayApi from "@/api/gatewayApi";
 import ConfirmModal from "@/components/ConfirmModal";
 import toast from "react-hot-toast";
-import { useAuth } from "@/components/AuthContext";
+import { useAuth } from "@/components/auth-context";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
 

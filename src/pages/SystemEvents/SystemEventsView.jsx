@@ -115,7 +115,6 @@ const SystemEvents = () => {
 
     try {
       await postReadAllNoti(user?.userId || null); 
-      console.log('Marked all as read successfully');
     } catch (error) {
       setRows(previousRows);
       console.error('Error marking all as read:', error);

@@ -143,8 +143,8 @@ export default function AlertsView() {
   const extractMessageId = (alert) => {
     if (!alert) return null;
     if (alert.messageId) return String(alert.messageId);
-    if (alert.relatedId) return String(alert.relatedId);
-    if (alert.entityId) return String(alert.entityId);
+    // BE (gw_alert) trả về refId - id của dòng gwin/gwout sinh ra cảnh báo
+    if (alert.refId) return String(alert.refId);
     // Match patterns like "Message ID #1234", "message_id: 123", "msgId: 123", or numbers
     const match = (alert.message || "").match(/(?:message[_\s-]?id|msgid|id)[\s:#]+([a-zA-Z0-9_-]+)/i);
     if (match && match[1]) return match[1];

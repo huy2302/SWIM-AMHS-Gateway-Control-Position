@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback, useTransition } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  X,
   XCircle,
   Copy,
   Check,
@@ -36,7 +37,7 @@ const getDirectionMeta = (cat, type) => {
   const dir = normalizeDirection(cat, type);
   if (dir === "IN") {
     return {
-      label: "SWIM ➔ AMHS (IN)",
+      label: t("log.toolbar.directionIn"),
       shortLabel: "IN",
       badgeClass: "text-purple-700 bg-purple-50 border-purple-200",
       type: "IN"
@@ -44,7 +45,7 @@ const getDirectionMeta = (cat, type) => {
   }
   if (dir === "OUT") {
     return {
-      label: "AMHS ➔ SWIM (OUT)",
+      label: t("log.toolbar.directionOut"),
       shortLabel: "OUT",
       badgeClass: "text-sky-700 bg-sky-50 border-sky-200",
       type: "OUT"
@@ -199,7 +200,6 @@ const FullLogView = () => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
-  const [isCopied, setIsCopied] = useState(false);
   const [isModalCopied, setIsModalCopied] = useState(false);
 
   // Navigate directly to Message View
@@ -339,8 +339,8 @@ const FullLogView = () => {
                 className="bg-transparent text-xs font-bold text-slate-700 outline-none cursor-pointer"
               >
                 <option value="ALL">{t("log.toolbar.allDirections")}</option>
-                <option value="SWIM_TO_AMHS">SWIM ➔ AMHS (IN)</option>
-                <option value="AMHS_TO_SWIM">AMHS ➔ SWIM (OUT)</option>
+                <option value="SWIM_TO_AMHS">{t("log.toolbar.directionIn")}</option>
+                <option value="AMHS_TO_SWIM">{t("log.toolbar.directionOut")}</option>
               </select>
             </div>
 
@@ -450,7 +450,7 @@ const FullLogView = () => {
                     <td colSpan={8} className="text-center py-16 text-slate-400 font-medium">
                       <div className="flex flex-col items-center justify-center gap-2">
                         <div className="w-6 h-6 border-2 border-slate-300 border-t-indigo-600 rounded-full animate-spin" />
-                        <span>Đang tải nhật ký chuyển đổi...</span>
+                        <span>{t("log.toolbar.loading")}</span>
                       </div>
                     </td>
                   </tr>
@@ -580,7 +580,6 @@ const FullLogView = () => {
         {selectedLog && (() => {
           const dirMeta = getDirectionMeta(selectedLog.category, selectedLog.type);
           const rawContentFormatted = formatRawContent(selectedLog.content || selectedLog.payloadContent || selectedLog.remark || selectedLog.subject || "");
-          const isError = isErrorStatus(selectedLog.status);
 
           return (
             <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in" onClick={() => setSelectedLog(null)}>
@@ -618,7 +617,7 @@ const FullLogView = () => {
                       onClick={() => setSelectedLog(null)}
                       className="px-2.5 py-1 hover:bg-slate-100 text-slate-400 hover:text-slate-700 rounded-md text-sm font-bold transition-colors cursor-pointer"
                     >
-                      ✕
+                      <X size={16} />
                     </button>
                   </div>
                 </div>
@@ -737,25 +736,25 @@ const FullLogView = () => {
                     const r = String(rejReason || "").toLowerCase();
                     const d = String(rejDiag || "").toLowerCase();
                     const rawSource = selectedLog.rejectionSource;
-                    let originLabel = t("log.modal.partySwim") || "Phía SWIM";
+                    let originLabel = t("log.modal.partySwim");
                     let originBadge = "bg-purple-100 text-purple-900 border-purple-300";
 
                     if (rawSource === "AMHS") {
-                      originLabel = t("log.modal.partyAmhs") || "Phía AMHS";
+                      originLabel = t("log.modal.partyAmhs");
                       originBadge = "bg-sky-100 text-sky-900 border-sky-300";
                     } else if (rawSource === "SWIM") {
-                      originLabel = t("log.modal.partySwim") || "Phía SWIM";
+                      originLabel = t("log.modal.partySwim");
                       originBadge = "bg-purple-100 text-purple-900 border-purple-300";
                     } else if (cat.includes("IN") || cat.includes("SWIM")) {
                       if (r.startsWith("ndr_") || r.includes("x400") || d.includes("non-delivery") || d.includes("mta")) {
-                        originLabel = t("log.modal.partyAmhs") || "Phía AMHS";
+                        originLabel = t("log.modal.partyAmhs");
                         originBadge = "bg-sky-100 text-sky-900 border-sky-300";
                       }
                     } else {
-                      originLabel = t("log.modal.partyAmhs") || "Phía AMHS";
+                      originLabel = t("log.modal.partyAmhs");
                       originBadge = "bg-sky-100 text-sky-900 border-sky-300";
                       if (r.includes("amqp") || r.includes("broker") || d.includes("amqp") || d.includes("broker") || d.includes("connection")) {
-                        originLabel = t("log.modal.partySwim") || "Phía SWIM";
+                        originLabel = t("log.modal.partySwim");
                         originBadge = "bg-purple-100 text-purple-900 border-purple-300";
                       }
                     }
@@ -783,7 +782,7 @@ const FullLogView = () => {
 
                         {rejDiag && (
                           <div className="bg-white p-2.5 rounded-lg border border-rose-200 text-rose-950 font-sans leading-relaxed">
-                            <strong className="font-mono text-rose-900 block mb-0.5">{t("log.modal.rejectionDiagnostic") || "Chẩn đoán chi tiết"}:</strong>
+                            <strong className="font-mono text-rose-900 block mb-0.5">{t("log.modal.rejectionDiagnostic")}:</strong>
                             <span>{rejDiag}</span>
                           </div>
                         )}

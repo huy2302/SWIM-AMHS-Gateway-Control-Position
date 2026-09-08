@@ -129,6 +129,10 @@
     "languageDesc": {
       "vi": "Chọn ngôn ngữ hiển thị trên toàn bộ hệ thống Control Position.",
       "en": "Select the display language across the Control Position system."
+    },
+    "languageChanged": {
+      "vi": "Đã đổi ngôn ngữ sang Tiếng Việt",
+      "en": "Language switched to English"
     }
   }
 }

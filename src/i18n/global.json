@@ -71,6 +71,34 @@
       "en": "Log Out"
     }
   },
+  "time": {
+    "justNow": {
+      "vi": "Vừa xong",
+      "en": "Just now"
+    },
+    "minutesAgo": {
+      "vi": "{n} phút trước",
+      "en": "{n}m ago"
+    },
+    "today": {
+      "vi": "Hôm nay lúc {time}",
+      "en": "Today at {time}"
+    },
+    "yesterday": {
+      "vi": "Hôm qua lúc {time}",
+      "en": "Yesterday at {time}"
+    },
+    "weekday": {
+      "vi": "{day} lúc {time}",
+      "en": "{day} at {time}"
+    }
+  },
+  "errors": {
+    "forbidden": {
+      "vi": "Bạn không có quyền thực hiện thao tác này",
+      "en": "You do not have permission to perform this action"
+    }
+  },
   "noData": {
     "vi": "Không có dữ liệu",
     "en": "No data"

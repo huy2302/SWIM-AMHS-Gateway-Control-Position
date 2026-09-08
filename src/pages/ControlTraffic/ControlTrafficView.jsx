@@ -7,43 +7,34 @@ import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
 
 /**
- * Phản hồi AMHS — IPN (RN/NRN) và Report (DR/NDR) bay ngược về cho điện văn gateway đã gửi
- * sang AMHS.
+ * Phản hồi AMHS — RN, NRN, DR, NDR bay ngược về cho điện văn gateway đã gửi sang AMHS.
  *
- * EUR Doc 047 §2.2.1.1 cấm chuyển chúng sang môi trường SWIM, nên Control Position là điểm
- * đến duy nhất. Appendix A CTSW014/015/113/114 đều đòi "stores the message for appropriate
+ * Cả bốn loại nằm chung bảng `cp`, phân biệt bằng cột `ipnType`, nên hiển thị một danh sách
+ * chung. EUR Doc 047 §2.2.1.1 cấm chuyển chúng sang môi trường SWIM, nên Control Position là
+ * điểm đến duy nhất. Appendix A CTSW014/015/113/114 đều đòi "stores the message for appropriate
  * processing at the Control Position" — màn hình này chính là chỗ đó.
  */
 export default function ControlTrafficView() {
-  const [tab, setTab] = useState("report"); // "report" | "ipn"
-  const [ipnList, setIpnList] = useState([]);
-  const [reportList, setReportList] = useState([]);
+  const [rows, setRows] = useState([]);
   const [summary, setSummary] = useState({ rn: 0, nrn: 0, dr: 0, ndr: 0 });
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [keyword, setKeyword] = useState("");
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const pageSize = 10;
+  const pageSize = 15;
 
   useEffect(() => {
     setPage(0);
-  }, [tab, typeFilter, keyword]);
-
-  // Đổi tab thì bộ lọc loại của tab cũ (RN/NRN vs DR/NDR) không còn nghĩa
-  useEffect(() => {
-    setTypeFilter("ALL");
-  }, [tab]);
+  }, [typeFilter, keyword]);
 
   const fetchAll = useCallback(async () => {
     try {
       setLoading(true);
-      const [ipn, report, sum] = await Promise.all([
-        gatewayApi.getIncomingIpn(),
-        gatewayApi.getIncomingReports(),
+      const [list, sum] = await Promise.all([
+        gatewayApi.getAmhsFeedback(),
         gatewayApi.getControlTrafficSummary(),
       ]);
-      setIpnList(Array.isArray(ipn) ? ipn : []);
-      setReportList(Array.isArray(report) ? report : []);
+      setRows(Array.isArray(list) ? list : []);
       setSummary(sum || { rn: 0, nrn: 0, dr: 0, ndr: 0 });
     } catch (error) {
       console.error("Error fetching AMHS feedback:", error);
@@ -57,38 +48,68 @@ export default function ControlTrafficView() {
     fetchAll();
   }, [fetchAll]);
 
-  const rows = tab === "ipn" ? ipnList : reportList;
-
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     return rows.filter((r) => {
-      const type = tab === "ipn" ? r.notificationType : r.reportType;
-      if (typeFilter !== "ALL" && type !== typeFilter) return false;
+      if (typeFilter !== "ALL" && r.ipnType !== typeFilter) return false;
       if (!kw) return true;
       return Object.values(r).some(
         (v) => v != null && String(v).toLowerCase().includes(kw)
       );
     });
-  }, [rows, tab, typeFilter, keyword]);
+  }, [rows, typeFilter, keyword]);
 
   const paged = filtered.slice(page * pageSize, page * pageSize + pageSize);
-
-  const typeOptions = tab === "ipn" ? ["RN", "NRN"] : ["DR", "NDR"];
-
-  const formatTime = (value) => {
-    if (!value) return "-";
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString();
-  };
 
   const dash = (value) =>
     value === null || value === undefined || String(value).trim() === "" ? "-" : value;
 
-  /** NDR và NRN là tin xấu — tô đỏ để operator thấy ngay giữa danh sách dài. */
+  /** NDR và NRN là tin xấu — tô đỏ để operator không lướt qua giữa danh sách dài. */
   const badgeClass = (type) =>
     type === "NDR" || type === "NRN"
       ? "bg-rose-100 text-rose-700"
       : "bg-emerald-100 text-emerald-700";
+
+  const isReport = (type) => type === "DR" || type === "NDR";
+
+  /**
+   * Khoá đối chiếu về điện văn gốc khác nhau theo tầng sinh ra phản hồi: MTA sinh report mà
+   * không giải mã nội dung nên chỉ biết MTS-Id; người nhận sinh IPN sau khi đã đọc nên biết IPM-Id.
+   */
+  const subjectRef = (r) =>
+    isReport(r.ipnType)
+      ? { label: "MTS", value: r.subjectMts }
+      : { label: "IPM", value: r.subjectIpm };
+
+  /**
+   * Cột "Chi tiết" gộp các trường riêng của từng loại, vì mỗi loại chỉ dùng vài trường và để
+   * cột riêng cho từng loại thì bảng rỗng quá nửa.
+   */
+  const detailOf = (r) => {
+    if (r.ipnType === "NDR") {
+      const code = r.diagnosticCode && String(r.diagnosticCode).trim() !== ""
+        ? r.diagnosticCode
+        : null;
+      return {
+        main: dash(r.reasonCode),
+        // CTSW114 cố tình để trống diagnostic-code. Hiện rõ "(để trống)" để operator biết đó là
+        // dữ liệu đúng chuẩn, không phải mất dữ liệu.
+        extra: code || t("controlTraffic.diagnosticEmpty"),
+        muted: !code,
+      };
+    }
+    if (r.ipnType === "NRN") {
+      return {
+        main: r.nonReceiptReason != null ? `non-receipt-reason=${r.nonReceiptReason}` : "-",
+        extra: r.discardReason != null ? `discard-reason=${r.discardReason}` : null,
+        muted: false,
+      };
+    }
+    if (r.ipnType === "RN") {
+      return { main: dash(r.receiptTime), extra: null, muted: false };
+    }
+    return { main: "-", extra: null, muted: false };
+  };
 
   const stats = [
     { key: "ndr", value: summary.ndr, Icon: PackageX, tone: "text-rose-600" },
@@ -130,23 +151,7 @@ export default function ControlTrafficView() {
         </div>
 
         <div className="bg-white rounded-xl border border-slate-200">
-          <div className="flex items-center gap-2 border-b border-slate-100 px-3">
-            {["report", "ipn"].map((key) => (
-              <button
-                key={key}
-                onClick={() => setTab(key)}
-                className={
-                  tab === key
-                    ? "px-3 py-3 text-sm font-semibold text-sky-700 border-b-2 border-sky-600"
-                    : "px-3 py-3 text-sm font-medium text-slate-500 hover:text-slate-700"
-                }
-              >
-                {t(`controlTraffic.tabs.${key}`)}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 p-3 flex-wrap">
+          <div className="flex items-center gap-2 p-3 flex-wrap border-b border-slate-100">
             <div className="relative flex-1 min-w-[220px]">
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
@@ -156,8 +161,8 @@ export default function ControlTrafficView() {
                 className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-200"
               />
             </div>
-            <div className="flex items-center gap-1">
-              {["ALL", ...typeOptions].map((option) => (
+            <div className="flex items-center gap-1 flex-wrap">
+              {["ALL", "NDR", "DR", "NRN", "RN"].map((option) => (
                 <button
                   key={option}
                   onClick={() => setTypeFilter(option)}
@@ -174,86 +179,65 @@ export default function ControlTrafficView() {
           </div>
 
           <div className="overflow-x-auto">
-            {tab === "ipn" ? (
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-600">
-                  <tr>
-                    {["id", "type", "orAddress", "subjectIpmId", "subjectMtsId", "receiptTime",
-                      "nonReceiptReason", "receivedAt", "status"].map((c) => (
-                      <th key={c} className="px-4 py-3 text-left font-semibold text-xs whitespace-nowrap">
-                        {t(`controlTraffic.ipnColumns.${c}`)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {paged.map((r) => (
-                    <tr key={r.id} className="border-t border-slate-100 hover:bg-slate-50">
-                      <td className="px-4 py-3 text-slate-500">{r.id}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${badgeClass(r.notificationType)}`}>
-                          {r.notificationType}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 font-mono text-xs">{dash(r.orAddress)}</td>
-                      <td className="px-4 py-3 font-mono text-xs">{dash(r.subjectIpmId)}</td>
-                      <td className="px-4 py-3 font-mono text-xs">{dash(r.subjectMtsId)}</td>
-                      <td className="px-4 py-3 text-xs">{dash(r.receiptTime)}</td>
-                      <td className="px-4 py-3 text-xs">{dash(r.nonReceiptReason)}</td>
-                      <td className="px-4 py-3 text-xs whitespace-nowrap">{formatTime(r.receivedAt)}</td>
-                      <td className="px-4 py-3 text-xs">{dash(r.status)}</td>
-                    </tr>
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 text-slate-600">
+                <tr>
+                  {["id", "type", "origin", "recipient", "subject", "detail",
+                    "supplementaryInfo", "status"].map((c) => (
+                    <th key={c} className="px-4 py-3 text-left font-semibold text-xs whitespace-nowrap">
+                      {t(`controlTraffic.columns.${c}`)}
+                    </th>
                   ))}
-                </tbody>
-              </table>
-            ) : (
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50 text-slate-600">
-                  <tr>
-                    {["id", "type", "recipient", "gwinId", "subjectMtsId", "reasonCode",
-                      "diagnosticCode", "supplementaryInfo", "receivedAt", "status"].map((c) => (
-                      <th key={c} className="px-4 py-3 text-left font-semibold text-xs whitespace-nowrap">
-                        {t(`controlTraffic.reportColumns.${c}`)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {paged.map((r) => (
+                </tr>
+              </thead>
+              <tbody>
+                {paged.map((r) => {
+                  const ref = subjectRef(r);
+                  const detail = detailOf(r);
+                  return (
                     <tr key={r.id} className="border-t border-slate-100 hover:bg-slate-50">
                       <td className="px-4 py-3 text-slate-500">{r.id}</td>
                       <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${badgeClass(r.reportType)}`}>
-                          {r.reportType}
+                        <span className={`px-2 py-0.5 rounded text-xs font-bold ${badgeClass(r.ipnType)}`}>
+                          {dash(r.ipnType)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 font-mono text-xs">{dash(r.recipient)}</td>
-                      <td className="px-4 py-3 text-xs">{r.gwinId ? `gwin#${r.gwinId}` : "-"}</td>
-                      <td className="px-4 py-3 font-mono text-xs">{dash(r.subjectMtsId)}</td>
-                      <td className="px-4 py-3 font-mono text-xs">{dash(r.reasonCode)}</td>
-                      {/* CTSW114: NDR của nó cố tình để trống diagnostic-code. Hiện rõ "(để trống)"
-                          để operator biết đó là dữ liệu đúng chuẩn, không phải lỗi mất dữ liệu. */}
-                      <td className="px-4 py-3 font-mono text-xs">
-                        {r.diagnosticCode && String(r.diagnosticCode).trim() !== "" ? (
-                          r.diagnosticCode
-                        ) : (
-                          <span className="text-slate-400 italic">{t("controlTraffic.diagnosticEmpty")}</span>
+                      <td className="px-4 py-3 font-mono text-xs max-w-[200px] truncate" title={r.origin || ""}>
+                        {dash(r.origin)}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-xs max-w-[200px] truncate" title={r.recipient || ""}>
+                        {dash(r.recipient)}
+                      </td>
+                      {/* Nhãn IPM/MTS cho biết phản hồi này tra về điện văn gốc bằng khoá nào */}
+                      <td className="px-4 py-3 text-xs max-w-[260px]">
+                        <span className="inline-block px-1.5 py-0.5 mr-1.5 rounded bg-slate-100 text-slate-500 font-semibold text-[10px]">
+                          {ref.label}
+                        </span>
+                        <span className="font-mono" title={ref.value || ""}>
+                          {ref.value ? String(ref.value).slice(0, 32) : "-"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs">
+                        <div className="font-mono">{detail.main}</div>
+                        {detail.extra && (
+                          <div className={`font-mono ${detail.muted ? "text-slate-400 italic" : "text-slate-500"}`}>
+                            {detail.extra}
+                          </div>
                         )}
                       </td>
                       <td className="px-4 py-3 text-xs max-w-xs truncate" title={r.supplementaryInfo || ""}>
                         {dash(r.supplementaryInfo)}
                       </td>
-                      <td className="px-4 py-3 text-xs whitespace-nowrap">{formatTime(r.receivedAt)}</td>
                       <td className="px-4 py-3 text-xs">{dash(r.status)}</td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                  );
+                })}
+              </tbody>
+            </table>
 
             {!loading && filtered.length === 0 && (
               <div className="px-4 py-10 text-center text-sm text-slate-400">
-                {t(`controlTraffic.empty.${tab}`)}
+                {t("controlTraffic.empty")}
               </div>
             )}
           </div>

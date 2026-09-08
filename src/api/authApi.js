@@ -3,30 +3,26 @@ import axiosClient, { authUtils } from './axiosClient';
 export const authApi = {
   // Đăng nhập
   login: async (username, password) => {
-    try {
-      const response = await axiosClient.post('/auth/login', {
-        username,
-        password,
-      });
+    const response = await axiosClient.post('/auth/login', {
+      username,
+      password,
+    });
 
-      const user = response.user || response;
-      const safeUser = { ...user };
-      if (safeUser.password) {
-        delete safeUser.password;
-      }
-
-      const authPayload = {
-        user: safeUser,
-        token: response.token || response.accessToken || response.authToken || null,
-        expiresAt: response.expiresAt || response.exp || null,
-      };
-
-      authUtils.saveAuth(authPayload);
-
-      return response;
-    } catch (error) {
-      throw error;
+    const user = response.user || response;
+    const safeUser = { ...user };
+    if (safeUser.password) {
+      delete safeUser.password;
     }
+
+    const authPayload = {
+      user: safeUser,
+      token: response.token || response.accessToken || response.authToken || null,
+      expiresAt: response.expiresAt || response.exp || null,
+    };
+
+    authUtils.saveAuth(authPayload);
+
+    return response;
   },
 
   // Đăng xuất

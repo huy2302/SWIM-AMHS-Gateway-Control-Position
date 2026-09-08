@@ -122,7 +122,23 @@
       "dbCpuLoad": {
         "vi": "Mức tải CPU dịch vụ CSDL",
         "en": "DATABASE SERVICE CPU LOAD"
+      },
+      "maxConn": {
+        "vi": "Giới hạn kết nối tối đa",
+        "en": "MAX CONNECTION LIMIT"
+      },
+      "dbRamUsage": {
+        "vi": "RAM dịch vụ CSDL sử dụng",
+        "en": "DATABASE SERVICE RAM USAGE"
+      },
+      "connSeries": {
+        "vi": "Số kết nối MySQL",
+        "en": "MySQL connections"
       }
+    },
+    "chartTime": {
+      "vi": "Thời gian",
+      "en": "Time"
     }
   }
 }

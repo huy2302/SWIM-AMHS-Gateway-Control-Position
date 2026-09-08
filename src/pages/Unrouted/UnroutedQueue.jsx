@@ -24,7 +24,7 @@ export default function UnroutedQueue() {
   // Pagination & Sorting state
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
 
   // Dialogs state
@@ -32,7 +32,7 @@ export default function UnroutedQueue() {
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [actionMessage, setActionMessage] = useState(null); // String or Array (for batch)
   const [detailMessage, setDetailMessage] = useState(null);
-  const [isCopied, setIsCopied] = useState(false);
+  const [, setIsCopied] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(null);
 
   const [routeFormData, setRouteFormData] = useState({
@@ -475,8 +475,8 @@ export default function UnroutedQueue() {
                       </td>
                       <td className="p-4 font-mono text-sm font-bold text-blue-600">{row.origin || "-"}</td>
                       <td className="p-4 text-slate-700 text-sm">{row.priority || "NORMAL"}</td>
-                      <td className="p-4 text-red-655 font-semibold break-words max-w-xs text-sm" title={row.rejectionDiagnostic || row.rejectionReason || row.errorDesc || "NO_MATCHING_ROUTING_RULE"}>
-                        {row.rejectionDiagnostic || row.rejectionReason || row.errorDesc || "NO_MATCHING_ROUTING_RULE"}
+                      <td className="p-4 text-red-655 font-semibold break-words max-w-xs text-sm" title={row.rejectionDiagnostic || row.rejectionReason || "NO_MATCHING_ROUTING_RULE"}>
+                        {row.rejectionDiagnostic || row.rejectionReason || "NO_MATCHING_ROUTING_RULE"}
                       </td>
                       <td className="p-4 text-right relative" onClick={(e) => e.stopPropagation()}>
                         <button
@@ -639,7 +639,7 @@ export default function UnroutedQueue() {
                   <div className="flex flex-col gap-1.5 p-3 bg-red-50/60 border border-red-200 rounded-xl relative shadow-xs md:col-span-2">
                     <div className="flex justify-between items-center">
                       <span className="text-[10px] text-red-700 font-bold tracking-wider">{t("unrouted.dialog.fields.errorType")}</span>
-                      <button onClick={() => handleCopy(detailMessage.rejectionDiagnostic || detailMessage.rejectionReason || detailMessage.errorDesc || "NO_MATCHING_ROUTING_RULE")} className="text-red-700 hover:text-red-650 cursor-pointer" title="Copy"><Copy size={12} /></button>
+                      <button onClick={() => handleCopy(detailMessage.rejectionDiagnostic || detailMessage.rejectionReason || "NO_MATCHING_ROUTING_RULE")} className="text-red-700 hover:text-red-650 cursor-pointer" title="Copy"><Copy size={12} /></button>
                     </div>
                     <div className="text-red-800 break-all text-[11px] font-mono font-bold mt-0.5">
                       {detailMessage.rejectionReason && (
@@ -647,7 +647,7 @@ export default function UnroutedQueue() {
                           {detailMessage.rejectionReason}
                         </span>
                       )}
-                      {detailMessage.rejectionDiagnostic || detailMessage.errorDesc || "NO_MATCHING_ROUTING_RULE"}
+                      {detailMessage.rejectionDiagnostic || "NO_MATCHING_ROUTING_RULE"}
                     </div>
                   </div>
                 </div>

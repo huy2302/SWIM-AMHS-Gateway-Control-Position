@@ -18,7 +18,7 @@ export const useMessageStore = create((set) => ({
    * Limits messages to the first 50 items.
    * @param {Array} messages - Array of message objects.
    */
-  setMessages: (messages = []) => set((state) => ({
+  setMessages: (messages = []) => set(() => ({
     messages: messages.slice(0, 50),
     stats: {
       total: messages.length,

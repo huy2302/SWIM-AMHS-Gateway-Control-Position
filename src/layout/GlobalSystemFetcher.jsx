@@ -2,9 +2,8 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { setUptime, setSystemError, setUsedProcess } from "../store/systemSlice";
 import gatewayApi from "../api/gatewayApi";
-import { 
-  showSuccessToast, 
-  showWarningToast 
+import {
+  showWarningToast
 } from '../constants/toastIcons'; 
 import toast from "react-hot-toast";
 import { useSystemStore } from '../hooks/systemStore';
@@ -94,6 +93,13 @@ export default function GlobalSystemFetcher() {
         dispatch(setUsedProcess({
           gatewayCp: response?.gatewayCp,
           mysql: response?.mysql,
+          // Nhãn thời gian tạo ở đây để reducer giữ được tính thuần
+          timeLabel: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          }),
         }));
       } catch (err) {
         clearTimeout(timeoutId);

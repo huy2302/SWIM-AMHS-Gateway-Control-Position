@@ -286,6 +286,26 @@
       "partyAmhs": {
         "vi": "Phía AMHS",
         "en": "AMHS Side"
+      },
+      "supplementaryInfo": {
+        "vi": "Thông tin bổ sung (Supplementary Info)",
+        "en": "Supplementary Information"
+      },
+      "noPayload": {
+        "vi": "Không có nội dung payload",
+        "en": "No payload content"
+      },
+      "conversionFlowIn": {
+        "vi": "Luồng chuyển đổi: SWIM → AMHS",
+        "en": "Conversion flow: SWIM → AMHS"
+      },
+      "conversionFlowOut": {
+        "vi": "Luồng chuyển đổi: AMHS → SWIM",
+        "en": "Conversion flow: AMHS → SWIM"
+      },
+      "ftbpLastMod": {
+        "vi": "Sửa lần cuối",
+        "en": "Modified"
       }
     },
     "sections": {

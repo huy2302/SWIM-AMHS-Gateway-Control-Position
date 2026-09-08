@@ -3,7 +3,7 @@ import { ShieldCheck, Globe, Eye, Lock, User } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { authApi } from "../api/authApi";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "./auth-context";
 import { t } from "@/i18n/translator";
 
 import { useLanguageStore } from "../store/languageStore";
@@ -40,7 +40,6 @@ export default function LoginCard() {
 
     try {
       const response = await authApi.login(username, password);
-      console.log("Login successful:", response);
 
       // Lưu trực tiếp response.data
       const userData = response; // { username, role, token, expiresIn }

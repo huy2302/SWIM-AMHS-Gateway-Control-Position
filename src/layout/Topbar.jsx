@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 import { useSelector } from "react-redux";
@@ -53,12 +53,12 @@ const formatRelativeTime = (timeString, lang) => {
 
   // Vừa xong (dưới 1 phút)
   if (diffMins < 1) {
-    return lang === "vi" ? "Vừa xong" : "Just now";
+    return t("global.time.justNow");
   }
 
   // Vài phút trước (dưới 1 giờ)
   if (diffMins < 60) {
-    return lang === "vi" ? `${diffMins} phút trước` : `${diffMins}m ago`;
+    return t("global.time.minutesAgo").replace("{n}", diffMins);
   }
 
   // Hôm nay (dưới 24h và cùng ngày)
@@ -68,7 +68,7 @@ const formatRelativeTime = (timeString, lang) => {
       minute: '2-digit', 
       hour12: false 
     });
-    return lang === "vi" ? `Hôm nay lúc ${timeStr}` : `Today at ${timeStr}`;
+    return t("global.time.today").replace("{time}", timeStr);
   }
 
   // Hôm qua
@@ -82,7 +82,7 @@ const formatRelativeTime = (timeString, lang) => {
       minute: '2-digit', 
       hour12: false 
     });
-    return lang === "vi" ? `Hôm qua lúc ${timeStr}` : `Yesterday at ${timeStr}`;
+    return t("global.time.yesterday").replace("{time}", timeStr);
   }
 
   // Trong tuần (cách đây < 7 ngày)
@@ -94,7 +94,7 @@ const formatRelativeTime = (timeString, lang) => {
       minute: '2-digit', 
       hour12: false 
     });
-    return lang === "vi" ? `${dayName} lúc ${timeStr}` : `${dayName} at ${timeStr}`;
+    return t("global.time.weekday").replace("{day}", dayName).replace("{time}", timeStr);
   }
 
   // Cũ hơn: hiển thị ngày tháng
@@ -107,13 +107,12 @@ const formatRelativeTime = (timeString, lang) => {
     hour12: false 
   };
 
-  console.log(date.toLocaleString(lang === "vi" ? "vi-VN" : "en-US", options))
   return date.toLocaleString(lang === "vi" ? "vi-VN" : "en-US", options);
 };
 
 export default function Topbar() {
   const location = useLocation();
-  const navigate = useNavigate();
+
   const pathKey = location.pathname.split("/")[1] || "dashboard";
   const titleKey = titleMap[pathKey];
   const title = titleKey ? t(titleKey) : "Gateway Monitor";
