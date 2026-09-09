@@ -96,6 +96,30 @@
       "vi": "Báo cáo không giao được (NDR)",
       "en": "Non-Delivery Report"
     },
+    "undeliverable": {
+      "vi": "Không chuyển giao được sang SWIM",
+      "en": "Undeliverable to SWIM"
+    },
+    "dr_requested": {
+      "vi": "Có yêu cầu Delivery Report",
+      "en": "Delivery Report Requested"
+    },
+    "probe_deliverable": {
+      "vi": "Probe: recipient chuyển đổi được",
+      "en": "Probe: Recipient Resolvable"
+    },
+    "probe_unknown_recipient": {
+      "vi": "Probe: recipient không xác định",
+      "en": "Probe: Unknown Recipient"
+    },
+    "probe_rejected": {
+      "vi": "Probe bị từ chối",
+      "en": "Probe Rejected"
+    },
+    "misrouted_ipn": {
+      "vi": "Phản hồi lạc tuyến (không có điện văn gốc)",
+      "en": "Misrouted IPN (no subject message)"
+    },
     "received_routed": {
       "vi": "Đã tiếp nhận & định tuyến",
       "en": "Received & Routed"

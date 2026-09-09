@@ -128,11 +128,27 @@ const isErrorStatus = (status) => {
 const formatActionTaken = (action) => {
   if (!action) return "-";
   const norm = String(action).toLowerCase().replace(/[\s\-_]+/g, '_');
+
+  // Nhánh probe (CTSW011/012/013) phải xét TRƯỚC các luật chung, vì "probe_deliverable"
+  // chứa chuỗi "deliver" và sẽ bị luật delivered_amhs bắt nhầm.
+  if (norm.startsWith("probe_unknown_recipient")) return t("log.actionTaken.probe_unknown_recipient");
+  if (norm.startsWith("probe_deliverable")) return t("log.actionTaken.probe_deliverable");
+  if (norm.startsWith("probe_rejected")) return t("log.actionTaken.probe_rejected");
+
+  // "undeliverable" chứa "deliver" nên cũng phải xét trước, nếu không sẽ hiển thị
+  // NGƯỢC NGHĨA thành "Đã giao tới AMHS".
+  if (norm.includes("undeliverable")) return t("log.actionTaken.undeliverable");
+
   if (norm.includes("routing_failed")) return t("log.actionTaken.routing_failed");
   if (norm.includes("validation_failed") || norm.includes("invalid")) return t("log.actionTaken.validation_failed");
   if (norm.includes("unauthorized")) return t("log.actionTaken.unauthorized");
   if (norm.includes("ttl_expired")) return t("log.actionTaken.ttl_expired");
   if (norm.includes("type_detection")) return t("log.actionTaken.type_detection_failed");
+  if (norm.includes("misrouted_ipn")) return t("log.actionTaken.misrouted_ipn");
+  if (norm.startsWith("dr_requested") || norm.startsWith("dr_generated")) {
+    return t("log.actionTaken.dr_requested");
+  }
+  // Giữ lại cho các bản ghi log CŨ sinh trước 09/09/2026, khi ITCU còn tự xếp hàng NDR.
   if (norm.includes("ndr")) return t("log.actionTaken.ndr");
   if (norm.includes("received") && norm.includes("routing")) return t("log.actionTaken.received_routed");
   if (norm.includes("publish")) return t("log.actionTaken.published_swim");
