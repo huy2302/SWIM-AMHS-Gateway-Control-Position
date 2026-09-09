@@ -129,31 +129,45 @@ const formatActionTaken = (action) => {
   if (!action) return "-";
   const norm = String(action).toLowerCase().replace(/[\s\-_]+/g, '_');
 
-  // Nhánh probe (CTSW011/012/013) phải xét TRƯỚC các luật chung, vì "probe_deliverable"
-  // chứa chuỗi "deliver" và sẽ bị luật delivered_amhs bắt nhầm.
+  // --- Probe (CTSW011/012/013) ---
+  // Phải xét TRƯỚC luật chung: "probe_deliverable" và "undeliverable" đều chứa chuỗi "deliver".
   if (norm.startsWith("probe_unknown_recipient")) return t("log.actionTaken.probe_unknown_recipient");
   if (norm.startsWith("probe_deliverable")) return t("log.actionTaken.probe_deliverable");
   if (norm.startsWith("probe_rejected")) return t("log.actionTaken.probe_rejected");
-
-  // "undeliverable" chứa "deliver" nên cũng phải xét trước, nếu không sẽ hiển thị
-  // NGƯỢC NGHĨA thành "Đã giao tới AMHS".
   if (norm.includes("undeliverable")) return t("log.actionTaken.undeliverable");
 
-  if (norm.includes("routing_failed")) return t("log.actionTaken.routing_failed");
-  if (norm.includes("validation_failed") || norm.includes("invalid")) return t("log.actionTaken.validation_failed");
-  if (norm.includes("unauthorized")) return t("log.actionTaken.unauthorized");
+  // --- Phản hồi AMHS bay ngược về (CTSW014/015/113/114) ---
+  if (norm.startsWith("misrouted_ipn")) return t("log.actionTaken.misrouted_ipn");
+  if (norm.startsWith("ipn_rejected_priority")) return t("log.actionTaken.ipn_rejected_priority");
+  if (norm.startsWith("dr_received")) return t("log.actionTaken.dr_received");
+  if (norm.startsWith("ndr_received")) return t("log.actionTaken.ndr_received");
+
+  // --- Chiều AMHS → SWIM: tiếp nhận và chuyển tiếp ---
+  if (norm.startsWith("dr_requested")) return t("log.actionTaken.dr_requested");
+  if (norm.startsWith("forwarded_unchanged")) return t("log.actionTaken.forwarded_unchanged");
+  if (norm.startsWith("received_amqp_property")) return t("log.actionTaken.received_amqp_property");
+  if (norm.startsWith("received_routing_rule")) return t("log.actionTaken.received_routing_rule");
+  if (norm.startsWith("received_unresolved")) return t("log.actionTaken.received_unresolved");
+
+  // --- Từ chối ở mức recipient ---
+  if (norm.startsWith("unrecognised_recipient")) return t("log.actionTaken.unrecognised_recipient");
+  if (norm.startsWith("no_route")) return t("log.actionTaken.no_route");
+  if (norm.startsWith("no_recipients")) return t("log.actionTaken.no_recipients");
+  if (norm.startsWith("invalid_recipients")) return t("log.actionTaken.invalid_recipients");
+
+  // --- Từ chối ở mức bản tin (13 nhánh NDR của Appendix A) ---
+  if (norm.startsWith("unsupported_eit")) return t("log.actionTaken.unsupported_eit");
+  if (norm.startsWith("unsupported_content_type")) return t("log.actionTaken.unsupported_content_type");
+  if (norm.startsWith("unsupported_body_parts")) return t("log.actionTaken.unsupported_body_parts");
+  if (norm.startsWith("unsupported_repertoire")) return t("log.actionTaken.unsupported_repertoire");
+  if (norm.startsWith("ats_header_syntax_error")) return t("log.actionTaken.ats_header_syntax_error");
+  if (norm.startsWith("invalid_origin_format")) return t("log.actionTaken.invalid_origin_format");
+  if (norm.startsWith("processing_failed")) return t("log.actionTaken.processing_failed");
   if (norm.includes("ttl_expired")) return t("log.actionTaken.ttl_expired");
-  if (norm.includes("type_detection")) return t("log.actionTaken.type_detection_failed");
-  if (norm.includes("misrouted_ipn")) return t("log.actionTaken.misrouted_ipn");
-  if (norm.startsWith("dr_requested") || norm.startsWith("dr_generated")) {
-    return t("log.actionTaken.dr_requested");
-  }
-  // Giữ lại cho các bản ghi log CŨ sinh trước 09/09/2026, khi ITCU còn tự xếp hàng NDR.
-  if (norm.includes("ndr")) return t("log.actionTaken.ndr");
-  if (norm.includes("received") && norm.includes("routing")) return t("log.actionTaken.received_routed");
-  if (norm.includes("publish")) return t("log.actionTaken.published_swim");
-  if (norm.includes("deliver")) return t("log.actionTaken.delivered_amhs");
-  if (norm.includes("unrouted")) return t("log.actionTaken.unrouted_queue");
+  if (norm.includes("routing_failed")) return t("log.actionTaken.routing_failed");
+  if (norm.includes("unauthorized")) return t("log.actionTaken.unauthorized");
+  if (norm.includes("validation_failed") || norm.includes("invalid")) return t("log.actionTaken.validation_failed");
+
   return action;
 };
 

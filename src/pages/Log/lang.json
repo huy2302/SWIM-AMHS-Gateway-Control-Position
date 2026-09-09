@@ -88,14 +88,6 @@
       "vi": "Hết thời gian chờ (TTL)",
       "en": "TTL Expired"
     },
-    "type_detection_failed": {
-      "vi": "Không nhận diện được loại điện văn",
-      "en": "Type Detection Failed"
-    },
-    "ndr": {
-      "vi": "Báo cáo không giao được (NDR)",
-      "en": "Non-Delivery Report"
-    },
     "undeliverable": {
       "vi": "Không chuyển giao được sang SWIM",
       "en": "Undeliverable to SWIM"
@@ -120,21 +112,77 @@
       "vi": "Phản hồi lạc tuyến (không có điện văn gốc)",
       "en": "Misrouted IPN (no subject message)"
     },
-    "received_routed": {
-      "vi": "Đã tiếp nhận & định tuyến",
-      "en": "Received & Routed"
+    "ipn_rejected_priority": {
+      "vi": "Phản hồi bị từ chối (điện văn gốc không phải SS)",
+      "en": "IPN Rejected (subject not SS)"
     },
-    "published_swim": {
-      "vi": "Đã phát hành sang SWIM",
-      "en": "Published to SWIM"
+    "dr_received": {
+      "vi": "Nhận Delivery Report từ AMHS",
+      "en": "Delivery Report Received"
     },
-    "delivered_amhs": {
-      "vi": "Đã giao tới AMHS",
-      "en": "Delivered to AMHS"
+    "ndr_received": {
+      "vi": "Nhận Non-Delivery Report từ AMHS",
+      "en": "Non-Delivery Report Received"
     },
-    "unrouted_queue": {
-      "vi": "Chuyển vào hàng chờ lỗi tuyến",
-      "en": "Moved to Unrouted Queue"
+    "forwarded_unchanged": {
+      "vi": "Chuyển tiếp nguyên văn sang SWIM",
+      "en": "Forwarded Unchanged to SWIM"
+    },
+    "received_amqp_property": {
+      "vi": "Đã tiếp nhận (địa chỉ từ AMQP property)",
+      "en": "Received (address from AMQP property)"
+    },
+    "received_routing_rule": {
+      "vi": "Đã tiếp nhận (địa chỉ từ rule định tuyến)",
+      "en": "Received (address from routing rule)"
+    },
+    "received_unresolved": {
+      "vi": "Đã tiếp nhận (chưa tra được địa chỉ)",
+      "en": "Received (address unresolved)"
+    },
+    "unrecognised_recipient": {
+      "vi": "Địa chỉ người nhận sai khuôn",
+      "en": "Unrecognised Recipient Address"
+    },
+    "no_route": {
+      "vi": "Không có rule định tuyến cho người nhận",
+      "en": "No Routing Rule for Recipient"
+    },
+    "no_recipients": {
+      "vi": "Bản tin không có người nhận",
+      "en": "No Recipients"
+    },
+    "invalid_recipients": {
+      "vi": "Không có người nhận nào hợp lệ",
+      "en": "No Valid Recipients"
+    },
+    "unsupported_eit": {
+      "vi": "EIT không được hỗ trợ",
+      "en": "Unsupported EIT"
+    },
+    "unsupported_content_type": {
+      "vi": "Content-type không được hỗ trợ",
+      "en": "Unsupported Content-Type"
+    },
+    "unsupported_body_parts": {
+      "vi": "Số lượng body part không hợp lệ",
+      "en": "Unsupported Body Parts"
+    },
+    "unsupported_repertoire": {
+      "vi": "Bảng mã ký tự không được hỗ trợ",
+      "en": "Unsupported Repertoire"
+    },
+    "ats_header_syntax_error": {
+      "vi": "Sai cú pháp ATS-message-header",
+      "en": "ATS-message-header Syntax Error"
+    },
+    "invalid_origin_format": {
+      "vi": "Địa chỉ người gửi sai khuôn",
+      "en": "Invalid Originator Format"
+    },
+    "processing_failed": {
+      "vi": "Lỗi xử lý nội bộ",
+      "en": "Internal Processing Error"
     }
   },
   "toast": {
