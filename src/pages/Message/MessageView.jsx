@@ -10,7 +10,9 @@ import {
   AlertCircle,
   Paperclip,
   Download,
-  FileText
+  FileText,
+  Code,
+  List
 } from "lucide-react";
 import toast from "react-hot-toast";
 import DashboardLayout from "@/layout/DashboardLayout";
@@ -26,6 +28,49 @@ const MessageView = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const [amqpPropsMode, setAmqpPropsMode] = useState("table");
+  const [isAmqpPropsCopied, setIsAmqpPropsCopied] = useState(false);
+  const [copiedPropKey, setCopiedPropKey] = useState(null);
+
+  const handleCopyAmqpProps = (propsText) => {
+    if (!propsText) return;
+    navigator.clipboard.writeText(propsText);
+    setIsAmqpPropsCopied(true);
+    setTimeout(() => setIsAmqpPropsCopied(false), 2000);
+  };
+
+  const handleCopySingleProp = (key, val) => {
+    if (val === null || val === undefined) return;
+    navigator.clipboard.writeText(String(val));
+    setCopiedPropKey(key);
+    setTimeout(() => setCopiedPropKey(null), 1500);
+  };
+
+  const getAmqpPropertiesData = (item) => {
+    if (!item) return { raw: "", parsed: null, formattedJson: "" };
+    let parsed = null;
+    if (item.parsedAmqpProperties && typeof item.parsedAmqpProperties === "object") {
+      parsed = item.parsedAmqpProperties;
+    } else if (item.amqpProperties) {
+      if (typeof item.amqpProperties === "object") {
+        parsed = item.amqpProperties;
+      } else {
+        try {
+          parsed = JSON.parse(item.amqpProperties);
+        } catch {
+          parsed = null;
+        }
+      }
+    }
+    const raw = typeof item.amqpProperties === "string" 
+      ? item.amqpProperties 
+      : (parsed ? JSON.stringify(parsed) : "");
+    const formattedJson = parsed 
+      ? JSON.stringify(parsed, null, 2) 
+      : raw;
+
+    return { raw, parsed, formattedJson };
+  };
 
   const formatFileSize = (bytes) => {
     if (!bytes || isNaN(bytes)) return "-";
@@ -481,7 +526,7 @@ const MessageView = () => {
         {/* CENTER DETAIL MODAL */}
         {selectedItem && (
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in" onClick={handleCloseModal}>
-            <div className="w-[860px] max-w-full bg-white max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-zoom-in border border-slate-200" onClick={(e) => e.stopPropagation()}>
+            <div className="w-[940px] max-w-[96vw] bg-white max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-zoom-in border border-slate-200" onClick={(e) => e.stopPropagation()}>
               
               {/* MODAL HEADER */}
               <div className="px-6 py-4 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between">
@@ -687,14 +732,6 @@ const MessageView = () => {
                             {selectedItem.priority !== null && selectedItem.priority !== undefined ? selectedItem.priority : "-"}
                           </span>
                         </div>
-                        {selectedItem.amqpProperties && (
-                          <div className="md:col-span-2 flex flex-col gap-1 py-1 border-b border-slate-100 min-w-0">
-                            <span className="text-slate-500 font-medium">{t("messages.drawer.fields.amqpProperties")}:</span>
-                            <pre className="font-mono text-[11px] text-slate-700 bg-slate-50 border border-slate-200 rounded-lg p-2 m-0 max-h-40 overflow-auto whitespace-pre-wrap break-all">
-                              {selectedItem.amqpProperties}
-                            </pre>
-                          </div>
-                        )}
                         {selectedItem.subject && (
                           <div className="md:col-span-2 flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                             <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.subject")}:</span>
@@ -791,6 +828,123 @@ const MessageView = () => {
                       </>
                     )}
                   </div>
+
+                  {/* DEDICATED AMQP PROPERTIES SUB-SECTION (IF PRESENT) */}
+                  {(() => {
+                    const { raw, parsed, formattedJson } = getAmqpPropertiesData(selectedItem);
+                    if (!raw && !parsed) return null;
+
+                    const propEntries = parsed ? Object.entries(parsed) : [];
+
+                    return (
+                      <div className="border-t border-slate-200 bg-slate-50/60 p-4 flex flex-col gap-3">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                              <Code size={14} className="text-purple-600" />
+                              {t("messages.drawer.fields.amqpProperties")}
+                            </span>
+                            {propEntries.length > 0 && (
+                              <span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-200">
+                                {propEntries.length} {t("messages.drawer.fields.properties")}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {propEntries.length > 0 && (
+                              <div className="bg-slate-200/80 p-0.5 rounded-lg flex items-center text-[11px]">
+                                <button
+                                  type="button"
+                                  onClick={() => setAmqpPropsMode("table")}
+                                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                    amqpPropsMode === "table"
+                                      ? "bg-white text-purple-700 shadow-2xs"
+                                      : "text-slate-500 hover:text-slate-800"
+                                  }`}
+                                >
+                                  <List size={12} />
+                                  <span>{t("messages.drawer.fields.amqpPropsViewTable")}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setAmqpPropsMode("json")}
+                                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                    amqpPropsMode === "json"
+                                      ? "bg-white text-purple-700 shadow-2xs"
+                                      : "text-slate-500 hover:text-slate-800"
+                                  }`}
+                                >
+                                  <Code size={12} />
+                                  <span>{t("messages.drawer.fields.amqpPropsViewJson")}</span>
+                                </button>
+                              </div>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleCopyAmqpProps(formattedJson)}
+                              className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
+                              title={t("messages.drawer.fields.amqpPropsCopy")}
+                            >
+                              {isAmqpPropsCopied ? (
+                                <>
+                                  <Check size={12} className="text-emerald-600" />
+                                  <span className="text-emerald-600">{t("messages.drawer.fields.amqpPropsCopied")}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy size={12} />
+                                  <span>{t("messages.drawer.fields.amqpPropsCopy")}</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+
+                        {amqpPropsMode === "table" && propEntries.length > 0 ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+                            {propEntries.map(([key, val]) => (
+                              <div
+                                key={key}
+                                className="flex items-center justify-between gap-3 px-3 py-2 bg-white rounded-lg border border-slate-200/90 shadow-2xs min-w-0 hover:border-slate-300 transition-colors group"
+                              >
+                                <span className="font-mono text-[11px] text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded border border-purple-100 shrink-0 select-all">
+                                  {key}
+                                </span>
+                                <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                                  <span
+                                    className="font-mono text-[11px] font-semibold text-slate-800 text-right truncate select-all"
+                                    title={String(val)}
+                                  >
+                                    {val === null || val === undefined ? "-" : String(val)}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCopySingleProp(key, val)}
+                                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-purple-600 transition-all rounded hover:bg-slate-100 shrink-0 cursor-pointer"
+                                    title="Copy value"
+                                  >
+                                    {copiedPropKey === key ? (
+                                      <Check size={11} className="text-emerald-600" />
+                                    ) : (
+                                      <Copy size={11} />
+                                    )}
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="relative rounded-lg overflow-hidden border border-slate-300 bg-slate-900 shadow-inner">
+                            <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-x-auto overflow-y-auto max-h-72 whitespace-pre leading-relaxed custom-scrollbar select-all m-0">
+                              {formattedJson}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* FTBP ATTACHMENT CARD */}

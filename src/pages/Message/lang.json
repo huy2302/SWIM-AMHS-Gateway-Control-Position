@@ -196,8 +196,28 @@
         "en": "Registered identifier"
       },
       "amqpProperties": {
-        "vi": "AMQP properties (thô)",
+        "vi": "AMQP properties (raw)",
         "en": "AMQP properties (raw)"
+      },
+      "properties": {
+        "vi": "thuộc tính",
+        "en": "properties"
+      },
+      "amqpPropsViewTable": {
+        "vi": "Dạng bảng",
+        "en": "Key-Value"
+      },
+      "amqpPropsViewJson": {
+        "vi": "JSON thô",
+        "en": "Raw JSON"
+      },
+      "amqpPropsCopy": {
+        "vi": "Sao chép JSON",
+        "en": "Copy JSON"
+      },
+      "amqpPropsCopied": {
+        "vi": "Đã chép!",
+        "en": "Copied!"
       },
       "optionalHeading": {
         "vi": "OHI",
