@@ -28,6 +28,7 @@ import { t } from "@/i18n/translator";
  */
 const normalizeDirection = (cat, type) => {
   const str = String(cat || type || "").toUpperCase();
+  if (str.includes("CP") || str.includes("IPN") || str.includes("REP")) return "CP";
   if (str.includes("IN") || str.includes("SWIM_TO_AMHS") || str.includes("SWIM")) return "IN";
   if (str.includes("OUT") || str.includes("AMHS_TO_SWIM") || str.includes("AMHS")) return "OUT";
   return "OTHER";
@@ -35,6 +36,14 @@ const normalizeDirection = (cat, type) => {
 
 const getDirectionMeta = (cat, type) => {
   const dir = normalizeDirection(cat, type);
+  if (dir === "CP") {
+    return {
+      label: t("log.toolbar.directionCp") || "AMHS → CP",
+      shortLabel: "CP",
+      badgeClass: "text-amber-800 bg-amber-50 border-amber-200",
+      type: "CP"
+    };
+  }
   if (dir === "IN") {
     return {
       label: t("log.toolbar.directionIn"),
@@ -80,6 +89,12 @@ const getStatusStyle = (status) => {
     case "TRANSFORMING":
     case "PENDING":
       return "bg-sky-50 text-sky-700 border-sky-200/80";
+    case "IPN":
+      return "bg-indigo-50 text-indigo-700 border-indigo-200/80";
+    case "CP":
+    case "STORED_FOR_CP":
+    case "REPORTED_TO_CP":
+      return "bg-amber-50 text-amber-700 border-amber-200/80";
     case "UNROUTED":
     case "ROUTING_FAILED":
       return "bg-amber-50 text-amber-700 border-amber-200/80";
@@ -371,6 +386,7 @@ const FullLogView = () => {
                 <option value="ALL">{t("log.toolbar.allDirections")}</option>
                 <option value="SWIM_TO_AMHS">{t("log.toolbar.directionIn")}</option>
                 <option value="AMHS_TO_SWIM">{t("log.toolbar.directionOut")}</option>
+                <option value="AMHS_TO_CP">{t("log.toolbar.directionCp") || "AMHS → CP"}</option>
               </select>
             </div>
 
@@ -389,6 +405,8 @@ const FullLogView = () => {
                 <option value="SUCCESS">{t("log.status.SUCCESS")}</option>
                 <option value="FAILED">{t("log.status.FAILED")}</option>
                 <option value="REJECTED">{t("log.status.REJECTED")}</option>
+                <option value="IPN">{t("log.status.IPN") || "IPN"}</option>
+                <option value="CP">{t("log.status.CP") || "CP"}</option>
                 <option value="UNROUTED">{t("log.status.UNROUTED")}</option>
                 <option value="PENDING">{t("log.status.PENDING")}</option>
                 <option value="ERROR">{t("log.status.ERROR")}</option>

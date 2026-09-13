@@ -38,6 +38,14 @@
       "vi": "Từ chối",
       "en": "REJECTED"
     },
+    "IPN": {
+      "vi": "Báo nhận (IPN)",
+      "en": "IPN"
+    },
+    "CP": {
+      "vi": "Chuyển CP",
+      "en": "CP"
+    },
     "ERROR": {
       "vi": "Lỗi",
       "en": "ERROR"
@@ -247,6 +255,10 @@
     "directionOut": {
       "vi": "AMHS → SWIM (OUT)",
       "en": "AMHS → SWIM (OUT)"
+    },
+    "directionCp": {
+      "vi": "AMHS → CP (Báo nhận/Báo cáo)",
+      "en": "AMHS → CP (Feedback)"
     },
     "loading": {
       "vi": "Đang tải nhật ký chuyển đổi...",
