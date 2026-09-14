@@ -100,13 +100,12 @@ const gatewayApi = {
       console.error("API updateRouting error:", error);
 
       if (error.response) {
-        // Server trả về lỗi (ví dụ: 404 Not Found hoặc 400 Bad Request)
+        // Server trả về lỗi
         throw new Error(error.response.data?.message || "Server error occurred while updating");
       } else if (error.request) {
-        // Request đã gửi nhưng không nhận được phản hồi (lỗi mạng/gateway)
+        // Không nhận được phản hồi
         throw new Error("Cannot connect to Gateway API");
       } else {
-        // Lỗi thiết lập request
         throw new Error(error.message);
       }
     }
@@ -295,9 +294,7 @@ const gatewayApi = {
     return axiosClient.delete(`/messages/outbound/${id}`);
   },
 
-  // --- PHAN HOI AMHS: IPN (RN/NRN) va Report (DR/NDR) bay nguoc ve ---
-  // EUR Doc 047 §2.2.1.1 cam chuyen sang moi truong SWIM, nen Control Position la dich duy nhat.
-  // Ca 4 loai RN/NRN/DR/NDR nam chung bang cp, loc bang tham so type.
+  // --- Phản hồi AMHS ---
   getAmhsFeedback: (type) => {
     return axiosClient.get('/control-traffic/feedback', { params: type ? { type } : {} });
   },

@@ -19,8 +19,6 @@ import { useSelector } from "react-redux";
 import { t } from "@/i18n/translator";
 
 const SystemMonitorView = () => {
-  // Chuỗi thời gian được tích luỹ trong systemSlice mỗi lần lấy mẫu thành công,
-  // component chỉ đọc ra để vẽ.
   const { GatewayProcess, Mysql, history: data } = useSelector((state) => state.system);
 
   return (

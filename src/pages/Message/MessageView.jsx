@@ -594,9 +594,6 @@ const MessageView = () => {
                     </span>
                   </div>
 
-                  {/* CTSW001: doc 047 yeu cau kiem tra priority o CA HAI noi - application
-                      property amhs_ats_pri (ma chu ATS) va AMQP header priority (so 0-9,
-                      Table 3/5). Hien ca hai canh nhau de doi chieu duoc ngay. */}
                   <div className="flex flex-col min-w-0">
                     <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.atsPriority")}:</span>
                     <span className="font-mono font-bold text-slate-800 text-xs">

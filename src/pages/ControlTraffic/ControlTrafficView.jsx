@@ -8,11 +8,6 @@ import TablePagination from "@/components/TablePagination";
 
 /**
  * Phản hồi AMHS — RN, NRN, DR, NDR bay ngược về cho điện văn gateway đã gửi sang AMHS.
- *
- * Cả bốn loại nằm chung bảng `cp`, phân biệt bằng cột `ipnType`, nên hiển thị một danh sách
- * chung. EUR Doc 047 §2.2.1.1 cấm chuyển chúng sang môi trường SWIM, nên Control Position là
- * điểm đến duy nhất. Appendix A CTSW014/015/113/114 đều đòi "stores the message for appropriate
- * processing at the Control Position" — màn hình này chính là chỗ đó.
  */
 export default function ControlTrafficView() {
   const [rows, setRows] = useState([]);
@@ -92,8 +87,6 @@ export default function ControlTrafficView() {
         : null;
       return {
         main: dash(r.reasonCode),
-        // CTSW114 cố tình để trống diagnostic-code. Hiện rõ "(để trống)" để operator biết đó là
-        // dữ liệu đúng chuẩn, không phải mất dữ liệu.
         extra: code || t("controlTraffic.diagnosticEmpty"),
         muted: !code,
       };

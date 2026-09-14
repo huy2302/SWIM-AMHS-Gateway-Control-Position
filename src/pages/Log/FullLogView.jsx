@@ -144,14 +144,13 @@ const formatActionTaken = (action) => {
   if (!action) return "-";
   const norm = String(action).toLowerCase().replace(/[\s\-_]+/g, '_');
 
-  // --- Probe (CTSW011/012/013) ---
-  // Phải xét TRƯỚC luật chung: "probe_deliverable" và "undeliverable" đều chứa chuỗi "deliver".
+  // --- Probe ---
   if (norm.startsWith("probe_unknown_recipient")) return t("log.actionTaken.probe_unknown_recipient");
   if (norm.startsWith("probe_deliverable")) return t("log.actionTaken.probe_deliverable");
   if (norm.startsWith("probe_rejected")) return t("log.actionTaken.probe_rejected");
   if (norm.includes("undeliverable")) return t("log.actionTaken.undeliverable");
 
-  // --- Phản hồi AMHS bay ngược về (CTSW014/015/113/114) ---
+  // --- Phản hồi AMHS ---
   if (norm.startsWith("misrouted_ipn")) return t("log.actionTaken.misrouted_ipn");
   if (norm.startsWith("ipn_rejected_priority")) return t("log.actionTaken.ipn_rejected_priority");
   if (norm.startsWith("dr_received")) return t("log.actionTaken.dr_received");
@@ -170,7 +169,7 @@ const formatActionTaken = (action) => {
   if (norm.startsWith("no_recipients")) return t("log.actionTaken.no_recipients");
   if (norm.startsWith("invalid_recipients")) return t("log.actionTaken.invalid_recipients");
 
-  // --- Từ chối ở mức bản tin (13 nhánh NDR của Appendix A) ---
+  // --- Từ chối ở mức bản tin ---
   if (norm.startsWith("unsupported_eit")) return t("log.actionTaken.unsupported_eit");
   if (norm.startsWith("unsupported_content_type")) return t("log.actionTaken.unsupported_content_type");
   if (norm.startsWith("unsupported_body_parts")) return t("log.actionTaken.unsupported_body_parts");

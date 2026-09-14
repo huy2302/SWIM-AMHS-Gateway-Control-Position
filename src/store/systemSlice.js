@@ -28,9 +28,7 @@ const initialState = {
   error: null,
   GatewayProcess: null,
   Mysql: null,
-  // Chuỗi thời gian dùng chung cho sparkline ở Sidebar và các biểu đồ ở màn Giám sát.
-  // Tích luỹ tại đây - nơi dữ liệu đi vào - thay vì để từng component tự gom trong
-  // useEffect: bỏ được setState trong effect và không còn hai bản logic trùng nhau.
+  // Chuỗi thời gian dùng cho sparkline và biểu đồ giám sát
   history: Array(HISTORY_SIZE).fill(emptyPoint),
 };
 
@@ -49,9 +47,6 @@ const systemSlice = createSlice({
     },
     /**
      * Ghi nhận một lần lấy mẫu thành công từ /api/system/health.
-     *
-     * @param action.payload.timeLabel nhãn thời gian do nơi gọi tạo sẵn - reducer phải thuần
-     *                                 nên không tự gọi new Date()
      */
     setUsedProcess: (state, action) => {
       const gatewayCp = action.payload.gatewayCp;

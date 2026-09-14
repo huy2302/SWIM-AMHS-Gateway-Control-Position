@@ -34,8 +34,7 @@ const createA2SRule = () => ({
   updatedAt: createTimestamp(),
 });
 
-// Gợi ý địa chỉ AFTN cho ô nhập - chỉ là danh sách gợi ý, người dùng gõ địa chỉ khác vẫn được.
-// Lấy từ các recipient đã xuất hiện thực tế trong gwout_dispatch.
+// Gợi ý địa chỉ AFTN cho ô nhập
 const A2S_KNOWN_RECIPIENTS = [
   "VVTSZTZX",
   "VVNBZTZX",
