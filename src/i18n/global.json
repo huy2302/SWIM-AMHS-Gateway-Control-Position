@@ -114,5 +114,19 @@
   "edit": {
     "vi": "Sửa",
     "en": "Edit"
+  },
+  "autoRefresh": {
+    "title": {
+      "vi": "Tự động làm mới",
+      "en": "Auto Refresh"
+    },
+    "off": {
+      "vi": "Tắt",
+      "en": "Off"
+    },
+    "refreshNow": {
+      "vi": "Làm mới ngay",
+      "en": "Refresh now"
+    }
   }
 }

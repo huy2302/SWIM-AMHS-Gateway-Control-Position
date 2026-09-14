@@ -6,6 +6,8 @@ import gatewayApi from "@/api/gatewayApi";
 import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 export default function AlertsView() {
   const navigate = useNavigate();
@@ -23,9 +25,9 @@ export default function AlertsView() {
   }, [statusFilter, searchKeyword]);
 
   // Fetch all alerts from backend
-  const fetchAlerts = useCallback(async () => {
+  const fetchAlerts = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const response = await gatewayApi.getAlerts();
       const rawList = Array.isArray(response) ? response : [];
       
@@ -42,14 +44,23 @@ export default function AlertsView() {
       setAllAlertsList(mapped);
     } catch (error) {
       console.error("Error fetching alerts:", error);
-      toast.error(t("alerts.messages.loadError"));
+      if (!isBackground) {
+        toast.error(t("alerts.messages.loadError"));
+      }
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }, []);
 
+  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+    onRefresh: fetchAlerts,
+    defaultInterval: 5000,
+  });
+
   useEffect(() => {
-    fetchAlerts();
+    fetchAlerts(false);
   }, [fetchAlerts]);
 
   // Calculate statistics directly from the loaded list
@@ -336,13 +347,12 @@ export default function AlertsView() {
               )}
             </div>
 
-            <button
-              onClick={fetchAlerts}
-              className="p-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 rounded-lg transition-colors cursor-pointer"
-              title={t("alerts.buttons.refresh")}
-            >
-              <RefreshCw size={14} className={loading ? "animate-spin text-blue-600" : ""} />
-            </button>
+            <AutoRefreshControl
+              intervalTime={intervalTime}
+              setIntervalTime={setIntervalTime}
+              onRefresh={triggerRefresh}
+              isRefreshing={isRefreshing}
+            />
           </div>
 
         </div>

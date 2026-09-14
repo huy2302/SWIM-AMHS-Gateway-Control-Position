@@ -19,6 +19,8 @@ import DashboardLayout from "@/layout/DashboardLayout";
 import gatewayApi from "@/api/gatewayApi";
 import TablePagination from "@/components/TablePagination";
 import { t } from "@/i18n/translator";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 const MessageView = () => {
   const location = useLocation();
@@ -186,8 +188,10 @@ const MessageView = () => {
   });
 
   // Fetch messages API
-  const fetchArchiveData = useCallback(async () => {
-    setLoading(true);
+  const fetchArchiveData = useCallback(async (isBackground = false) => {
+    if (!isBackground) {
+      setLoading(true);
+    }
     try {
       let response;
       const params = {
@@ -216,16 +220,25 @@ const MessageView = () => {
       }
     } catch (error) {
       console.error("Error fetching archive data:", error);
-      setRows([]);
-      setTotalElements(0);
-      setTotalPages(0);
+      if (!isBackground) {
+        setRows([]);
+        setTotalElements(0);
+        setTotalPages(0);
+      }
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }, [page, rowsPerPage, filters, searchQuery, searchType]);
 
+  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+    onRefresh: fetchArchiveData,
+    defaultInterval: 5000,
+  });
+
   useEffect(() => {
-    fetchArchiveData();
+    fetchArchiveData(false);
   }, [fetchArchiveData]);
 
   // Handle deep-linking navigation from Logs, Alerts, or Unrouted Queue
@@ -393,6 +406,14 @@ const MessageView = () => {
                 {t("messages.toolbar.resetFilter")}
               </button>
             )}
+
+            {/* Auto Refresh Control */}
+            <AutoRefreshControl
+              intervalTime={intervalTime}
+              setIntervalTime={setIntervalTime}
+              onRefresh={triggerRefresh}
+              isRefreshing={isRefreshing}
+            />
           </div>
 
         </div>

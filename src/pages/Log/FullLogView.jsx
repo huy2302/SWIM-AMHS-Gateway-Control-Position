@@ -22,6 +22,8 @@ import DashboardLayout from "@/layout/DashboardLayout";
 import gatewayApi from "@/api/gatewayApi";
 import TablePagination from "@/components/TablePagination";
 import { t } from "@/i18n/translator";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 /**
  * Chuẩn hóa hướng truyền điện văn
@@ -288,9 +290,9 @@ const FullLogView = () => {
     return startTime ? { startTime, endTime: now.toISOString() } : {};
   }, [filters.timeRange]);
 
-  const fetchLogs = useCallback(async () => {
+  const fetchLogs = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const timeParams = getTimeRangeParams();
       const params = {
         page,
@@ -310,14 +312,23 @@ const FullLogView = () => {
       setTotalElements(total);
     } catch (error) {
       console.error("Lỗi khi lấy dữ liệu log:", error);
-      toast.error(t("log.toast.fetchFailed"));
+      if (!isBackground) {
+        toast.error(t("log.toast.fetchFailed"));
+      }
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }, [page, pageSize, filters, debouncedSearch, getTimeRangeParams]);
 
+  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+    onRefresh: fetchLogs,
+    defaultInterval: 5000,
+  });
+
   useEffect(() => {
-    fetchLogs();
+    fetchLogs(false);
   }, [fetchLogs]);
 
   // Client-side search fallback nếu backend không filter theo search
@@ -431,15 +442,13 @@ const FullLogView = () => {
               </select>
             </div>
 
-            {/* Refresh Button */}
-            <button
-              onClick={() => fetchLogs()}
-              disabled={loading}
-              className="p-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-650 rounded-lg hover:text-slate-900 shadow-xs active:scale-95 transition-all cursor-pointer flex items-center justify-center h-8 w-8 disabled:opacity-50"
-              title={t("log.toolbar.refresh")}
-            >
-              <RefreshCw size={13} className={loading ? "animate-spin text-indigo-600" : ""} />
-            </button>
+            {/* Auto Refresh Control */}
+            <AutoRefreshControl
+              intervalTime={intervalTime}
+              setIntervalTime={setIntervalTime}
+              onRefresh={triggerRefresh}
+              isRefreshing={isRefreshing}
+            />
 
             {/* Clear Filter Button */}
             {hasActiveFilters && (

@@ -5,6 +5,8 @@ import gatewayApi from "@/api/gatewayApi";
 import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 /**
  * Phản hồi AMHS — RN, NRN, DR, NDR bay ngược về cho điện văn gateway đã gửi sang AMHS.
@@ -22,9 +24,9 @@ export default function ControlTrafficView() {
     setPage(0);
   }, [typeFilter, keyword]);
 
-  const fetchAll = useCallback(async () => {
+  const fetchAll = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const [list, sum] = await Promise.all([
         gatewayApi.getAmhsFeedback(),
         gatewayApi.getControlTrafficSummary(),
@@ -33,14 +35,23 @@ export default function ControlTrafficView() {
       setSummary(sum || { rn: 0, nrn: 0, dr: 0, ndr: 0 });
     } catch (error) {
       console.error("Error fetching AMHS feedback:", error);
-      toast.error(t("controlTraffic.loadError"));
+      if (!isBackground) {
+        toast.error(t("controlTraffic.loadError"));
+      }
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }, []);
 
+  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+    onRefresh: fetchAll,
+    defaultInterval: 5000,
+  });
+
   useEffect(() => {
-    fetchAll();
+    fetchAll(false);
   }, [fetchAll]);
 
   const filtered = useMemo(() => {
@@ -119,14 +130,12 @@ export default function ControlTrafficView() {
             <h1 className="text-xl font-bold text-slate-800">{t("controlTraffic.title")}</h1>
             <p className="text-sm text-slate-500 mt-0.5">{t("controlTraffic.subtitle")}</p>
           </div>
-          <button
-            onClick={fetchAll}
-            disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white hover:bg-slate-50 disabled:opacity-50"
-          >
-            <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
-            {t("controlTraffic.refresh")}
-          </button>
+          <AutoRefreshControl
+            intervalTime={intervalTime}
+            setIntervalTime={setIntervalTime}
+            onRefresh={triggerRefresh}
+            isRefreshing={isRefreshing}
+          />
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

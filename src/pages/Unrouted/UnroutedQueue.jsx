@@ -6,6 +6,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 const COLORS = ["#3B82F6", "#F59E0B", "#10B981", "#EF4444", "#8B5CF6"];
 
@@ -73,9 +75,9 @@ export default function UnroutedQueue() {
   }, [statsPeriod]);
 
   // Fetch Unrouted Messages
-  const fetchUnrouted = useCallback(async () => {
+  const fetchUnrouted = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const params = {
         page,
         size: pageSize,
@@ -93,18 +95,35 @@ export default function UnroutedQueue() {
       }
     } catch (error) {
       console.error("Error fetching unrouted messages:", error);
-      toast.error(t("unrouted.messages.loadError"));
+      if (!isBackground) {
+        toast.error(t("unrouted.messages.loadError"));
+      }
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }, [page, pageSize, originatorFilter]);
+
+  const refreshAll = useCallback(async (isBackground = false) => {
+    await Promise.all([
+      fetchUnrouted(isBackground),
+      fetchStats(),
+    ]);
+  }, [fetchUnrouted, fetchStats]);
+
+  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+    onRefresh: refreshAll,
+    defaultInterval: 5000,
+    pauseCondition: isRouteOpen || isRejectOpen,
+  });
 
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
 
   useEffect(() => {
-    fetchUnrouted();
+    fetchUnrouted(false);
   }, [fetchUnrouted]);
 
   // Close actions menu when clicking outside
@@ -370,16 +389,12 @@ export default function UnroutedQueue() {
               />
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             </div>
-            <button
-              onClick={() => {
-                fetchStats();
-                fetchUnrouted();
-              }}
-              className="p-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-650 rounded-lg hover:text-slate-900 shadow-sm active:scale-95 transition-all cursor-pointer flex items-center justify-center h-8 w-8"
-              title={t("unrouted.stats.refreshTitle")}
-            >
-              <RefreshCw size={13} />
-            </button>
+            <AutoRefreshControl
+              intervalTime={intervalTime}
+              setIntervalTime={setIntervalTime}
+              onRefresh={triggerRefresh}
+              isRefreshing={isRefreshing}
+            />
           </div>
 
           {/* Batch Actions */}

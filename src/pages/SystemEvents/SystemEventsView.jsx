@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,8 @@ import gatewayApi from "../../api/gatewayApi";
 import { Check } from "lucide-react";
 import TablePagination from "../../components/TablePagination";
 import { t } from "@/i18n/translator";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 const getSeverityStyle = (severity) => {
   switch (severity) {
@@ -34,9 +36,9 @@ const SystemEvents = () => {
   const [selected, setSelected] = useState(null);
   const user = JSON.parse(localStorage.getItem('user'));
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const response = await gatewayApi.getSystemEventsByUser({
         page,
         size: pageSize,
@@ -49,19 +51,21 @@ const SystemEvents = () => {
     } catch (error) {
       console.error("Load system events failed", error);
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
-  };
+  }, [page, pageSize, user?.userId]);
+
+  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+    onRefresh: fetchData,
+    defaultInterval: 5000,
+    pauseCondition: !!selected,
+  });
 
   useEffect(() => {
-    fetchData();
-    
-    const interval = setInterval(() => {
-      fetchData();
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, [page, pageSize]);
+    fetchData(false);
+  }, [fetchData]);
 
   const postReadNoti = async (userId, historyId) => {
     try {
@@ -130,13 +134,21 @@ const SystemEvents = () => {
             <span className="text-xs font-bold text-slate-700 tracking-wider">
               {t("sidebar.menu.systemHistory")}
             </span>
-            <button 
-              onClick={handleMarkAllAsRead}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-slate-250 rounded-xl shadow-xxs transition-all duration-200 hover:bg-gray-50 hover:text-indigo-650 active:scale-95 cursor-pointer"
-            >
-              <Check size={14} className="text-slate-550 shrink-0"/>
-              {t("systemEvents.markAllRead")}
-            </button>
+            <div className="flex items-center gap-2">
+              <AutoRefreshControl
+                intervalTime={intervalTime}
+                setIntervalTime={setIntervalTime}
+                onRefresh={triggerRefresh}
+                isRefreshing={isRefreshing}
+              />
+              <button 
+                onClick={handleMarkAllAsRead}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-slate-250 rounded-xl shadow-xxs transition-all duration-200 hover:bg-gray-50 hover:text-indigo-650 active:scale-95 cursor-pointer"
+              >
+                <Check size={14} className="text-slate-550 shrink-0"/>
+                {t("systemEvents.markAllRead")}
+              </button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
