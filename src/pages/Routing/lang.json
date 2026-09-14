@@ -1,12 +1,12 @@
 {
   "title": {
     "a2s": {
-      "vi": "Chiều SWIM → AMHS (Inbound)",
-      "en": "SWIM → AMHS (Inbound)"
-    },
-    "s2a": {
       "vi": "Chiều AMHS → SWIM (Outbound)",
       "en": "AMHS → SWIM (Outbound)"
+    },
+    "s2a": {
+      "vi": "Chiều SWIM → AMHS (Inbound)",
+      "en": "SWIM → AMHS (Inbound)"
     }
   },
   "subtitle": {
@@ -15,12 +15,12 @@
   },
   "tabs": {
     "a2s": {
-      "vi": "SWIM → AMHS",
-      "en": "SWIM → AMHS"
-    },
-    "s2a": {
       "vi": "AMHS → SWIM",
       "en": "AMHS → SWIM"
+    },
+    "s2a": {
+      "vi": "SWIM → AMHS",
+      "en": "SWIM → AMHS"
     }
   },
   "toolbar": {

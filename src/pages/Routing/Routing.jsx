@@ -97,7 +97,7 @@ const normalizeS2aApiRule = (rule) => ({
 });
 
 const RoutingView = () => {
-  const [activeTab, setActiveTab] = useState("A2S"); // S2A (SWIM to AMHS) là quan trọng hơn
+  const [activeTab, setActiveTab] = useState("S2A"); // S2A (SWIM to AMHS) là luồng Inbound chính
   const [a2sRules, setA2sRules] = useState([]);
   const [s2aRules, setS2aRules] = useState([]);
   const [loadingRoutes, setLoadingRoutes] = useState(false);
@@ -107,7 +107,6 @@ const RoutingView = () => {
   const [editingRule, setEditingRule] = useState(null); // Rule đang được edit
   const [editFormData, setEditFormData] = useState({}); // Data của form edit
   const [recipientInput, setRecipientInput] = useState("");
-  const [filterMessageType, setFilterMessageType] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -120,7 +119,7 @@ const RoutingView = () => {
 
   useEffect(() => {
     setPage(0);
-  }, [activeTab, filterMessageType, filterStatus, searchQuery]);
+  }, [activeTab, filterStatus, searchQuery]);
 
   const fetchRoutingConfigs = async () => {
     setLoadingRoutes(true);
@@ -262,23 +261,10 @@ const RoutingView = () => {
     setRecipientInput("");
   };
 
-  const filterRuleList = (rules, mode) => {
+  const filterRuleList = (rules) => {
     const query = searchQuery.trim().toLowerCase();
 
     return rules.filter((rule) => {
-      // Rule A2S định tuyến theo địa chỉ recipient nên không còn message type để lọc;
-      // bộ lọc này chỉ còn ý nghĩa với chiều S2A.
-      if (filterMessageType && mode !== "A2S") {
-        const values = (rule.msgType || "")
-          .split(",")
-          .map((item) => item.trim().toUpperCase())
-          .filter(Boolean);
-
-        if (!values.includes(filterMessageType.toUpperCase())) {
-          return false;
-        }
-      }
-
       if (filterStatus) {
         const active = Boolean(rule.active);
         if (filterStatus === "Active" && !active) return false;
@@ -307,8 +293,8 @@ const RoutingView = () => {
     });
   };
 
-  const displayedA2sRules = useMemo(() => filterRuleList(a2sRules, "A2S"), [a2sRules, filterMessageType, filterStatus, searchQuery]);
-  const displayedS2aRules = useMemo(() => filterRuleList(s2aRules, "S2A"), [s2aRules, filterMessageType, filterStatus, searchQuery]);
+  const displayedA2sRules = useMemo(() => filterRuleList(a2sRules), [a2sRules, filterStatus, searchQuery]);
+  const displayedS2aRules = useMemo(() => filterRuleList(s2aRules), [s2aRules, filterStatus, searchQuery]);
 
   const handleEditFormChange = (field, value) => {
     setEditFormData(prev => ({ ...prev, [field]: value }));
@@ -405,17 +391,6 @@ const RoutingView = () => {
           {/* Segmented Control for Tabs */}
           <div className="flex bg-slate-100 p-0.5 rounded-lg border border-slate-200/60 shadow-xxs">
             <button
-              onClick={() => setActiveTab("A2S")}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
-                activeTab === "A2S"
-                  ? "bg-white text-blue-600 shadow-xs"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              <ArrowUpRight size={14} />
-              <span>{t("routing.tabs.a2s")}</span>
-            </button>
-            <button
               onClick={() => setActiveTab("S2A")}
               className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
                 activeTab === "S2A"
@@ -425,6 +400,17 @@ const RoutingView = () => {
             >
               <ArrowDownLeft size={14} />
               <span>{t("routing.tabs.s2a")}</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("A2S")}
+              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-md text-xs font-bold transition-all cursor-pointer ${
+                activeTab === "A2S"
+                  ? "bg-white text-blue-600 shadow-xs"
+                  : "text-slate-500 hover:text-slate-800"
+              }`}
+            >
+              <ArrowUpRight size={14} />
+              <span>{t("routing.tabs.a2s")}</span>
             </button>
           </div>
 
@@ -458,26 +444,6 @@ const RoutingView = () => {
                   className="pl-9 pr-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all min-w-[200px] text-slate-900"
                 />
               </div>
-
-              <select
-                value={filterMessageType}
-                onChange={(e) => setFilterMessageType(e.target.value)}
-                className="px-3 py-1.5 border border-slate-200 bg-white rounded-lg text-xs outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all text-slate-700 cursor-pointer"
-              >
-                <option value="">{t("routing.filter.allMessageTypes")}</option>
-                <option value="METAR">METAR</option>
-                <option value="SPECI">SPECI</option>
-                <option value="TAF">TAF</option>
-                <option value="SIGMET">SIGMET</option>
-                <option value="AIRMET">AIRMET</option>
-                <option value="FPL">FPL</option>
-                <option value="DEP">DEP</option>
-                <option value="ARR">ARR</option>
-                <option value="DLA">DLA</option>
-                <option value="CNL">CNL</option>
-                <option value="CHG">CHG</option>
-                <option value="NOTAM">NOTAM</option>
-              </select>
 
               <select
                 value={filterStatus}

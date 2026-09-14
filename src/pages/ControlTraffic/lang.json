@@ -1,34 +1,192 @@
 {
-  "title": { "vi": "Phản hồi AMHS", "en": "AMHS Feedback" },
+  "title": {
+    "vi": "Phản hồi AMHS",
+    "en": "AMHS Feedback"
+  },
   "subtitle": {
     "vi": "Thông báo và báo cáo bay ngược về cho điện văn đã gửi sang AMHS",
     "en": "Notifications and reports returned for messages sent to AMHS"
   },
   "stats": {
-    "rn": { "vi": "RN — đã đọc", "en": "RN — read" },
-    "nrn": { "vi": "NRN — không đọc", "en": "NRN — not read" },
-    "dr": { "vi": "DR — đã giao", "en": "DR — delivered" },
-    "ndr": { "vi": "NDR — không giao được", "en": "NDR — undeliverable" }
+    "rn": {
+      "vi": "RN — đã đọc",
+      "en": "RN — read"
+    },
+    "nrn": {
+      "vi": "NRN — không đọc",
+      "en": "NRN — not read"
+    },
+    "dr": {
+      "vi": "DR — đã giao",
+      "en": "DR — delivered"
+    },
+    "ndr": {
+      "vi": "NDR — không giao được",
+      "en": "NDR — undeliverable"
+    }
   },
   "filter": {
-    "all": { "vi": "Tất cả", "en": "All" },
-    "search": { "vi": "Tìm theo địa chỉ, IPM-Id, MTS-Id...", "en": "Search by address, IPM-Id, MTS-Id..." }
+    "all": {
+      "vi": "Tất cả",
+      "en": "All"
+    },
+    "search": {
+      "vi": "Tìm theo địa chỉ, IPM-Id, MTS-Id...",
+      "en": "Search by address, IPM-Id, MTS-Id..."
+    }
   },
   "columns": {
-    "id": { "vi": "ID", "en": "ID" },
-    "type": { "vi": "Loại", "en": "Type" },
-    "origin": { "vi": "Bên gửi", "en": "Originator" },
-    "recipient": { "vi": "Bên nhận", "en": "Recipient" },
-    "subject": { "vi": "Điện văn gốc", "en": "Subject message" },
-    "detail": { "vi": "Chi tiết", "en": "Detail" },
-    "supplementaryInfo": { "vi": "Thông tin thêm", "en": "Supplementary info" },
-    "status": { "vi": "Trạng thái", "en": "Status" }
+    "id": {
+      "vi": "ID",
+      "en": "ID"
+    },
+    "type": {
+      "vi": "Loại",
+      "en": "Type"
+    },
+    "origin": {
+      "vi": "Bên gửi",
+      "en": "Originator"
+    },
+    "recipient": {
+      "vi": "Bên nhận",
+      "en": "Recipient"
+    },
+    "subject": {
+      "vi": "Điện văn gốc",
+      "en": "Subject message"
+    },
+    "detail": {
+      "vi": "Chi tiết",
+      "en": "Detail"
+    },
+    "supplementaryInfo": {
+      "vi": "Thông tin thêm",
+      "en": "Supplementary info"
+    },
+    "status": {
+      "vi": "Trạng thái",
+      "en": "Status"
+    },
+    "actions": {
+      "vi": "Thao tác",
+      "en": "Actions"
+    }
   },
   "empty": {
     "vi": "Chưa có phản hồi nào. Bảng cp do AMHS Component ghi.",
     "en": "No feedback yet. Table cp is written by the AMHS Component."
   },
-  "diagnosticEmpty": { "vi": "(để trống)", "en": "(empty)" },
-  "refresh": { "vi": "Tải lại", "en": "Refresh" },
-  "loadError": { "vi": "Không tải được dữ liệu phản hồi AMHS", "en": "Failed to load AMHS feedback" }
+  "diagnosticEmpty": {
+    "vi": "(để trống)",
+    "en": "(empty)"
+  },
+  "refresh": {
+    "vi": "Tải lại",
+    "en": "Refresh"
+  },
+  "loadError": {
+    "vi": "Không tải được dữ liệu phản hồi AMHS",
+    "en": "Failed to load AMHS feedback"
+  },
+  "viewDetail": {
+    "vi": "Xem chi tiết phản hồi",
+    "en": "View Feedback Details"
+  },
+  "viewOriginal": {
+    "vi": "Xem điện văn gốc",
+    "en": "View Original Message"
+  },
+  "modal": {
+    "title": {
+      "vi": "Chi tiết Phản hồi AMHS",
+      "en": "AMHS Feedback Details"
+    },
+    "general": {
+      "vi": "Thông tin chung",
+      "en": "General Information"
+    },
+    "subjectSection": {
+      "vi": "Điện văn gốc được đối chiếu",
+      "en": "Correlated Original Message"
+    },
+    "diagnostics": {
+      "vi": "Mã kết quả & Chẩn đoán",
+      "en": "Result & Diagnostics"
+    },
+    "close": {
+      "vi": "Đóng",
+      "en": "Close"
+    },
+    "copy": {
+      "vi": "Sao chép",
+      "en": "Copy"
+    },
+    "copied": {
+      "vi": "Đã sao chép",
+      "en": "Copied"
+    },
+    "viewOriginalTooltip": {
+      "vi": "Mở Kho điện văn để xem chi tiết điện văn gốc tương ứng",
+      "en": "Open Message Archives to view this correlated original message"
+    },
+    "noSubject": {
+      "vi": "Không có mã định danh điện văn gốc",
+      "en": "No original message identifier"
+    },
+    "fields": {
+      "id": {
+        "vi": "ID bản ghi",
+        "en": "Record ID"
+      },
+      "type": {
+        "vi": "Loại phản hồi (IPN Type)",
+        "en": "IPN Type"
+      },
+      "status": {
+        "vi": "Trạng thái",
+        "en": "Status"
+      },
+      "origin": {
+        "vi": "Bên phát phản hồi (Originator)",
+        "en": "Originator"
+      },
+      "recipient": {
+        "vi": "Bên nhận phản hồi (Recipient)",
+        "en": "Recipient"
+      },
+      "subjectType": {
+        "vi": "Loại định danh",
+        "en": "Identifier Type"
+      },
+      "subjectValue": {
+        "vi": "Mã định danh",
+        "en": "Identifier Value"
+      },
+      "reasonCode": {
+        "vi": "Mã nguyên nhân (Reason Code)",
+        "en": "Reason Code"
+      },
+      "diagnosticCode": {
+        "vi": "Mã chẩn đoán (Diagnostic Code)",
+        "en": "Diagnostic Code"
+      },
+      "nonReceiptReason": {
+        "vi": "Lý do không đọc (Non-Receipt Reason)",
+        "en": "Non-Receipt Reason"
+      },
+      "discardReason": {
+        "vi": "Lý do huỷ (Discard Reason)",
+        "en": "Discard Reason"
+      },
+      "receiptTime": {
+        "vi": "Thời điểm đọc (Receipt Time)",
+        "en": "Receipt Time"
+      },
+      "supplementaryInfo": {
+        "vi": "Thông tin bổ sung",
+        "en": "Supplementary Information"
+      }
+    }
+  }
 }
