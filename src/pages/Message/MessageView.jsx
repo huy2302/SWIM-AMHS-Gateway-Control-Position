@@ -948,8 +948,8 @@ const MessageView = () => {
                               ))}
                             </div>
                           ) : (
-                            <div className="relative rounded-lg overflow-hidden border border-slate-200 bg-slate-900 shadow-inner">
-                              <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-x-auto max-h-80 whitespace-pre leading-relaxed custom-scrollbar select-all m-0">
+                            <div className="relative rounded-lg border border-slate-200 bg-slate-900 shadow-inner overflow-hidden">
+                              <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-auto whitespace-pre-wrap break-all leading-relaxed custom-scrollbar select-all m-0">
                                 {formattedJson}
                               </pre>
                             </div>
@@ -1019,7 +1019,7 @@ const MessageView = () => {
 
                   <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-slate-50 shadow-inner">
                     <pre
-                      className="p-4 font-mono text-xs overflow-x-auto whitespace-pre-wrap leading-relaxed custom-scrollbar max-h-64 select-all font-semibold"
+                      className="p-4 font-mono text-xs overflow-auto whitespace-pre-wrap break-all leading-relaxed custom-scrollbar select-all font-semibold"
                       style={{ backgroundColor: '#f8fafc', color: '#0f172a' }}
                     >
                       {selectedItem.payloadContent || selectedItem.text || t("messages.drawer.fields.noPayload")}
