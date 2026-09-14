@@ -837,124 +837,128 @@ const MessageView = () => {
                       </>
                     )}
                   </div>
-                </div>
 
-                {/* 4. DEDICATED AMQP PROPERTIES CARD (IF PRESENT) */}
-                {(() => {
-                  const { raw, parsed, formattedJson } = getAmqpPropertiesData(selectedItem);
-                  if (!raw && !parsed) return null;
+                  {/* DEDICATED AMQP PROPERTIES SUB-SECTION (FLAT CLEAN DESIGN) */}
+                  {(() => {
+                    const { raw, parsed, formattedJson } = getAmqpPropertiesData(selectedItem);
+                    if (!raw && !parsed) return null;
 
-                  const propEntries = parsed ? Object.entries(parsed) : [];
+                    const propEntries = parsed ? Object.entries(parsed) : [];
 
-                  return (
-                    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs flex flex-col">
-                      <div className="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200 font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center justify-between flex-wrap gap-2">
-                        <div className="flex items-center gap-2">
-                          <Code size={14} className="text-purple-600" />
-                          <span>{t("messages.drawer.fields.amqpProperties")}</span>
-                          {propEntries.length > 0 && (
-                            <span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-200">
-                              {propEntries.length} {t("messages.drawer.fields.properties")}
+                    return (
+                      <div className="border-t border-slate-200 flex flex-col">
+                        {/* Sub-header */}
+                        <div className="bg-slate-50/70 px-4 py-2 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <Code size={13} className="text-purple-600" />
+                            <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+                              {t("messages.drawer.fields.amqpProperties")}
                             </span>
-                          )}
+                            {propEntries.length > 0 && (
+                              <span className="bg-purple-100/80 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-200">
+                                {propEntries.length} {t("messages.drawer.fields.properties")}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {propEntries.length > 0 && (
+                              <div className="bg-slate-200/70 p-0.5 rounded-lg flex items-center text-[11px]">
+                                <button
+                                  type="button"
+                                  onClick={() => setAmqpPropsMode("table")}
+                                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                    amqpPropsMode === "table"
+                                      ? "bg-white text-purple-700 shadow-2xs"
+                                      : "text-slate-500 hover:text-slate-800"
+                                  }`}
+                                >
+                                  <List size={12} />
+                                  <span>{t("messages.drawer.fields.amqpPropsViewTable")}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setAmqpPropsMode("json")}
+                                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                    amqpPropsMode === "json"
+                                      ? "bg-white text-purple-700 shadow-2xs"
+                                      : "text-slate-500 hover:text-slate-800"
+                                  }`}
+                                >
+                                  <Code size={12} />
+                                  <span>{t("messages.drawer.fields.amqpPropsViewJson")}</span>
+                                </button>
+                              </div>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => handleCopyAmqpProps(formattedJson)}
+                              className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
+                              title={t("messages.drawer.fields.amqpPropsCopy")}
+                            >
+                              {isAmqpPropsCopied ? (
+                                <>
+                                  <Check size={12} className="text-emerald-600" />
+                                  <span className="text-emerald-600">{t("messages.drawer.fields.amqpPropsCopied")}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Copy size={12} />
+                                  <span>{t("messages.drawer.fields.amqpPropsCopy")}</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          {propEntries.length > 0 && (
-                            <div className="bg-slate-200/80 p-0.5 rounded-lg flex items-center text-[11px]">
-                              <button
-                                type="button"
-                                onClick={() => setAmqpPropsMode("table")}
-                                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
-                                  amqpPropsMode === "table"
-                                    ? "bg-white text-purple-700 shadow-2xs"
-                                    : "text-slate-500 hover:text-slate-800"
-                                }`}
-                              >
-                                <List size={12} />
-                                <span>{t("messages.drawer.fields.amqpPropsViewTable")}</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => setAmqpPropsMode("json")}
-                                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
-                                  amqpPropsMode === "json"
-                                    ? "bg-white text-purple-700 shadow-2xs"
-                                    : "text-slate-500 hover:text-slate-800"
-                                }`}
-                              >
-                                <Code size={12} />
-                                <span>{t("messages.drawer.fields.amqpPropsViewJson")}</span>
-                              </button>
+                        {/* Flat property list (no cards, clean rows) */}
+                        <div className="p-4">
+                          {amqpPropsMode === "table" && propEntries.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1.5 text-xs">
+                              {propEntries.map(([key, val]) => (
+                                <div
+                                  key={key}
+                                  className="flex justify-between items-center py-1.5 border-b border-slate-100 gap-2 min-w-0 group hover:bg-slate-50/80 px-1 rounded transition-colors"
+                                >
+                                  <span className="font-mono text-[11px] text-purple-700 font-semibold shrink-0 select-all">
+                                    {key}:
+                                  </span>
+                                  <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                                    <span
+                                      className="font-mono font-semibold text-slate-800 text-right truncate select-all"
+                                      title={String(val)}
+                                    >
+                                      {val === null || val === undefined ? "-" : String(val)}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopySingleProp(key, val)}
+                                      className="opacity-0 group-hover:opacity-100 p-0.5 text-slate-400 hover:text-purple-600 transition-all rounded hover:bg-slate-200/60 shrink-0 cursor-pointer"
+                                      title="Copy value"
+                                    >
+                                      {copiedPropKey === key ? (
+                                        <Check size={11} className="text-emerald-600" />
+                                      ) : (
+                                        <Copy size={11} />
+                                      )}
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="relative rounded-lg overflow-hidden border border-slate-200 bg-slate-900 shadow-inner">
+                              <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-x-auto max-h-80 whitespace-pre leading-relaxed custom-scrollbar select-all m-0">
+                                {formattedJson}
+                              </pre>
                             </div>
                           )}
-
-                          <button
-                            type="button"
-                            onClick={() => handleCopyAmqpProps(formattedJson)}
-                            className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-                            title={t("messages.drawer.fields.amqpPropsCopy")}
-                          >
-                            {isAmqpPropsCopied ? (
-                              <>
-                                <Check size={12} className="text-emerald-600" />
-                                <span className="text-emerald-600">{t("messages.drawer.fields.amqpPropsCopied")}</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy size={12} />
-                                <span>{t("messages.drawer.fields.amqpPropsCopy")}</span>
-                              </>
-                            )}
-                          </button>
                         </div>
                       </div>
-
-                      <div className="p-4 bg-slate-50/40">
-                        {amqpPropsMode === "table" && propEntries.length > 0 ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
-                            {propEntries.map(([key, val]) => (
-                              <div
-                                key={key}
-                                className="flex items-center justify-between gap-3 px-3.5 py-2.5 bg-white rounded-lg border border-slate-200/90 shadow-2xs min-w-0 hover:border-slate-300 transition-colors group"
-                              >
-                                <span className="font-mono text-[11px] text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded border border-purple-100 shrink-0 select-all">
-                                  {key}
-                                </span>
-                                <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
-                                  <span
-                                    className="font-mono text-[11px] font-semibold text-slate-800 text-right truncate select-all"
-                                    title={String(val)}
-                                  >
-                                    {val === null || val === undefined ? "-" : String(val)}
-                                  </span>
-                                  <button
-                                    type="button"
-                                    onClick={() => handleCopySingleProp(key, val)}
-                                    className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-purple-600 transition-all rounded hover:bg-slate-100 shrink-0 cursor-pointer"
-                                    title="Copy value"
-                                  >
-                                    {copiedPropKey === key ? (
-                                      <Check size={11} className="text-emerald-600" />
-                                    ) : (
-                                      <Copy size={11} />
-                                    )}
-                                  </button>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="relative rounded-lg overflow-hidden border border-slate-300 bg-slate-900 shadow-inner">
-                            <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-x-auto max-h-80 whitespace-pre leading-relaxed custom-scrollbar select-all m-0">
-                              {formattedJson}
-                            </pre>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
+                    );
+                  })()}
+                </div>
 
                 {/* FTBP ATTACHMENT CARD */}
                 {selectedItem.ftbpFileName && (
