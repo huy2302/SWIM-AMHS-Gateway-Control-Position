@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 export default function AlertsView() {
   const navigate = useNavigate();
@@ -54,7 +53,7 @@ export default function AlertsView() {
     }
   }, []);
 
-  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+  useAutoRefresh({
     onRefresh: fetchAlerts,
     defaultInterval: 5000,
   });
@@ -346,13 +345,6 @@ export default function AlertsView() {
                 </button>
               )}
             </div>
-
-            <AutoRefreshControl
-              intervalTime={intervalTime}
-              setIntervalTime={setIntervalTime}
-              onRefresh={triggerRefresh}
-              isRefreshing={isRefreshing}
-            />
           </div>
 
         </div>

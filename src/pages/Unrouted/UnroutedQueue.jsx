@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 const COLORS = ["#3B82F6", "#F59E0B", "#10B981", "#EF4444", "#8B5CF6"];
 
@@ -112,7 +111,7 @@ export default function UnroutedQueue() {
     ]);
   }, [fetchUnrouted, fetchStats]);
 
-  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+  useAutoRefresh({
     onRefresh: refreshAll,
     defaultInterval: 5000,
     pauseCondition: isRouteOpen || isRejectOpen,
@@ -389,12 +388,6 @@ export default function UnroutedQueue() {
               />
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             </div>
-            <AutoRefreshControl
-              intervalTime={intervalTime}
-              setIntervalTime={setIntervalTime}
-              onRefresh={triggerRefresh}
-              isRefreshing={isRefreshing}
-            />
           </div>
 
           {/* Batch Actions */}

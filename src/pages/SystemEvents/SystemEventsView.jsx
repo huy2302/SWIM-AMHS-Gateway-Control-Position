@@ -10,7 +10,6 @@ import { Check } from "lucide-react";
 import TablePagination from "../../components/TablePagination";
 import { t } from "@/i18n/translator";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 const getSeverityStyle = (severity) => {
   switch (severity) {
@@ -57,7 +56,7 @@ const SystemEvents = () => {
     }
   }, [page, pageSize, user?.userId]);
 
-  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+  useAutoRefresh({
     onRefresh: fetchData,
     defaultInterval: 5000,
     pauseCondition: !!selected,
@@ -135,12 +134,6 @@ const SystemEvents = () => {
               {t("sidebar.menu.systemHistory")}
             </span>
             <div className="flex items-center gap-2">
-              <AutoRefreshControl
-                intervalTime={intervalTime}
-                setIntervalTime={setIntervalTime}
-                onRefresh={triggerRefresh}
-                isRefreshing={isRefreshing}
-              />
               <button 
                 onClick={handleMarkAllAsRead}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 bg-white border border-slate-250 rounded-xl shadow-xxs transition-all duration-200 hover:bg-gray-50 hover:text-indigo-650 active:scale-95 cursor-pointer"

@@ -22,7 +22,6 @@ import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 /**
  * Phản hồi AMHS — RN, NRN, DR, NDR bay ngược về cho điện văn gateway đã gửi sang AMHS.
@@ -65,7 +64,7 @@ export default function ControlTrafficView() {
     }
   }, []);
 
-  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+  useAutoRefresh({
     onRefresh: fetchAll,
     defaultInterval: 5000,
   });
@@ -177,17 +176,9 @@ export default function ControlTrafficView() {
   return (
     <DashboardLayout>
       <div className="p-4 space-y-4">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-xl font-bold text-slate-800">{t("controlTraffic.title")}</h1>
-            <p className="text-sm text-slate-500 mt-0.5">{t("controlTraffic.subtitle")}</p>
-          </div>
-          <AutoRefreshControl
-            intervalTime={intervalTime}
-            setIntervalTime={setIntervalTime}
-            onRefresh={triggerRefresh}
-            isRefreshing={isRefreshing}
-          />
+        <div>
+          <h1 className="text-xl font-bold text-slate-800">{t("controlTraffic.title")}</h1>
+          <p className="text-sm text-slate-500 mt-0.5">{t("controlTraffic.subtitle")}</p>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

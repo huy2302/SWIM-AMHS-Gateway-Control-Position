@@ -103,3 +103,34 @@ code {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* ==========================================================================
+   Global Interactive Cursor Styles
+   Đảm bảo tất cả các phần tử có thể tương tác luôn có con trỏ chuột pointer
+   ========================================================================== */
+button:not(:disabled),
+[role="button"],
+select:not(:disabled),
+summary,
+a[href],
+input[type="button"]:not(:disabled),
+input[type="submit"]:not(:disabled),
+input[type="reset"]:not(:disabled),
+input[type="checkbox"]:not(:disabled),
+input[type="radio"]:not(:disabled),
+label:has(input:not(:disabled)),
+label:has(select:not(:disabled)),
+label[for],
+tr.cursor-pointer,
+.clickable,
+[clickable="true"] {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}

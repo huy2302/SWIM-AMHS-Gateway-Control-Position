@@ -23,7 +23,6 @@ import gatewayApi from "@/api/gatewayApi";
 import TablePagination from "@/components/TablePagination";
 import { t } from "@/i18n/translator";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 /**
  * Chuẩn hóa hướng truyền điện văn
@@ -322,7 +321,7 @@ const FullLogView = () => {
     }
   }, [page, pageSize, filters, debouncedSearch, getTimeRangeParams]);
 
-  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+  useAutoRefresh({
     onRefresh: fetchLogs,
     defaultInterval: 5000,
   });
@@ -383,7 +382,7 @@ const FullLogView = () => {
           <div className="flex flex-wrap items-center gap-2.5">
             
             {/* Direction Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0">
+            <label className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0 cursor-pointer hover:bg-slate-100/70 transition-colors">
               <span className="text-[11px] text-slate-500 font-bold">{t("log.toolbar.direction")}</span>
               <select
                 value={filters.direction}
@@ -398,10 +397,10 @@ const FullLogView = () => {
                 <option value="AMHS_TO_SWIM">{t("log.toolbar.directionOut")}</option>
                 <option value="AMHS_TO_CP">{t("log.toolbar.directionCp") || "AMHS → CP"}</option>
               </select>
-            </div>
+            </label>
 
             {/* Status Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0">
+            <label className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0 cursor-pointer hover:bg-slate-100/70 transition-colors">
               <span className="text-[11px] text-slate-500 font-bold">{t("log.toolbar.status")}</span>
               <select
                 value={filters.status}
@@ -421,10 +420,10 @@ const FullLogView = () => {
                 <option value="PENDING">{t("log.status.PENDING")}</option>
                 <option value="ERROR">{t("log.status.ERROR")}</option>
               </select>
-            </div>
+            </label>
 
             {/* Time Range Filter */}
-            <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0">
+            <label className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0 cursor-pointer hover:bg-slate-100/70 transition-colors">
               <Clock size={13} className="text-slate-400" />
               <span className="text-[11px] text-slate-500 font-bold">{t("log.toolbar.timeRange")}</span>
               <select
@@ -440,15 +439,7 @@ const FullLogView = () => {
                 <option value="24H">{t("log.toolbar.last24h")}</option>
                 <option value="7D">{t("log.toolbar.last7d")}</option>
               </select>
-            </div>
-
-            {/* Auto Refresh Control */}
-            <AutoRefreshControl
-              intervalTime={intervalTime}
-              setIntervalTime={setIntervalTime}
-              onRefresh={triggerRefresh}
-              isRefreshing={isRefreshing}
-            />
+            </label>
 
             {/* Clear Filter Button */}
             {hasActiveFilters && (

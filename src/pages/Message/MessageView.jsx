@@ -20,7 +20,6 @@ import gatewayApi from "@/api/gatewayApi";
 import TablePagination from "@/components/TablePagination";
 import { t } from "@/i18n/translator";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import AutoRefreshControl from "@/components/AutoRefreshControl";
 
 const MessageView = () => {
   const location = useLocation();
@@ -232,7 +231,7 @@ const MessageView = () => {
     }
   }, [page, rowsPerPage, filters, searchQuery, searchType]);
 
-  const { intervalTime, setIntervalTime, isRefreshing, triggerRefresh } = useAutoRefresh({
+  useAutoRefresh({
     onRefresh: fetchArchiveData,
     defaultInterval: 5000,
   });
@@ -362,7 +361,7 @@ const MessageView = () => {
             </div>
 
             {/* Status Select */}
-            <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0">
+            <label className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-200 shrink-0 cursor-pointer hover:bg-slate-100/70 transition-colors">
               <span className="text-[10px] text-slate-500 font-bold">{t("messages.toolbar.status")}</span>
               <select
                 value={filters.status}
@@ -395,7 +394,7 @@ const MessageView = () => {
                   </>
                 )}
               </select>
-            </div>
+            </label>
 
             {/* Reset Filters */}
             {(filters.status !== '' || searchQuery) && (
@@ -406,14 +405,6 @@ const MessageView = () => {
                 {t("messages.toolbar.resetFilter")}
               </button>
             )}
-
-            {/* Auto Refresh Control */}
-            <AutoRefreshControl
-              intervalTime={intervalTime}
-              setIntervalTime={setIntervalTime}
-              onRefresh={triggerRefresh}
-              isRefreshing={isRefreshing}
-            />
           </div>
 
         </div>
@@ -846,86 +837,86 @@ const MessageView = () => {
                       </>
                     )}
                   </div>
+                </div>
 
-                  {/* DEDICATED AMQP PROPERTIES SUB-SECTION (IF PRESENT) */}
-                  {(() => {
-                    const { raw, parsed, formattedJson } = getAmqpPropertiesData(selectedItem);
-                    if (!raw && !parsed) return null;
+                {/* 4. DEDICATED AMQP PROPERTIES CARD (IF PRESENT) */}
+                {(() => {
+                  const { raw, parsed, formattedJson } = getAmqpPropertiesData(selectedItem);
+                  if (!raw && !parsed) return null;
 
-                    const propEntries = parsed ? Object.entries(parsed) : [];
+                  const propEntries = parsed ? Object.entries(parsed) : [];
 
-                    return (
-                      <div className="border-t border-slate-200 bg-slate-50/60 p-4 flex flex-col gap-3">
-                        <div className="flex items-center justify-between flex-wrap gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                              <Code size={14} className="text-purple-600" />
-                              {t("messages.drawer.fields.amqpProperties")}
+                  return (
+                    <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs flex flex-col">
+                      <div className="bg-slate-50/80 px-4 py-2.5 border-b border-slate-200 font-bold text-slate-700 uppercase tracking-wider text-[11px] flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-2">
+                          <Code size={14} className="text-purple-600" />
+                          <span>{t("messages.drawer.fields.amqpProperties")}</span>
+                          {propEntries.length > 0 && (
+                            <span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-200">
+                              {propEntries.length} {t("messages.drawer.fields.properties")}
                             </span>
-                            {propEntries.length > 0 && (
-                              <span className="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded-full border border-purple-200">
-                                {propEntries.length} {t("messages.drawer.fields.properties")}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            {propEntries.length > 0 && (
-                              <div className="bg-slate-200/80 p-0.5 rounded-lg flex items-center text-[11px]">
-                                <button
-                                  type="button"
-                                  onClick={() => setAmqpPropsMode("table")}
-                                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
-                                    amqpPropsMode === "table"
-                                      ? "bg-white text-purple-700 shadow-2xs"
-                                      : "text-slate-500 hover:text-slate-800"
-                                  }`}
-                                >
-                                  <List size={12} />
-                                  <span>{t("messages.drawer.fields.amqpPropsViewTable")}</span>
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => setAmqpPropsMode("json")}
-                                  className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
-                                    amqpPropsMode === "json"
-                                      ? "bg-white text-purple-700 shadow-2xs"
-                                      : "text-slate-500 hover:text-slate-800"
-                                  }`}
-                                >
-                                  <Code size={12} />
-                                  <span>{t("messages.drawer.fields.amqpPropsViewJson")}</span>
-                                </button>
-                              </div>
-                            )}
-
-                            <button
-                              type="button"
-                              onClick={() => handleCopyAmqpProps(formattedJson)}
-                              className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
-                              title={t("messages.drawer.fields.amqpPropsCopy")}
-                            >
-                              {isAmqpPropsCopied ? (
-                                <>
-                                  <Check size={12} className="text-emerald-600" />
-                                  <span className="text-emerald-600">{t("messages.drawer.fields.amqpPropsCopied")}</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Copy size={12} />
-                                  <span>{t("messages.drawer.fields.amqpPropsCopy")}</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
+                          )}
                         </div>
 
+                        <div className="flex items-center gap-2">
+                          {propEntries.length > 0 && (
+                            <div className="bg-slate-200/80 p-0.5 rounded-lg flex items-center text-[11px]">
+                              <button
+                                type="button"
+                                onClick={() => setAmqpPropsMode("table")}
+                                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                  amqpPropsMode === "table"
+                                    ? "bg-white text-purple-700 shadow-2xs"
+                                    : "text-slate-500 hover:text-slate-800"
+                                }`}
+                              >
+                                <List size={12} />
+                                <span>{t("messages.drawer.fields.amqpPropsViewTable")}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setAmqpPropsMode("json")}
+                                className={`flex items-center gap-1 px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                  amqpPropsMode === "json"
+                                    ? "bg-white text-purple-700 shadow-2xs"
+                                    : "text-slate-500 hover:text-slate-800"
+                                }`}
+                              >
+                                <Code size={12} />
+                                <span>{t("messages.drawer.fields.amqpPropsViewJson")}</span>
+                              </button>
+                            </div>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleCopyAmqpProps(formattedJson)}
+                            className="px-2.5 py-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95"
+                            title={t("messages.drawer.fields.amqpPropsCopy")}
+                          >
+                            {isAmqpPropsCopied ? (
+                              <>
+                                <Check size={12} className="text-emerald-600" />
+                                <span className="text-emerald-600">{t("messages.drawer.fields.amqpPropsCopied")}</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy size={12} />
+                                <span>{t("messages.drawer.fields.amqpPropsCopy")}</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="p-4 bg-slate-50/40">
                         {amqpPropsMode === "table" && propEntries.length > 0 ? (
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-72 overflow-y-auto custom-scrollbar pr-1">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                             {propEntries.map(([key, val]) => (
                               <div
                                 key={key}
-                                className="flex items-center justify-between gap-3 px-3 py-2 bg-white rounded-lg border border-slate-200/90 shadow-2xs min-w-0 hover:border-slate-300 transition-colors group"
+                                className="flex items-center justify-between gap-3 px-3.5 py-2.5 bg-white rounded-lg border border-slate-200/90 shadow-2xs min-w-0 hover:border-slate-300 transition-colors group"
                               >
                                 <span className="font-mono text-[11px] text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded border border-purple-100 shrink-0 select-all">
                                   {key}
@@ -955,15 +946,15 @@ const MessageView = () => {
                           </div>
                         ) : (
                           <div className="relative rounded-lg overflow-hidden border border-slate-300 bg-slate-900 shadow-inner">
-                            <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-x-auto overflow-y-auto max-h-72 whitespace-pre leading-relaxed custom-scrollbar select-all m-0">
+                            <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-x-auto max-h-80 whitespace-pre leading-relaxed custom-scrollbar select-all m-0">
                               {formattedJson}
                             </pre>
                           </div>
                         )}
                       </div>
-                    );
-                  })()}
-                </div>
+                    </div>
+                  );
+                })()}
 
                 {/* FTBP ATTACHMENT CARD */}
                 {selectedItem.ftbpFileName && (
