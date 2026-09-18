@@ -18,6 +18,7 @@ const titleMap = {
   messages: "sidebar.menu.messages",
   system: "sidebar.menu.systemMonitor",
   unrouted: "sidebar.menu.unrouted",
+  "control-traffic": "sidebar.menu.controlTraffic",
   alerts: "sidebar.menu.alerts",
   "system-events": "sidebar.menu.systemHistory",
   users: "sidebar.menu.users",
