@@ -52,7 +52,6 @@ const createS2ARule = () => ({
   receiveTopic: "",
   sendTopic: "",
   domain: "",
-  msgType: "",
   destination: "",
   priority: 100,
   filingTime: "CURRENT_TIME",
@@ -85,7 +84,6 @@ const normalizeS2aApiRule = (rule) => ({
   receiveTopic: rule.receiveTopic ?? rule.swimTopic ?? rule.topic ?? "",
   sendTopic: rule.sendTopic ?? rule.amhsTopic ?? "",
   domain: rule.swimDomain ?? rule.domain ?? "",
-  msgType: rule.messageType ?? rule.msgType ?? "",
   destination: rule.recipients ?? rule.amhsDestination ?? rule.destination ?? "",
   priority: rule.priority ?? 100,
   filingTime: rule.amhsFilingTimeMode ?? rule.filingTime ?? "CURRENT_TIME",
@@ -274,7 +272,6 @@ const RoutingView = () => {
       if (query) {
         const haystack = [
           rule.recipients || "",
-          rule.messageType || rule.msgType || "",
           rule.topic || "",
           rule.sendTopic || rule.topic || "",
           rule.destination || "",
@@ -475,7 +472,6 @@ const RoutingView = () => {
                     <>
                       <th className="p-3.5">{t("routing.table.receiveTopic")}</th>
                       <th className="p-3.5">{t("routing.table.recipients")}</th>
-                      <th className="p-3.5">{t("routing.table.messageType")}</th>
                       <th className="p-3.5">{t("routing.table.note")}</th>
                       <th className="p-3.5">{t("routing.table.priority")}</th>
                       <th className="p-3.5">{t("routing.table.active")}</th>
@@ -524,7 +520,6 @@ const RoutingView = () => {
                       <td className="p-3.5 font-bold text-slate-900">{rule.id}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.receiveTopic}</td>
                       <td className="p-3.5 text-slate-600 font-mono">{rule.destination}</td>
-                      <td className="p-3.5 text-slate-700">{rule.msgType || "-"}</td>
                       <td className="p-3.5 text-slate-600 max-w-[220px] truncate" title={rule.description || rule.note || ""}>{rule.description || rule.note || "-"}</td>
                       <td className="p-3.5 font-semibold text-indigo-650">{rule.priority ?? 100}</td>
                       <td className="p-3.5">

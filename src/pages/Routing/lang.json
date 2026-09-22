@@ -38,10 +38,6 @@
       "vi": "ID",
       "en": "ID"
     },
-    "messageType": {
-      "vi": "Loại Điện Văn",
-      "en": "Msg Type"
-    },
     "sendTopic": {
       "vi": "Topic Phát",
       "en": "Send Topic"
@@ -127,10 +123,6 @@
     "searchPlaceholder": {
       "vi": "Tìm kiếm quy tắc...",
       "en": "Search rules..."
-    },
-    "allMessageTypes": {
-      "vi": "Tất cả loại điện văn",
-      "en": "All Message Types"
     },
     "allStatus": {
       "vi": "Tất cả trạng thái",

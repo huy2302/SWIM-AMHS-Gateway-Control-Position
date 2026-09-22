@@ -316,9 +316,6 @@ const gatewayApi = {
     return axiosClient.post('/admin/diagnostic');
   },
 
-  convertAddress: (address) => {
-    return axiosClient.post('/admin/address/convert', { address });
-  },
 };
 
 export default gatewayApi;
