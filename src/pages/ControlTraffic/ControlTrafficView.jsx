@@ -176,12 +176,6 @@ export default function ControlTrafficView() {
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-slate-800">
-            {t("controlTraffic.title")}
-          </h2>
-        </div>
-
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {stats.map(({ key, value, Icon, tone }) => (
             <div key={key} className="bg-white rounded-xl border border-slate-200 p-4">

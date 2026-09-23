@@ -121,6 +121,10 @@
     "port": {
       "vi": "Cổng (Port)",
       "en": "Port"
+    },
+    "empty": {
+      "vi": "Chưa có tài khoản nào được cấu hình.",
+      "en": "No accounts configured."
     }
   },
   "protocols": {
@@ -151,6 +155,10 @@
     "disconnected": {
       "vi": "Mất kết nối",
       "en": "Disconnected"
+    },
+    "connecting": {
+      "vi": "Đang kết nối",
+      "en": "Connecting"
     }
   },
   "commands": {
@@ -226,6 +234,10 @@
       "vi": "Thêm mới tài khoản",
       "en": "Add New Account"
     },
+    "subtitle": {
+      "vi": "Cấu hình tài khoản kết nối Broker",
+      "en": "Broker Account Configuration"
+    },
     "accountName": {
       "vi": "Tên tài khoản",
       "en": "Account Name"
@@ -261,6 +273,26 @@
     "bindStatus": {
       "vi": "Trạng thái kết nối",
       "en": "Bind Status"
+    },
+    "tlsEnabled": {
+      "vi": "Kích hoạt TLS / SSL",
+      "en": "Enable TLS / SSL"
+    },
+    "cancel": {
+      "vi": "Hủy",
+      "en": "Cancel"
+    },
+    "save": {
+      "vi": "Lưu thay đổi",
+      "en": "Save Changes"
+    },
+    "create": {
+      "vi": "Tạo tài khoản",
+      "en": "Create Account"
+    },
+    "saving": {
+      "vi": "Đang lưu...",
+      "en": "Saving..."
     }
   }
 }

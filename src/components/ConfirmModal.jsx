@@ -1,15 +1,20 @@
 import React from 'react';
+import { t } from "@/i18n/translator";
 
 const ConfirmModal = ({
   isOpen,
   title,
   message,
-  confirmText = "Confirm",
+  confirmText,
   confirmClass = "bg-rose-600 hover:bg-rose-700",
+  cancelText,
   onConfirm,
   onCancel,
 }) => {
   if (!isOpen) return null;
+
+  const resolvedConfirmText = confirmText || t("global.confirm");
+  const resolvedCancelText = cancelText || t("global.cancel");
 
   return (
     <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex justify-center items-center p-4 animate-fade-in" onClick={onCancel}>
@@ -40,13 +45,13 @@ const ConfirmModal = ({
             onClick={onCancel}
             className="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-semibold rounded-lg transition-all cursor-pointer shadow-xs"
           >
-            Cancel
+            {resolvedCancelText}
           </button>
           <button
             onClick={onConfirm}
             className={`px-4 py-2 text-xs font-semibold text-white rounded-lg transition-all cursor-pointer shadow-xs flex items-center gap-1.5 ${confirmClass}`}
           >
-            {confirmText}
+            {resolvedConfirmText}
           </button>
         </div>
 

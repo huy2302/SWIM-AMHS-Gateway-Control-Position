@@ -241,7 +241,7 @@ export default function Account() {
                 {displayedAccounts.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="text-center py-8 text-slate-400 font-medium">
-                      No accounts configured.
+                      {t("accounts.table.empty")}
                     </td>
                   </tr>
                 ) : (
@@ -283,7 +283,9 @@ export default function Account() {
                       }`}>
                         {acc.bindStatus === "CONNECTED" 
                           ? t("accounts.bindStatuses.connected") 
-                          : t("accounts.bindStatuses.disconnected")}
+                          : acc.bindStatus === "CONNECTING"
+                            ? t("accounts.bindStatuses.connecting")
+                            : t("accounts.bindStatuses.disconnected")}
                       </td>
                       <td className="px-4 py-3.5 font-mono text-xs text-slate-600">{acc.host}</td>
                       <td className="px-4 py-3.5 font-mono text-xs font-semibold text-slate-600">{acc.port}</td>
@@ -391,7 +393,7 @@ export default function Account() {
                     {editingAccountId ? t("accounts.modal.editTitle") : t("accounts.modal.addTitle")}
                   </h3>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    {formData.protocol || "AMQP"} Broker Account Configuration
+                    {formData.protocol || "AMQP"} {t("accounts.modal.subtitle")}
                   </p>
                 </div>
               </div>

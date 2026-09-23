@@ -111,6 +111,10 @@
     "vi": "Hủy",
     "en": "Cancel"
   },
+  "confirm": {
+    "vi": "Xác nhận",
+    "en": "Confirm"
+  },
   "edit": {
     "vi": "Sửa",
     "en": "Edit"

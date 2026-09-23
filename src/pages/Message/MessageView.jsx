@@ -734,7 +734,7 @@ const MessageView = () => {
             <div className="w-[940px] max-w-[96vw] bg-white max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden animate-zoom-in border border-slate-200" onClick={(e) => e.stopPropagation()}>
               
               {/* MODAL HEADER */}
-              <div className="px-6 py-4 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between">
+              <div className="px-6 py-4 bg-slate-50/90 border-b border-slate-200 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`p-2 rounded-xl flex items-center justify-center ${
                     searchType === "AMQP" ? "bg-purple-100 text-purple-700" : "bg-sky-100 text-sky-700"
@@ -774,7 +774,7 @@ const MessageView = () => {
               </div>
 
               {/* MODAL BODY */}
-              <div className="p-6 flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-5 text-xs bg-slate-50/30">
+              <div className="p-6 flex-1 min-h-0 overflow-y-auto custom-scrollbar flex flex-col gap-5 text-xs bg-slate-50/30">
                 
                 {/* 1. KEY METADATA SUMMARY BAR */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs">
@@ -1142,7 +1142,7 @@ const MessageView = () => {
                             </div>
                           ) : (
                             <div className="relative rounded-lg border border-slate-200 bg-slate-900 shadow-inner overflow-hidden">
-                              <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-auto whitespace-pre-wrap break-all leading-relaxed custom-scrollbar select-all m-0">
+                              <pre className="p-3.5 font-mono text-[11px] text-emerald-400 overflow-auto max-h-72 whitespace-pre-wrap break-all leading-relaxed custom-scrollbar select-all m-0">
                                 {formattedJson}
                               </pre>
                             </div>
@@ -1212,7 +1212,7 @@ const MessageView = () => {
 
                   <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-slate-50 shadow-inner">
                     <pre
-                      className="p-4 font-mono text-xs overflow-auto whitespace-pre-wrap break-all leading-relaxed custom-scrollbar select-all font-semibold"
+                      className="p-4 font-mono text-xs overflow-auto max-h-80 whitespace-pre-wrap break-all leading-relaxed custom-scrollbar select-all font-semibold"
                       style={{ backgroundColor: '#f8fafc', color: '#0f172a' }}
                     >
                       {selectedItem.payloadContent || selectedItem.text || t("messages.drawer.fields.noPayload")}
@@ -1223,7 +1223,7 @@ const MessageView = () => {
               </div>
 
               {/* MODAL FOOTER */}
-              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+              <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
                 <span className="text-slate-500 text-xs font-medium">
                   {searchType === "AMQP" ? t("messages.drawer.fields.conversionFlowIn") : t("messages.drawer.fields.conversionFlowOut")}
                 </span>
