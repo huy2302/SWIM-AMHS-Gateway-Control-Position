@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/layout/DashboardLayout";
 import {
-  BookText, Cable, Check, X,
+  BookText, Cable, Check, X, AlertTriangle,
   ArrowDownToLine, ArrowUpFromLine
 } from "lucide-react";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
@@ -149,7 +149,18 @@ export default function Dashboard() {
   const { GatewayProcess, status: reduxStatus } = useSelector((state) => state.system);
   const allConns = stats?.connections?.amqp || [];
   const hasDisconnectedAmqp = allConns.length > 0 && allConns.some(c => c.status !== "CONNECTED");
-  const isSystemOk = !stats ? (reduxStatus !== "error") : (reduxStatus !== "error" && !hasDisconnectedAmqp);
+  const hasAnyConnected    = allConns.some(c => c.status === "CONNECTED");
+
+  // 3-state system health
+  // ERROR: backend unreachable OR tất cả AMQP channels đều DISCONNECTED
+  // WARN:  có kênh disconnect nhưng ≥1 kênh vẫn CONNECTED
+  // OK:    tất cả bình thường
+  const systemState =
+    reduxStatus === "error" || (allConns.length > 0 && !hasAnyConnected)
+      ? "error"
+      : hasDisconnectedAmqp
+      ? "warn"
+      : "ok";
   const startTime = GatewayProcess?.serviceStartTime;
 
   useEffect(() => {
@@ -174,22 +185,39 @@ export default function Dashboard() {
       <div className="flex flex-col gap-5 pb-6">
 
         <div
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl px-5 py-4 border"
-          style={!isSystemOk
-            ? { background: "#fff5f5", borderColor: "#fecaca" }
-            : { background: "#f0fdf4", borderColor: "#bbf7d0" }
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 rounded-xl px-5 py-4 border transition-colors"
+          style={
+            systemState === "error"
+              ? { background: "#fff5f5", borderColor: "#fecaca" }
+              : systemState === "warn"
+              ? { background: "#fffbeb", borderColor: "#fde68a" }
+              : { background: "#f0fdf4", borderColor: "#bbf7d0" }
           }
         >
           <div className="flex items-center gap-3">
-            <div className={`p-2.5 rounded-full ${!isSystemOk ? "bg-red-100" : "bg-emerald-100"}`}>
-              {!isSystemOk ? <X size={18} className="text-red-500" /> : <Check size={18} className="text-emerald-600" />}
+            <div className={`p-2.5 rounded-full ${
+              systemState === "error" ? "bg-red-100" :
+              systemState === "warn"  ? "bg-amber-100" : "bg-emerald-100"
+            }`}>
+              {systemState === "error" ? (
+                <X            size={18} className="text-red-500"     />
+              ) : systemState === "warn" ? (
+                <AlertTriangle size={18} className="text-amber-500" />
+              ) : (
+                <Check         size={18} className="text-emerald-600" />
+              )}
             </div>
             <div>
-              <p className={`text-[14px] font-extrabold ${!isSystemOk ? "text-red-600" : "text-emerald-700"}`}>
-                {!isSystemOk ? t("dashboard.health.error") : t("dashboard.health.title")}
+              <p className={`text-[14px] font-extrabold ${
+                systemState === "error" ? "text-red-600" :
+                systemState === "warn"  ? "text-amber-600" : "text-emerald-700"
+              }`}>
+                {systemState === "error" ? t("dashboard.health.error") :
+                 systemState === "warn"  ? t("dashboard.health.warn")  : t("dashboard.health.title")}
               </p>
               <p className="text-[12px] text-slate-500">
-                {!isSystemOk ? t("dashboard.health.try") : t("dashboard.health.description")}
+                {systemState === "error" ? t("dashboard.health.try")             :
+                 systemState === "warn"  ? t("dashboard.health.warnDescription") : t("dashboard.health.description")}
               </p>
             </div>
           </div>

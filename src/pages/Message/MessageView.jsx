@@ -12,7 +12,11 @@ import {
   Download,
   FileText,
   Code,
-  List
+  List,
+  MoreVertical,
+  RotateCcw,
+  CheckCircle2,
+  Ban
 } from "lucide-react";
 import toast from "react-hot-toast";
 import DashboardLayout from "@/layout/DashboardLayout";
@@ -20,6 +24,26 @@ import gatewayApi from "@/api/gatewayApi";
 import TablePagination from "@/components/TablePagination";
 import { t } from "@/i18n/translator";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+
+// ─── Status allowed-action helpers ────────────────────────────────────────────
+// SWIM→AMHS (inbound) status codes:
+//   0=PENDING, 1=UNROUTED, 2=TRANSFORMED, 3=DELIVERED(old), 4=FAILED(old)
+//   5=RESOLVED, 6=CANCELLED, 10=DELIVERED, 11=FAILED
+// AMHS→SWIM (outbound) status codes:
+//   0=PENDING, 1=TRANSFORMED, 2=PUBLISHED, 3=FAILED, 4=UNROUTED, 5=RESOLVED, 6=CANCELLED
+const canRetry = (status, isOutbound) => {
+  if (isOutbound) return [3, 4, 6].includes(status); // FAILED, UNROUTED, CANCELLED
+  return [1, 4, 6, 11].includes(status);              // UNROUTED, FAILED(old/new), CANCELLED
+};
+const canResolve = (status, isOutbound) => {
+  if (isOutbound) return [3, 4].includes(status);     // FAILED, UNROUTED
+  return [1, 4, 11].includes(status);                 // UNROUTED, FAILED(old/new)
+};
+const canCancel = (status, isOutbound) => {
+  if (isOutbound) return [0].includes(status);        // PENDING only
+  return [0].includes(status);                        // PENDING only
+};
+// ──────────────────────────────────────────────────────────────────────────────
 
 const MessageView = () => {
   const location = useLocation();
@@ -29,6 +53,16 @@ const MessageView = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+
+  // ── Action dropdown state ──────────────────────────────────────────────────
+  const [openActionRowId, setOpenActionRowId] = useState(null);
+  const actionDropdownRef = useRef(null);
+
+  // ── Confirm dialog state ───────────────────────────────────────────────────
+  const [confirmDialog, setConfirmDialog] = useState(null);
+  // confirmDialog = { type: 'retry'|'resolve'|'cancel', msgid, label }
+
+  const [actionLoading, setActionLoading] = useState(false);
   const [amqpPropsMode, setAmqpPropsMode] = useState("table");
   const [isAmqpPropsCopied, setIsAmqpPropsCopied] = useState(false);
   const [copiedPropKey, setCopiedPropKey] = useState(null);
@@ -283,6 +317,67 @@ const MessageView = () => {
     setPage(0);
   };
 
+  // ── Close dropdown on outside click ────────────────────────────────────────
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (
+        openActionRowId !== null &&
+        actionDropdownRef.current &&
+        !actionDropdownRef.current.contains(e.target)
+      ) {
+        setOpenActionRowId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, [openActionRowId]);
+
+  // ── Action handlers ─────────────────────────────────────────────────────────
+  const openConfirm = (type, row) => {
+    setOpenActionRowId(null);
+    setConfirmDialog({ type, msgid: row.msgid, label: row.messageId || row.amhsid || `#${row.msgid}` });
+  };
+
+  const handleConfirmAction = async () => {
+    if (!confirmDialog || actionLoading) return;
+    const { type, msgid } = confirmDialog;
+    const isOutbound = searchType !== "AMQP";
+    setActionLoading(true);
+    try {
+      if (type === "retry") {
+        isOutbound
+          ? await gatewayApi.retryOutboundMessage(msgid)
+          : await gatewayApi.retryInboundMessage(msgid);
+        toast.success(t("messages.ops.retrySuccess"));
+      } else if (type === "resolve") {
+        isOutbound
+          ? await gatewayApi.resolveOutboundMessage(msgid)
+          : await gatewayApi.resolveInboundMessage(msgid);
+        toast.success(t("messages.ops.resolveSuccess"));
+      } else if (type === "cancel") {
+        isOutbound
+          ? await gatewayApi.cancelOutboundMessage(msgid)
+          : await gatewayApi.cancelInboundMessage(msgid);
+        toast.success(t("messages.ops.cancelSuccess"));
+      }
+      // Close detail modal if it's the same message
+      if (selectedItem && selectedItem.msgid === msgid) {
+        setSelectedItem(null);
+        setSelectedId(null);
+      }
+      // Refresh table
+      await fetchArchiveData(false);
+    } catch (err) {
+      console.error(`Action ${type} failed:`, err);
+      if (type === "retry") toast.error(t("messages.ops.retryFailed"));
+      else if (type === "resolve") toast.error(t("messages.ops.resolveFailed"));
+      else if (type === "cancel") toast.error(t("messages.ops.cancelFailed"));
+    } finally {
+      setActionLoading(false);
+      setConfirmDialog(null);
+    }
+  };
+
   const handleCopy = (text) => {
     if (text) {
       navigator.clipboard.writeText(text);
@@ -426,6 +521,7 @@ const MessageView = () => {
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.address")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.payload")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.status")}</th>
+                      <th className="px-4 py-3 font-semibold text-center w-[60px]">{t("messages.table.columns.actions")}</th>
                     </>
                   ) : (
                     <>
@@ -436,6 +532,7 @@ const MessageView = () => {
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.amhsId")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.payload")}</th>
                       <th className="px-4 py-3 font-semibold">{t("messages.table.columns.status")}</th>
+                      <th className="px-4 py-3 font-semibold text-center w-[60px]">{t("messages.table.columns.actions")}</th>
                     </>
                   )}
                 </tr>
@@ -443,13 +540,13 @@ const MessageView = () => {
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
                   <tr>
-                    <td colSpan={searchType === "AMQP" ? 9 : 7} className="text-center py-8 text-slate-400 font-medium">
+                    <td colSpan={searchType === "AMQP" ? 10 : 8} className="text-center py-8 text-slate-400 font-medium">
                       {t("messages.table.loading")}
                     </td>
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={searchType === "AMQP" ? 9 : 7} className="text-center py-8 text-slate-400 font-medium">
+                    <td colSpan={searchType === "AMQP" ? 10 : 8} className="text-center py-8 text-slate-400 font-medium">
                       {t("messages.table.empty")}
                     </td>
                   </tr>
@@ -491,6 +588,54 @@ const MessageView = () => {
                             <td className="px-4 py-3 whitespace-nowrap">
                               {renderSwimStatus(row.status)}
                             </td>
+                            {/* ACTIONS CELL - AMQP */}
+                            <td
+                              className="px-2 py-3 text-center"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {(canRetry(row.status, false) || canResolve(row.status, false) || canCancel(row.status, false)) && (
+                                <div className="relative inline-block" ref={openActionRowId === rowId ? actionDropdownRef : null}>
+                                  <button
+                                    onClick={() => setOpenActionRowId(openActionRowId === rowId ? null : rowId)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                                    title={t("messages.table.columns.actions")}
+                                  >
+                                    <MoreVertical size={15} />
+                                  </button>
+                                  {openActionRowId === rowId && (
+                                    <div className="absolute right-0 mt-1 w-44 bg-white border border-slate-200 rounded-xl shadow-lg z-30 py-1 animate-fade-in">
+                                      {canRetry(row.status, false) && (
+                                        <button
+                                          onClick={() => openConfirm("retry", row)}
+                                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors cursor-pointer"
+                                        >
+                                          <RotateCcw size={13} className="text-indigo-500" />
+                                          {t("messages.actions.retry")}
+                                        </button>
+                                      )}
+                                      {canResolve(row.status, false) && (
+                                        <button
+                                          onClick={() => openConfirm("resolve", row)}
+                                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-700 transition-colors cursor-pointer"
+                                        >
+                                          <CheckCircle2 size={13} className="text-teal-500" />
+                                          {t("messages.actions.resolve")}
+                                        </button>
+                                      )}
+                                      {canCancel(row.status, false) && (
+                                        <button
+                                          onClick={() => openConfirm("cancel", row)}
+                                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition-colors cursor-pointer"
+                                        >
+                                          <Ban size={13} className="text-amber-500" />
+                                          {t("messages.actions.cancel")}
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </td>
                           </>
                         ) : (
                           <>
@@ -511,6 +656,54 @@ const MessageView = () => {
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap">
                               {renderAmhsStatus(row.status)}
+                            </td>
+                            {/* ACTIONS CELL - X.400 / Outbound */}
+                            <td
+                              className="px-2 py-3 text-center"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {(canRetry(row.status, true) || canResolve(row.status, true) || canCancel(row.status, true)) && (
+                                <div className="relative inline-block" ref={openActionRowId === rowId ? actionDropdownRef : null}>
+                                  <button
+                                    onClick={() => setOpenActionRowId(openActionRowId === rowId ? null : rowId)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                                    title={t("messages.table.columns.actions")}
+                                  >
+                                    <MoreVertical size={15} />
+                                  </button>
+                                  {openActionRowId === rowId && (
+                                    <div className="absolute right-0 mt-1 w-44 bg-white border border-slate-200 rounded-xl shadow-lg z-30 py-1 animate-fade-in">
+                                      {canRetry(row.status, true) && (
+                                        <button
+                                          onClick={() => openConfirm("retry", row)}
+                                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors cursor-pointer"
+                                        >
+                                          <RotateCcw size={13} className="text-indigo-500" />
+                                          {t("messages.actions.retry")}
+                                        </button>
+                                      )}
+                                      {canResolve(row.status, true) && (
+                                        <button
+                                          onClick={() => openConfirm("resolve", row)}
+                                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-teal-50 hover:text-teal-700 transition-colors cursor-pointer"
+                                        >
+                                          <CheckCircle2 size={13} className="text-teal-500" />
+                                          {t("messages.actions.resolve")}
+                                        </button>
+                                      )}
+                                      {canCancel(row.status, true) && (
+                                        <button
+                                          onClick={() => openConfirm("cancel", row)}
+                                          className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-amber-50 hover:text-amber-700 transition-colors cursor-pointer"
+                                        >
+                                          <Ban size={13} className="text-amber-500" />
+                                          {t("messages.actions.cancel")}
+                                        </button>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </td>
                           </>
                         )}
@@ -1048,6 +1241,80 @@ const MessageView = () => {
         )}
 
       </div>
+
+      {/* ── CONFIRM ACTION DIALOG ──────────────────────────────────────────────── */}
+      {confirmDialog && (
+        <div
+          className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[60] flex items-center justify-center p-4"
+          onClick={() => !actionLoading && setConfirmDialog(null)}
+        >
+          <div
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 flex flex-col gap-4 animate-zoom-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Icon + Title */}
+            <div className="flex items-center gap-3">
+              <div className={`p-2.5 rounded-xl ${
+                confirmDialog.type === "retry"   ? "bg-indigo-100" :
+                confirmDialog.type === "resolve" ? "bg-teal-100"   : "bg-amber-100"
+              }`}>
+                {confirmDialog.type === "retry"   ? <RotateCcw    size={20} className="text-indigo-600" /> :
+                 confirmDialog.type === "resolve" ? <CheckCircle2 size={20} className="text-teal-600"   /> :
+                                                   <Ban           size={20} className="text-amber-600"  />}
+              </div>
+              <div>
+                <p className="font-bold text-slate-900 text-sm">
+                  {confirmDialog.type === "retry"   ? t("messages.actions.retry")   :
+                   confirmDialog.type === "resolve" ? t("messages.actions.resolve") : t("messages.actions.cancel")}
+                </p>
+                <p className="text-xs text-slate-500 font-mono mt-0.5 truncate max-w-[220px]" title={confirmDialog.label}>
+                  {confirmDialog.label}
+                </p>
+              </div>
+            </div>
+
+            {/* Description */}
+            <p className="text-sm text-slate-600 leading-relaxed">
+              {confirmDialog.type === "retry"
+                ? (searchType === "AMQP"
+                    ? "Điện văn sẽ được đưa trở lại hàng đợi xử lý (PENDING). Thao tác không thể hoàn tác."
+                    : "Điện văn sẽ được đưa trở lại hàng đợi xuất bản (PENDING). Thao tác không thể hoàn tác.")
+                : confirmDialog.type === "resolve"
+                ? "Điện văn sẽ được đánh dấu là đã giải quyết (RESOLVED). Thao tác không thể hoàn tác."
+                : "Điện văn sẽ bị hủy (CANCELLED). Thao tác không thể hoàn tác."}
+            </p>
+
+            {/* Buttons */}
+            <div className="flex items-center justify-end gap-2.5 pt-1">
+              <button
+                onClick={() => setConfirmDialog(null)}
+                disabled={actionLoading}
+                className="px-4 py-2 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                onClick={handleConfirmAction}
+                disabled={actionLoading}
+                className={`px-4 py-2 text-xs font-bold text-white rounded-lg transition-all cursor-pointer disabled:opacity-60 flex items-center gap-2 ${
+                  confirmDialog.type === "retry"   ? "bg-indigo-600 hover:bg-indigo-700" :
+                  confirmDialog.type === "resolve" ? "bg-teal-600 hover:bg-teal-700"     : "bg-amber-500 hover:bg-amber-600"
+                }`}
+              >
+                {actionLoading && (
+                  <svg className="animate-spin h-3.5 w-3.5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                )}
+                {confirmDialog.type === "retry"   ? t("messages.actions.retry")   :
+                 confirmDialog.type === "resolve" ? t("messages.actions.resolve") : t("messages.actions.cancel")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </DashboardLayout>
   );
 };

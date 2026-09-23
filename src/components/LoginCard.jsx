@@ -51,7 +51,12 @@ export default function LoginCard() {
 
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err.response?.data?.error || "Login failed");
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        err.message ||
+        "Login failed";
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -170,7 +175,9 @@ export default function LoginCard() {
           </span>
         </button>
         {error && (
-          <div className="text-red-600 text-sm text-center">{error}</div>
+          <div className="mt-3 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium text-center leading-relaxed">
+            {error}
+          </div>
         )}
 
         <div className="mt-6 flex justify-between text-[16px]">

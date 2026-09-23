@@ -32,6 +32,14 @@
       "vi": "Tất cả các dịch vụ đã kết nối thành công",
       "en": "All connected services are connect successfully"
     },
+    "warn": {
+      "vi": "Một số kênh kết nối bị gián đoạn",
+      "en": "Some channels are disconnected"
+    },
+    "warnDescription": {
+      "vi": "Hệ thống đang hoạt động một phần – kiểm tra kênh bị ngắt kết nối",
+      "en": "System is partially operational – check disconnected channels"
+    },
     "error": {
       "vi": "Hệ thống gặp sự cố kết nối",
       "en": "System connection error"
