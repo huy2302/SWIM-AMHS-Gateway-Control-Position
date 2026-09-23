@@ -30,13 +30,13 @@ import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 //   0=PENDING, 1=UNROUTED, 2=TRANSFORMED, 3=DELIVERED(old), 4=FAILED(old)
 //   5=RESOLVED, 6=CANCELLED, 10=DELIVERED, 11=FAILED
 // AMHS→SWIM (outbound) status codes:
-//   0=PENDING, 1=TRANSFORMED, 2=PUBLISHED, 3=FAILED, 4=UNROUTED, 5=RESOLVED, 6=CANCELLED
+//   0=PENDING, 1=TRANSFORMED, 2=PUBLISHED, 3=FAILED(old), 4=UNROUTED, 5=RESOLVED, 6=CANCELLED, 11=FAILED
 const canRetry = (status, isOutbound) => {
-  if (isOutbound) return [3, 4, 6].includes(status); // FAILED, UNROUTED, CANCELLED
+  if (isOutbound) return [3, 4, 6, 11].includes(status); // FAILED (3/11), UNROUTED, CANCELLED
   return [1, 4, 6, 11].includes(status);              // UNROUTED, FAILED(old/new), CANCELLED
 };
 const canResolve = (status, isOutbound) => {
-  if (isOutbound) return [3, 4].includes(status);     // FAILED, UNROUTED
+  if (isOutbound) return [3, 4, 11].includes(status);     // FAILED (3/11), UNROUTED
   return [1, 4, 11].includes(status);                 // UNROUTED, FAILED(old/new)
 };
 const canCancel = (status, isOutbound) => {
@@ -482,7 +482,7 @@ const MessageView = () => {
                     <option value="0">{t("messages.status.PENDING")}</option>
                     <option value="1">{t("messages.status.TRANSFORMED")}</option>
                     <option value="2">{t("messages.status.PUBLISHED")}</option>
-                    <option value="3">{t("messages.status.FAILED")}</option>
+                    <option value="11">{t("messages.status.FAILED")}</option>
                     <option value="4">{t("messages.status.UNROUTED")}</option>
                     <option value="5">{t("messages.status.RESOLVED")}</option>
                     <option value="6">{t("messages.status.CANCELLED")}</option>
@@ -1376,6 +1376,7 @@ const renderAmhsStatus = (status) => {
     1: { label: 'TRANSFORMED', className: 'bg-blue-50 text-blue-700 border border-blue-200' },
     2: { label: 'PUBLISHED', className: 'bg-green-50 text-green-700 border border-green-200' },
     3: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
+    11: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
     4: { label: 'UNROUTED', className: 'bg-purple-50 text-purple-700 border border-purple-200' },
     5: { label: 'RESOLVED', className: 'bg-teal-50 text-teal-700 border border-teal-200' },
     6: { label: 'CANCELLED', className: 'bg-slate-50 text-slate-700 border border-slate-200' },
