@@ -214,14 +214,27 @@ const MessageView = () => {
   const [totalPages, setTotalPages] = useState(0);
 
   // Search & Filter states
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [filters, setFilters] = useState({
     status: '',
     source: '',
   });
 
+  const fetchIdRef = useRef(0);
+
+  // Debounce search input by 350ms to prevent rapid API requests and UI lag
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchInput.trim());
+      setPage(0);
+    }, 350);
+    return () => clearTimeout(handler);
+  }, [searchInput]);
+
   // Fetch messages API
   const fetchArchiveData = useCallback(async (isBackground = false) => {
+    const currentFetchId = ++fetchIdRef.current;
     if (!isBackground) {
       setLoading(true);
     }
@@ -232,7 +245,7 @@ const MessageView = () => {
         size: rowsPerPage,
         ...(filters.status !== '' && { status: parseInt(filters.status) }),
         ...(filters.source && { source: filters.source }),
-        ...(searchQuery.trim() && { query: searchQuery.trim() }),
+        ...(debouncedQuery && { query: debouncedQuery }),
       };
 
       if (searchType === "AMQP") {
@@ -241,6 +254,11 @@ const MessageView = () => {
         response = await gatewayApi.getAllAmhsMessages(params);
       }
       
+      // If a newer search/fetch was initiated, discard this stale result
+      if (currentFetchId !== fetchIdRef.current) {
+        return;
+      }
+
       const itemsList = response?.items || response?.content || [];
       if (response && (response.items || response.content)) {
         setRows(itemsList);
@@ -252,6 +270,7 @@ const MessageView = () => {
         setTotalPages(0);
       }
     } catch (error) {
+      if (currentFetchId !== fetchIdRef.current) return;
       console.error("Error fetching archive data:", error);
       if (!isBackground) {
         setRows([]);
@@ -259,11 +278,11 @@ const MessageView = () => {
         setTotalPages(0);
       }
     } finally {
-      if (!isBackground) {
+      if (!isBackground && currentFetchId === fetchIdRef.current) {
         setLoading(false);
       }
     }
-  }, [page, rowsPerPage, filters, searchQuery, searchType]);
+  }, [page, rowsPerPage, filters, debouncedQuery, searchType]);
 
   useAutoRefresh({
     onRefresh: fetchArchiveData,
@@ -280,9 +299,10 @@ const MessageView = () => {
     const typeParam = searchParams.get("type") || location.state?.searchType;
     
     if (queryParam) {
-      setSearchQuery(queryParam);
-      if (typeParam && (typeParam === "AMQP" || typeParam === "X400")) {
-        setSearchType(typeParam);
+      setSearchInput(queryParam);
+      setDebouncedQuery(queryParam.trim());
+      if (typeParam && (typeParam === "AMQP" || typeParam === "X400" || typeParam === "X.400")) {
+        setSearchType(typeParam === "X400" ? "X.400" : typeParam);
       }
       setPage(0);
       hasAutoOpenedRef.current = false;
@@ -312,7 +332,8 @@ const MessageView = () => {
   }, [rows, location.state, searchParams]);
 
   const handleResetFilters = () => {
-    setSearchQuery("");
+    setSearchInput("");
+    setDebouncedQuery("");
     setFilters({ status: '', source: '' });
     setPage(0);
   };
@@ -434,18 +455,16 @@ const MessageView = () => {
               <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(0);
-                }}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 placeholder={t("messages.toolbar.searchPlaceholder")}
                 className="w-full pl-9 pr-8 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/10 font-medium transition-all"
               />
-              {searchQuery && (
+              {searchInput && (
                 <button 
                   onClick={() => {
-                    setSearchQuery("");
+                    setSearchInput("");
+                    setDebouncedQuery("");
                     setPage(0);
                   }}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
@@ -483,7 +502,6 @@ const MessageView = () => {
                     <option value="1">{t("messages.status.TRANSFORMED")}</option>
                     <option value="2">{t("messages.status.PUBLISHED")}</option>
                     <option value="11">{t("messages.status.FAILED")}</option>
-                    <option value="4">{t("messages.status.UNROUTED")}</option>
                     <option value="5">{t("messages.status.RESOLVED")}</option>
                     <option value="6">{t("messages.status.CANCELLED")}</option>
                   </>
@@ -492,7 +510,7 @@ const MessageView = () => {
             </label>
 
             {/* Reset Filters */}
-            {(filters.status !== '' || searchQuery) && (
+            {(filters.status !== '' || searchInput) && (
               <button
                 onClick={handleResetFilters}
                 className="px-2.5 py-1.5 text-xs text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 transition-colors font-medium cursor-pointer"
