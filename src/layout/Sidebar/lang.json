@@ -77,8 +77,8 @@
       "en": "Admin Configurations"
     },
     "controlTraffic": {
-      "vi": "Phản hồi AMHS",
-      "en": "AMHS Feedback"
+      "vi": "Lưu lượng điều khiển",
+      "en": "Control Traffic"
     }
   },
   "serverMonitor": {

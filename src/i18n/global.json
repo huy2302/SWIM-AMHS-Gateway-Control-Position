@@ -140,5 +140,13 @@
   "copy": {
     "vi": "Sao chép",
     "en": "Copy"
+  },
+  "refresh": {
+    "vi": "Làm mới",
+    "en": "Refresh"
+  },
+  "refreshed": {
+    "vi": "Dữ liệu đã được làm mới",
+    "en": "Data refreshed"
   }
 }

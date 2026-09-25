@@ -1,11 +1,11 @@
 {
   "title": {
-    "vi": "Phản hồi AMHS",
-    "en": "AMHS Feedback"
+    "vi": "Lưu lượng điều khiển",
+    "en": "Control Traffic"
   },
   "subtitle": {
-    "vi": "Thông báo và báo cáo bay ngược về cho điện văn đã gửi sang AMHS",
-    "en": "Notifications and reports returned for messages sent to AMHS"
+    "vi": "Giám sát thông báo và báo cáo điều khiển luồng (DR, NDR, RN, NRN)",
+    "en": "Monitoring control traffic reports and notifications (DR, NDR, RN, NRN)"
   },
   "stats": {
     "rn": {
@@ -74,8 +74,8 @@
     }
   },
   "empty": {
-    "vi": "Chưa có phản hồi nào. Bảng cp do AMHS Component ghi.",
-    "en": "No feedback yet. Table cp is written by the AMHS Component."
+    "vi": "Chưa có lưu lượng điều khiển nào. Bảng cp do AMHS Component ghi.",
+    "en": "No control traffic records yet. Table cp is written by AMHS Component."
   },
   "diagnosticEmpty": {
     "vi": "(để trống)",
@@ -86,12 +86,12 @@
     "en": "Refresh"
   },
   "loadError": {
-    "vi": "Không tải được dữ liệu phản hồi AMHS",
-    "en": "Failed to load AMHS feedback"
+    "vi": "Không tải được dữ liệu lưu lượng điều khiển",
+    "en": "Failed to load control traffic data"
   },
   "viewDetail": {
-    "vi": "Xem chi tiết phản hồi",
-    "en": "View Feedback Details"
+    "vi": "Xem chi tiết",
+    "en": "View Details"
   },
   "viewOriginal": {
     "vi": "Xem điện văn gốc",
@@ -99,8 +99,8 @@
   },
   "modal": {
     "title": {
-      "vi": "Chi tiết Phản hồi AMHS",
-      "en": "AMHS Feedback Details"
+      "vi": "Chi tiết lưu lượng điều khiển",
+      "en": "Control Traffic Details"
     },
     "general": {
       "vi": "Thông tin chung",
@@ -140,19 +140,19 @@
         "en": "Record ID"
       },
       "type": {
-        "vi": "Loại phản hồi (IPN Type)",
-        "en": "IPN Type"
+        "vi": "Loại báo cáo / thông báo",
+        "en": "Report / Notification Type"
       },
       "status": {
         "vi": "Trạng thái",
         "en": "Status"
       },
       "origin": {
-        "vi": "Bên phát phản hồi (Originator)",
+        "vi": "Bên phát (Originator)",
         "en": "Originator"
       },
       "recipient": {
-        "vi": "Bên nhận phản hồi (Recipient)",
+        "vi": "Bên nhận (Recipient)",
         "en": "Recipient"
       },
       "subjectType": {

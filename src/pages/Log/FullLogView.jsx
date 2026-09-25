@@ -496,11 +496,11 @@ const FullLogView = () => {
             <button
               onClick={() => {
                 fetchLogs(false);
-                toast.success(t("global.refreshed") || "Dữ liệu đã được làm mới");
+                toast.success(t("global.refreshed"));
               }}
               disabled={loading}
               className="p-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-indigo-600 rounded-lg transition-colors cursor-pointer shadow-xxs disabled:opacity-50"
-              title="Làm mới (Update)"
+              title={t("global.refresh")}
             >
               <RefreshCw size={14} className={loading ? "animate-spin text-indigo-600" : ""} />
             </button>

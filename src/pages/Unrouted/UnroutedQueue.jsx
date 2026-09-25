@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { copyToClipboard } from "@/utils/clipboard";
 
 const COLORS = ["#3B82F6", "#F59E0B", "#10B981", "#EF4444", "#8B5CF6"];
 
@@ -33,7 +34,7 @@ export default function UnroutedQueue() {
   const [isRejectOpen, setIsRejectOpen] = useState(false);
   const [actionMessage, setActionMessage] = useState(null); // String or Array (for batch)
   const [detailMessage, setDetailMessage] = useState(null);
-  const [, setIsCopied] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const [activeMenuId, setActiveMenuId] = useState(null);
 
   const [routeFormData, setRouteFormData] = useState({
@@ -253,12 +254,16 @@ export default function UnroutedQueue() {
     }
   };
 
-  const handleCopy = (text) => {
-    if (text) {
-      navigator.clipboard.writeText(text);
+  const handleCopy = async (text) => {
+    if (!text) return;
+    const ok = await copyToClipboard(String(text), {
+      showToast: true,
+      successMessage: t("global.copied") || "Đã sao chép",
+      duration: 1500,
+    });
+    if (ok) {
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-      toast.success(t("messages.toast.copySuccess"));
+      setTimeout(() => setIsCopied(false), 1500);
     }
   };
 
@@ -402,11 +407,11 @@ export default function UnroutedQueue() {
               onClick={() => {
                 fetchUnrouted(false);
                 fetchStats();
-                toast.success(t("global.refreshed") || "Dữ liệu đã được làm mới");
+                toast.success(t("global.refreshed"));
               }}
               disabled={loading}
               className="p-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-600 hover:text-indigo-600 rounded-lg transition-colors cursor-pointer shadow-xxs disabled:opacity-50"
-              title="Làm mới (Refresh)"
+              title={t("global.refresh")}
             >
               <RefreshCw size={14} className={loading ? "animate-spin text-indigo-600" : ""} />
             </button>
@@ -690,9 +695,11 @@ export default function UnroutedQueue() {
                     </span>
                     <button
                       onClick={() => handleCopy(detailMessage.payloadContent || detailMessage.text)}
-                      className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer"
+                      className="text-[11px] text-indigo-600 hover:text-indigo-500 font-semibold cursor-pointer flex items-center gap-1 transition-colors active:scale-95"
+                      title={t("global.copy") || "Copy"}
                     >
-                      {t("messages.modal.buttons.copy")}
+                      <Copy size={12} />
+                      <span>{isCopied ? (t("global.copied") || "Đã sao chép") : "COPY"}</span>
                     </button>
                   </div>
                   <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-slate-50 shadow-inner max-h-56">

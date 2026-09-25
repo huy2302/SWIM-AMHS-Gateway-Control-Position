@@ -54,7 +54,7 @@ export default function ControlTrafficView() {
       setRows(Array.isArray(list) ? list : []);
       setSummary(sum || { rn: 0, nrn: 0, dr: 0, ndr: 0 });
     } catch (error) {
-      console.error("Error fetching AMHS feedback:", error);
+      console.error("Error fetching control traffic:", error);
       if (!isBackground) {
         toast.error(t("controlTraffic.loadError"));
       }
