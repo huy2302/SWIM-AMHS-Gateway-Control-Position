@@ -34,11 +34,11 @@ import { copyToClipboard } from "@/utils/clipboard";
 //   0=PENDING, 1=TRANSFORMED, 2=PUBLISHED, 3=FAILED(old), 4=UNROUTED, 5=RESOLVED, 6=CANCELLED, 11=FAILED
 const canRetry = (status, isOutbound) => {
   if (isOutbound) return [3, 4, 6, 11].includes(status); // FAILED (3/11), UNROUTED, CANCELLED
-  return [1, 4, 6, 11].includes(status);              // UNROUTED, FAILED(old/new), CANCELLED
+  return [1, 4, 6, 11, 12].includes(status);             // UNROUTED, FAILED(old/new), CANCELLED, AMHS_CONV_FAILED(12)
 };
 const canResolve = (status, isOutbound) => {
   if (isOutbound) return [3, 4, 11].includes(status);     // FAILED (3/11), UNROUTED
-  return [1, 4, 11].includes(status);                 // UNROUTED, FAILED(old/new)
+  return [1, 4, 11, 12].includes(status);                 // UNROUTED, FAILED(old/new), AMHS_CONV_FAILED(12)
 };
 const canCancel = (status, isOutbound) => {
   if (isOutbound) return [0].includes(status);        // PENDING only
@@ -199,11 +199,13 @@ const MessageView = () => {
     if (!item) return { rejReason: null, rejDiag: null, hasError: false };
     const rejReason = 
       item.rejectionReason || 
+      item.errorReason ||
       item.parsedAmqpProperties?.rejection_reason || 
       item.parsedAmqpProperties?.rejectionReason || null;
 
     const rejDiag = 
       item.rejectionDiagnostic || 
+      item.errorReason ||
       item.parsedAmqpProperties?.rejection_note || 
       item.parsedAmqpProperties?.rejectionDiagnostic ||
       (item.dispatches?.find(d => d.lastError)?.lastError) || null;
@@ -211,6 +213,9 @@ const MessageView = () => {
     const hasError = Boolean(
       rejReason || 
       rejDiag || 
+      item.status === 4 ||
+      item.status === 11 ||
+      item.status === 12 ||
       (item.dispatches && item.dispatches.some(d => d.lastError || d.status === 'FAILED' || d.status === 'DEAD'))
     );
 
@@ -1524,6 +1529,7 @@ const renderSwimStatus = (status) => {
     4: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
     10: { label: 'DELIVERED', className: 'bg-green-50 text-green-700 border border-green-200' },
     11: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
+    12: { label: 'FAILED', className: 'bg-red-50 text-red-700 border border-red-200' },
     5: { label: 'RESOLVED', className: 'bg-teal-50 text-teal-700 border border-teal-200' },
     6: { label: 'CANCELLED', className: 'bg-slate-50 text-slate-700 border border-slate-200' },
   };

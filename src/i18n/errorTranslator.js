@@ -340,6 +340,16 @@ const ERROR_DICTIONARY = [
     vi: "Yêu cầu xử lý thất bại",
     en: "API request failed",
   },
+  {
+    pattern: /AMHS:\s*Originator address\s+([A-Z0-9]+)\s+cannot be converted/i,
+    vi: (m) => `AMHS: Địa chỉ Người gửi (Originator) "${m[1]}" không thể chuyển đổi sang địa chỉ X.400 O/R Address`,
+    en: (m) => `AMHS: Originator address "${m[1]}" cannot be converted to X.400 O/R Address`,
+  },
+  {
+    pattern: /AMHS:\s*Recipient address\s+([A-Z0-9]+)\s+cannot be converted/i,
+    vi: (m) => `AMHS: Địa chỉ Người nhận (Recipient) "${m[1]}" không thể chuyển đổi sang địa chỉ X.400 O/R Address`,
+    en: (m) => `AMHS: Recipient address "${m[1]}" cannot be converted to X.400 O/R Address`,
+  },
 ];
 
 /**
