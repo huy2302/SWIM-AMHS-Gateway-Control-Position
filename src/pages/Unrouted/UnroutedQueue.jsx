@@ -382,12 +382,34 @@ export default function UnroutedQueue() {
               <input
                 type="text"
                 placeholder={t("unrouted.searchPlaceholder")}
-                className="w-full bg-slate-50 border border-slate-355 rounded-lg pl-10 pr-4 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900 font-medium"
+                className="w-full bg-slate-50 border border-slate-355 rounded-lg pl-10 pr-9 py-2 outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 text-xs text-slate-900 font-medium"
                 value={originatorFilter}
                 onChange={(e) => setOriginatorFilter(e.target.value)}
               />
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              {originatorFilter && (
+                <button
+                  type="button"
+                  onClick={() => setOriginatorFilter("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                  title="Clear"
+                >
+                  <X size={14} />
+                </button>
+              )}
             </div>
+            <button
+              onClick={() => {
+                fetchUnrouted(false);
+                fetchStats();
+                toast.success(t("global.refreshed") || "Dữ liệu đã được làm mới");
+              }}
+              disabled={loading}
+              className="p-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-600 hover:text-indigo-600 rounded-lg transition-colors cursor-pointer shadow-xxs disabled:opacity-50"
+              title="Làm mới (Refresh)"
+            >
+              <RefreshCw size={14} className={loading ? "animate-spin text-indigo-600" : ""} />
+            </button>
           </div>
 
           {/* Batch Actions */}

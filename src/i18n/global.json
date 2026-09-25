@@ -132,5 +132,13 @@
       "vi": "Làm mới ngay",
       "en": "Refresh now"
     }
+  },
+  "copied": {
+    "vi": "Đã sao chép",
+    "en": "Copied"
+  },
+  "copy": {
+    "vi": "Sao chép",
+    "en": "Copy"
   }
 }

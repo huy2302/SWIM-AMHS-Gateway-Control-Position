@@ -1,6 +1,7 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { t } from '@/i18n/translator';
+import { translateApiMessage } from '@/i18n/errorTranslator';
 
 const getBaseUrl = () => {
   if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
@@ -128,7 +129,8 @@ axiosClient.interceptors.response.use(
     const resData = response.data;
     if (resData && typeof resData === 'object' && 'success' in resData) {
       if (!resData.success) {
-        return Promise.reject(new Error(resData.message || 'API Request Failed'));
+        const localizedMsg = translateApiMessage(resData.message || 'API Request Failed');
+        return Promise.reject(new Error(localizedMsg));
       }
       return resData.data;
     }
@@ -137,6 +139,17 @@ axiosClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     console.error('API Error:', originalRequest?.url, error.response?.status, error.response?.data);
+
+    // Tự động bản địa hóa thông báo lỗi từ backend theo ngôn ngữ hiện tại của người dùng
+    if (error.response?.data?.message) {
+      error.response.data.message = translateApiMessage(error.response.data.message);
+    }
+    if (error.response?.data?.error) {
+      error.response.data.error = translateApiMessage(error.response.data.error);
+    }
+    if (error.message) {
+      error.message = translateApiMessage(error.message);
+    }
 
     const isAuthEndpoint =
       originalRequest?.url?.includes('/auth/login') ||

@@ -19,8 +19,11 @@ import {
 } from '@/constants/toastIcons';
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
+import { useAuth } from "@/components/auth-context";
 
 export default function Account() {
+  const { user: currentUser } = useAuth();
+  const isViewer = currentUser?.role?.toLowerCase() === "viewer";
   const [accounts, setAccounts] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [accountStatus, setAccountStatus] = useState("INACTIVE");
@@ -56,6 +59,7 @@ export default function Account() {
   };
 
   const [formData, setFormData] = useState(defaultFormState);
+  const [formErrors, setFormErrors] = useState({});
 
   const openConfirmModal = ({
     title,
@@ -102,6 +106,7 @@ export default function Account() {
   const handleAdd = () => {
     setEditingAccountId(null);
     setFormData(defaultFormState);
+    setFormErrors({});
     setIsModalOpen(true);
   };
 
@@ -125,6 +130,7 @@ export default function Account() {
       bindStatus: account.bindStatus || "DISCONNECTED",
       tlsEnabled: account.tlsEnabled || false,
     });
+    setFormErrors({});
     setIsModalOpen(true);
   };
 
@@ -169,19 +175,44 @@ export default function Account() {
 
   const handleSaveAccount = async (e) => {
     e.preventDefault();
+
+    const errors = {};
+    if (!formData.accountName || !formData.accountName.trim()) {
+      errors.accountName = t("accounts.modal.validation.accountNameRequired");
+    }
+    if (!formData.host || !formData.host.trim()) {
+      errors.host = t("accounts.modal.validation.hostRequired");
+    }
+    if (!formData.username || !formData.username.trim()) {
+      errors.username = t("accounts.modal.validation.usernameRequired");
+    }
+    if (!formData.password || !formData.password.trim()) {
+      errors.password = t("accounts.modal.validation.passwordRequired");
+    }
+    if (!formData.port || isNaN(formData.port) || Number(formData.port) <= 0 || Number(formData.port) > 65535) {
+      errors.port = t("accounts.modal.validation.portRequired");
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      showErrorToast(t("accounts.modal.validation.fillRequired"), toast);
+      return;
+    }
+
+    setFormErrors({});
     setLoading(true);
 
     const configJson = JSON.stringify({
-      username: formData.username,
-      password: formData.password,
+      username: formData.username.trim(),
+      password: formData.password.trim(),
       vpn: formData.vpn,
     });
 
     const savedAccount = {
       id: editingAccountId || Date.now(),
-      accountName: formData.accountName,
+      accountName: formData.accountName.trim(),
       protocol: formData.protocol,
-      host: formData.host,
+      host: formData.host.trim(),
       port: Number(formData.port),
       configJson: configJson,
       status: formData.status,
@@ -317,20 +348,20 @@ export default function Account() {
               label={t("accounts.commands.add")} 
               color="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50/50" 
               onClick={handleAdd} 
-              disabled={false} 
+              disabled={isViewer} 
             />
             <CommandBtn 
               icon={<Edit3 size={14} />} 
               label={t("accounts.commands.edit")} 
               color="text-slate-700 hover:text-indigo-600" 
               onClick={handleEdit} 
-              disabled={!selectedId} 
+              disabled={isViewer || !selectedId} 
             />
             <CommandBtn 
               icon={<Trash2 size={14} />} 
               label={t("accounts.commands.delete")} 
               color="text-rose-600 hover:text-rose-700 hover:bg-rose-50/50" 
-              disabled={!selectedId} 
+              disabled={isViewer || !selectedId} 
               onClick={() =>
                 openConfirmModal({
                   title: t("accounts.confirm.deleteTitle"),
@@ -357,7 +388,7 @@ export default function Account() {
                   onConfirm: () => handleToggleStatus("ACTIVE"),
                 })
               }
-              disabled={!selectedId || accountStatus === "ACTIVE"} 
+              disabled={isViewer || !selectedId || accountStatus === "ACTIVE"} 
             />
             <CommandBtn 
               icon={<Square size={14} />} 
@@ -372,7 +403,7 @@ export default function Account() {
                   onConfirm: () => handleToggleStatus("INACTIVE"),
                 })
               }
-              disabled={!selectedId || accountStatus === "INACTIVE"} 
+              disabled={isViewer || !selectedId || accountStatus === "INACTIVE"} 
             />
           </div>
         </div>
@@ -404,17 +435,29 @@ export default function Account() {
             </div>
 
             {/* MODAL BODY */}
-            <form onSubmit={handleSaveAccount} className="flex flex-col flex-1 overflow-hidden">
+            <form onSubmit={handleSaveAccount} noValidate className="flex flex-col flex-1 overflow-hidden">
               <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4 text-xs">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.accountName")}</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    {t("accounts.modal.accountName")} <span className="text-red-500 font-bold">*</span>
+                  </label>
                   <input 
-                    required
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                      formErrors.accountName 
+                        ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600" 
+                        : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    }`}
                     value={formData.accountName}
-                    onChange={(e) => setFormData({...formData, accountName: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, accountName: e.target.value});
+                      if (formErrors.accountName) setFormErrors({...formErrors, accountName: null});
+                    }}
                     disabled={editingAccountId ? true : false}
+                    placeholder={t("accounts.modal.accountName")}
                   />
+                  {formErrors.accountName && (
+                    <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.accountName}</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -431,44 +474,94 @@ export default function Account() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.port")}</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      {t("accounts.modal.port")} <span className="text-red-500 font-bold">*</span>
+                    </label>
                     <input
                       type="number"
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                        formErrors.port 
+                          ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600" 
+                          : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      }`}
                       value={formData.port}
-                      onChange={(e) => setFormData({...formData, port: e.target.value})}
+                      onChange={(e) => {
+                        setFormData({...formData, port: e.target.value});
+                        if (formErrors.port) setFormErrors({...formErrors, port: null});
+                      }}
                     />
+                    {formErrors.port && (
+                      <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.port}</p>
+                    )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.host")}</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    {t("accounts.modal.host")} <span className="text-red-500 font-bold">*</span>
+                  </label>
                   <input 
-                    required
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                      formErrors.host 
+                        ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600" 
+                        : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    }`}
                     value={formData.host}
-                    onChange={(e) => setFormData({...formData, host: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, host: e.target.value});
+                      if (formErrors.host) setFormErrors({...formErrors, host: null});
+                    }}
+                    placeholder="127.0.0.1"
                   />
+                  {formErrors.host && (
+                    <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.host}</p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.username")}</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    {t("accounts.modal.username")} <span className="text-red-500 font-bold">*</span>
+                  </label>
                   <input
                     type="text"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                      formErrors.username 
+                        ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600" 
+                        : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    }`}
                     value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, username: e.target.value});
+                      if (formErrors.username) setFormErrors({...formErrors, username: null});
+                    }}
+                    placeholder={t("accounts.modal.username")}
                   />
+                  {formErrors.username && (
+                    <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.username}</p>
+                  )}
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("accounts.modal.password")}</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                    {t("accounts.modal.password")} <span className="text-red-500 font-bold">*</span>
+                  </label>
                   <input
                     type="password"
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                    className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                      formErrors.password 
+                        ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600" 
+                        : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                    }`}
                     value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
+                    onChange={(e) => {
+                      setFormData({...formData, password: e.target.value});
+                      if (formErrors.password) setFormErrors({...formErrors, password: null});
+                    }}
+                    placeholder={t("accounts.modal.password")}
                   />
+                  {formErrors.password && (
+                    <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.password}</p>
+                  )}
                 </div>
 
                 <div>

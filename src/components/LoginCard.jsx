@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { authApi } from "../api/authApi";
 import { useAuth } from "./auth-context";
 import { t } from "@/i18n/translator";
+import { translateApiMessage } from "@/i18n/errorTranslator";
 
 import { useLanguageStore } from "../store/languageStore";
 
@@ -26,6 +27,9 @@ export default function LoginCard() {
   const handleChangeLang = (e) => {
     const lang = e.target.value;
     setLanguage(lang);
+    if (error) {
+      setError(translateApiMessage(error, lang));
+    }
   };
   useEffect(() => {
     if (authApi.isAuthenticated()) {
@@ -51,12 +55,12 @@ export default function LoginCard() {
 
       navigate(from, { replace: true });
     } catch (err) {
-      const msg =
+      const rawMsg =
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||
         "Login failed";
-      setError(msg);
+      setError(translateApiMessage(rawMsg));
     } finally {
       setLoading(false);
     }
@@ -131,10 +135,11 @@ export default function LoginCard() {
             />
 
             <button
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-4 top-1/2 -translate-y-1/2"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
             >
-              <Eye size={20} className="text-slate-400" />
+              <Eye size={20} />
             </button>
           </div>
         </div>
@@ -180,13 +185,11 @@ export default function LoginCard() {
           </div>
         )}
 
-        <div className="mt-6 flex justify-between text-[16px]">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" />
+        <div className="mt-6 flex items-center text-[16px]">
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" className="cursor-pointer" />
             {t("login.remember")}
           </label>
-
-          <button className="text-blue-600">{t("login.forgot")}?</button>
         </div>
 
         <div className="mt-8 border-t border-black/45 pt-6 text-center">

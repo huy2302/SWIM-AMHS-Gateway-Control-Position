@@ -104,6 +104,7 @@ const RoutingView = () => {
   const [statusType, setStatusType] = useState(null);
   const [editingRule, setEditingRule] = useState(null); // Rule đang được edit
   const [editFormData, setEditFormData] = useState({}); // Data của form edit
+  const [editFormErrors, setEditFormErrors] = useState({});
   const [recipientInput, setRecipientInput] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -216,6 +217,7 @@ const RoutingView = () => {
 
   const handleEditRule = (rule) => {
     setEditingRule(rule);
+    setEditFormErrors({});
     if (activeTab === "A2S") {
       setEditFormData({
         id: rule.id,
@@ -256,6 +258,7 @@ const RoutingView = () => {
     }
     setEditingRule(null);
     setEditFormData({});
+    setEditFormErrors({});
     setRecipientInput("");
   };
 
@@ -295,6 +298,9 @@ const RoutingView = () => {
 
   const handleEditFormChange = (field, value) => {
     setEditFormData(prev => ({ ...prev, [field]: value }));
+    if (editFormErrors[field]) {
+      setEditFormErrors(prev => ({ ...prev, [field]: null }));
+    }
   };
 
   const addA2sRecipient = (value) => {
@@ -305,6 +311,9 @@ const RoutingView = () => {
       const list = Array.from(new Set([...(prev.recipientList || []), normalized]));
       return { ...prev, recipientList: list };
     });
+    if (editFormErrors.recipients) {
+      setEditFormErrors(prev => ({ ...prev, recipients: null }));
+    }
     setRecipientInput("");
   };
 
@@ -325,21 +334,63 @@ const RoutingView = () => {
   const handleSaveEditRule = async () => {
     if (!editingRule) return;
 
-    // Chỉ gửi đúng field thật mà form hiện có UI cho sửa (PUT/POST đều optional-field,
-    // field nào không có UI thì bỏ qua để không ghi đè giá trị đang có trên BE bằng dữ liệu cũ/rỗng).
+    const errors = {};
+    const prio = Number(editFormData.priority);
+    if (isNaN(prio) || prio < 0 || prio > 255) {
+      errors.priority = t("routing.validation.priorityRange");
+    }
+
+    const aftnRegex = /^[A-Za-z]{8}$/;
+
+    if (activeTab === "A2S") {
+      if (!editFormData.recipientList || editFormData.recipientList.length === 0) {
+        errors.recipients = t("routing.validation.recipientsRequired");
+      } else {
+        const invalid = editFormData.recipientList.some((r) => !aftnRegex.test(r.trim()));
+        if (invalid) {
+          errors.recipients = t("routing.validation.invalidAftn");
+        }
+      }
+      if (!editFormData.topic || !editFormData.topic.trim()) {
+        errors.topic = t("routing.validation.sendTopicRequired");
+      }
+    } else {
+      if (!editFormData.receiveTopic || !editFormData.receiveTopic.trim()) {
+        errors.receiveTopic = t("routing.validation.receiveTopicRequired");
+      }
+      if (!editFormData.recipients || !editFormData.recipients.trim()) {
+        errors.recipients = t("routing.validation.recipientsRequired");
+      } else {
+        const list = editFormData.recipients.split(/[,;\s]+/).map((s) => s.trim()).filter(Boolean);
+        const invalid = list.some((r) => !aftnRegex.test(r));
+        if (invalid) {
+          errors.recipients = t("routing.validation.invalidAftn");
+        }
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setEditFormErrors(errors);
+      showErrorToast(t("routing.validation.fillRequired"), toast);
+      return;
+    }
+
+    setEditFormErrors({});
+
+    // Chỉ gửi đúng field thật mà form hiện có UI cho sửa
     const payload = {
       direction: editFormData.direction,
       active: editFormData.active,
-      note: editFormData.note || "",
+      note: editFormData.note ? editFormData.note.trim() : "",
       priority: Number(editFormData.priority) || 100,
     };
 
     if (activeTab === "A2S") {
       payload.recipients = (editFormData.recipientList || []).join(",");
-      payload.sendTopic = editFormData.topic || "";
+      payload.sendTopic = editFormData.topic.trim();
     } else {
-      payload.receiveTopic = editFormData.receiveTopic || "";
-      payload.recipients = editFormData.recipients || "";
+      payload.receiveTopic = editFormData.receiveTopic.trim();
+      payload.recipients = editFormData.recipients.trim();
     }
 
     try {
@@ -352,13 +403,10 @@ const RoutingView = () => {
       showSuccessToast(t("routing.toast.saveSuccess"), toast);
       setStatusMessage(`Rule ${editingRule.id} ${t("routing.toast.saveSuccess")}`);
       setStatusType("success");
-      // Đóng edit mode trực tiếp (không qua handleCloseEdit) vì rule đã lưu thành công,
-      // không còn là draft cần dọn nữa.
       setEditingRule(null);
       setEditFormData({});
+      setEditFormErrors({});
       setRecipientInput("");
-      // Refetch từ BE thay vì tin state local: rule mới tạo đang mang id giả (client-generated),
-      // nếu không đồng bộ lại, sửa/xoá tiếp rule đó ngay sau khi tạo sẽ gọi API bằng id sai.
       await fetchRoutingConfigs();
     } catch (error) {
       showErrorToast(`${t("routing.toast.saveFailed")}${error.message || t("routing.toast.saveFailed")}`, toast);
@@ -564,6 +612,7 @@ const RoutingView = () => {
         activeTab={activeTab}
         editingRule={editingRule}
         editFormData={editFormData}
+        editFormErrors={editFormErrors}
         recipientInput={recipientInput}
         setRecipientInput={setRecipientInput}
         handleCloseEdit={handleCloseEdit}
@@ -671,6 +720,7 @@ const RuleEditorModal = memo(({
   activeTab,
   editingRule,
   editFormData,
+  editFormErrors = {},
   recipientInput,
   setRecipientInput,
   handleCloseEdit,
@@ -723,9 +773,13 @@ const RuleEditorModal = memo(({
               {/* Recipients (địa chỉ AFTN người nhận) */}
               <div className="space-y-1.5">
                 <label className="block font-bold text-slate-600 tracking-wider">
-                  {t("routing.form.a2s.recipients.label")} *
+                  {t("routing.form.a2s.recipients.label")} <span className="text-red-500 font-bold">*</span>
                 </label>
-                <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
+                <div className={`border rounded-xl p-3 transition-all ${
+                  editFormErrors.recipients 
+                    ? "border-red-500 ring-1 ring-red-500/30 bg-red-50/20" 
+                    : "border-slate-200 bg-slate-50/50"
+                }`}>
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     {(editFormData.recipientList || []).map((type) => (
                       <span
@@ -767,19 +821,29 @@ const RuleEditorModal = memo(({
                     ))}
                   </datalist>
                 </div>
+                {editFormErrors.recipients && (
+                  <p className="text-xs text-red-600 font-medium mt-1">{editFormErrors.recipients}</p>
+                )}
               </div>
               {/* Send Topic */}
               <div className="space-y-1.5">
                 <label className="block font-bold text-slate-600 tracking-wider">
-                  {t("routing.form.a2s.sendTopic.label")} *
+                  {t("routing.form.a2s.sendTopic.label")} <span className="text-red-500 font-bold">*</span>
                 </label>
                 <input
                   type="text"
                   value={editFormData.topic || ""}
                   onChange={(e) => handleEditFormChange("topic", e.target.value)}
                   placeholder={t("routing.form.a2s.sendTopic.placeholder")}
-                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
+                  className={`w-full px-3 py-2 rounded-xl font-mono outline-none transition text-slate-900 ${
+                    editFormErrors.topic
+                      ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                      : "bg-slate-50/50 border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                  }`}
                 />
+                {editFormErrors.topic && (
+                  <p className="text-xs text-red-600 font-medium mt-1">{editFormErrors.topic}</p>
+                )}
               </div>
 
               {/* Priority & Status */}
@@ -790,10 +854,19 @@ const RuleEditorModal = memo(({
                   </label>
                   <input
                     type="number"
+                    min="0"
+                    max="255"
                     value={editFormData.priority ?? 100}
                     onChange={(e) => handleEditFormChange("priority", e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
+                    className={`w-full px-3 py-2 rounded-xl font-semibold outline-none transition text-slate-900 ${
+                      editFormErrors.priority
+                        ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                        : "bg-slate-50/50 border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                    }`}
                   />
+                  {editFormErrors.priority && (
+                    <p className="text-xs text-red-600 font-medium mt-1">{editFormErrors.priority}</p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
@@ -844,28 +917,42 @@ const RuleEditorModal = memo(({
               {/* S2A Form */}
               <div className="space-y-1.5">
                 <label className="block font-bold text-slate-600 tracking-wider">
-                  {t("routing.form.s2a.receiveTopic.label")} *
+                  {t("routing.form.s2a.receiveTopic.label")} <span className="text-red-500 font-bold">*</span>
                 </label>
                 <input
                   type="text"
                   value={editFormData.receiveTopic || editFormData.topic || ""}
                   onChange={(e) => handleEditFormChange("receiveTopic", e.target.value)}
                   placeholder={t("routing.form.s2a.receiveTopic.placeholder")}
-                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
+                  className={`w-full px-3 py-2 rounded-xl font-mono outline-none transition text-slate-900 ${
+                    editFormErrors.receiveTopic
+                      ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                      : "bg-slate-50/50 border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                  }`}
                 />
+                {editFormErrors.receiveTopic && (
+                  <p className="text-xs text-red-600 font-medium mt-1">{editFormErrors.receiveTopic}</p>
+                )}
               </div>
 
               <div className="space-y-1.5">
                 <label className="block font-bold text-slate-600 tracking-wider">
-                  {t("routing.form.s2a.recipients.label")} *
+                  {t("routing.form.s2a.recipients.label")} <span className="text-red-500 font-bold">*</span>
                 </label>
                 <input
                   type="text"
                   value={editFormData.recipients || editFormData.destination || ""}
                   onChange={(e) => handleEditFormChange("recipients", e.target.value)}
                   placeholder={t("routing.form.s2a.recipients.placeholder")}
-                  className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-mono outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
+                  className={`w-full px-3 py-2 rounded-xl font-mono outline-none transition text-slate-900 ${
+                    editFormErrors.recipients
+                      ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                      : "bg-slate-50/50 border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                  }`}
                 />
+                {editFormErrors.recipients && (
+                  <p className="text-xs text-red-600 font-medium mt-1">{editFormErrors.recipients}</p>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
@@ -874,10 +961,19 @@ const RuleEditorModal = memo(({
                   </label>
                   <input
                     type="number"
+                    min="0"
+                    max="255"
                     value={editFormData.priority ?? 100}
                     onChange={(e) => handleEditFormChange("priority", e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition text-slate-900"
+                    className={`w-full px-3 py-2 rounded-xl font-semibold outline-none transition text-slate-900 ${
+                      editFormErrors.priority
+                        ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                        : "bg-slate-50/50 border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                    }`}
                   />
+                  {editFormErrors.priority && (
+                    <p className="text-xs text-red-600 font-medium mt-1">{editFormErrors.priority}</p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">

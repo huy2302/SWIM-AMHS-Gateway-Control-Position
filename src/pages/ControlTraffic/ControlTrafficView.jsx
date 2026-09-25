@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import { t } from "@/i18n/translator";
 import TablePagination from "@/components/TablePagination";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { copyToClipboard } from "@/utils/clipboard";
 
 /**
  * Phản hồi AMHS — RN, NRN, DR, NDR bay ngược về cho điện văn gateway đã gửi sang AMHS.
@@ -127,13 +128,18 @@ export default function ControlTrafficView() {
     });
   };
 
-  const handleCopy = (text, fieldKey, e) => {
+  const handleCopy = async (text, fieldKey, e) => {
     if (e) e.stopPropagation();
     if (!text) return;
-    navigator.clipboard.writeText(String(text));
-    setCopiedField(fieldKey);
-    toast.success(t("controlTraffic.modal.copied"));
-    setTimeout(() => setCopiedField(null), 1500);
+    const ok = await copyToClipboard(String(text), {
+      showToast: true,
+      successMessage: t("controlTraffic.modal.copied") || t("global.copied") || "Đã sao chép",
+      duration: 1500,
+    });
+    if (ok) {
+      setCopiedField(fieldKey);
+      setTimeout(() => setCopiedField(null), 1500);
+    }
   };
 
   /**
@@ -492,17 +498,35 @@ export default function ControlTrafficView() {
                         <span className="text-xs text-slate-500">
                           {t("controlTraffic.modal.fields.reasonCode")}
                         </span>
-                        <span className="font-mono text-xs font-bold text-rose-600">
-                          {dash(selectedRecord.reasonCode)}
-                        </span>
+                        <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-rose-600">
+                          <span>{dash(selectedRecord.reasonCode)}</span>
+                          {selectedRecord.reasonCode && (
+                            <button
+                              type="button"
+                              onClick={(e) => handleCopy(selectedRecord.reasonCode, "reasonCode", e)}
+                              className="text-slate-400 hover:text-slate-700"
+                            >
+                              {copiedField === "reasonCode" ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-start justify-between gap-2 border-b border-slate-200/60 pb-2">
                         <span className="text-xs text-slate-500">
                           {t("controlTraffic.modal.fields.diagnosticCode")}
                         </span>
-                        <span className="font-mono text-xs text-slate-800">
-                          {dash(selectedRecord.diagnosticCode)}
-                        </span>
+                        <div className="flex items-center gap-1.5 font-mono text-xs text-slate-800">
+                          <span>{dash(selectedRecord.diagnosticCode)}</span>
+                          {selectedRecord.diagnosticCode && (
+                            <button
+                              type="button"
+                              onClick={(e) => handleCopy(selectedRecord.diagnosticCode, "diagnosticCode", e)}
+                              className="text-slate-400 hover:text-slate-700"
+                            >
+                              {copiedField === "diagnosticCode" ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </>
                   )}
@@ -513,17 +537,35 @@ export default function ControlTrafficView() {
                         <span className="text-xs text-slate-500">
                           {t("controlTraffic.modal.fields.nonReceiptReason")}
                         </span>
-                        <span className="font-mono text-xs font-bold text-amber-600">
-                          {dash(selectedRecord.nonReceiptReason)}
-                        </span>
+                        <div className="flex items-center gap-1.5 font-mono text-xs font-bold text-amber-600">
+                          <span>{dash(selectedRecord.nonReceiptReason)}</span>
+                          {selectedRecord.nonReceiptReason && (
+                            <button
+                              type="button"
+                              onClick={(e) => handleCopy(selectedRecord.nonReceiptReason, "nonReceiptReason", e)}
+                              className="text-slate-400 hover:text-slate-700"
+                            >
+                              {copiedField === "nonReceiptReason" ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <div className="flex items-start justify-between gap-2 border-b border-slate-200/60 pb-2">
                         <span className="text-xs text-slate-500">
                           {t("controlTraffic.modal.fields.discardReason")}
                         </span>
-                        <span className="font-mono text-xs text-slate-800">
-                          {dash(selectedRecord.discardReason)}
-                        </span>
+                        <div className="flex items-center gap-1.5 font-mono text-xs text-slate-800">
+                          <span>{dash(selectedRecord.discardReason)}</span>
+                          {selectedRecord.discardReason && (
+                            <button
+                              type="button"
+                              onClick={(e) => handleCopy(selectedRecord.discardReason, "discardReason", e)}
+                              className="text-slate-400 hover:text-slate-700"
+                            >
+                              {copiedField === "discardReason" ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </>
                   )}
@@ -551,9 +593,21 @@ export default function ControlTrafficView() {
                   )}
 
                   <div>
-                    <span className="text-xs text-slate-500 block mb-1">
-                      {t("controlTraffic.modal.fields.supplementaryInfo")}
-                    </span>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-slate-500 block">
+                        {t("controlTraffic.modal.fields.supplementaryInfo")}
+                      </span>
+                      {selectedRecord.supplementaryInfo && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleCopy(selectedRecord.supplementaryInfo, "supplementaryInfo", e)}
+                          className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-slate-700"
+                        >
+                          {copiedField === "supplementaryInfo" ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+                          <span>{copiedField === "supplementaryInfo" ? (t("controlTraffic.modal.copied") || "Đã sao chép") : (t("controlTraffic.modal.copy") || "Sao chép")}</span>
+                        </button>
+                      )}
+                    </div>
                     <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-xs font-mono text-slate-700 whitespace-pre-wrap break-all min-h-[40px]">
                       {dash(selectedRecord.supplementaryInfo)}
                     </div>

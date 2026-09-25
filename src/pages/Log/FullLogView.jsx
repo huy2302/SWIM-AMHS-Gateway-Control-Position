@@ -23,6 +23,7 @@ import gatewayApi from "@/api/gatewayApi";
 import TablePagination from "@/components/TablePagination";
 import { t } from "@/i18n/translator";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { copyToClipboard } from "@/utils/clipboard";
 
 /**
  * Chuẩn hóa hướng truyền điện văn
@@ -246,6 +247,7 @@ const FullLogView = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
   const [isModalCopied, setIsModalCopied] = useState(false);
+  const [copiedField, setCopiedField] = useState(null);
 
   // Navigate directly to Message View
   const handleNavigateToMessage = (log, e) => {
@@ -354,12 +356,30 @@ const FullLogView = () => {
     });
   }, [logs, debouncedSearch]);
 
-  const handleCopyRaw = (text) => {
+  const handleCopyRaw = async (text) => {
     if (!text) return;
-    navigator.clipboard.writeText(text);
-    setIsModalCopied(true);
-    setTimeout(() => setIsModalCopied(false), 2000);
-    toast.success(t("log.toast.copied"));
+    const ok = await copyToClipboard(text, {
+      showToast: true,
+      successMessage: t("log.toast.copied") || t("global.copied") || "Đã sao chép",
+      duration: 1500,
+    });
+    if (ok) {
+      setIsModalCopied(true);
+      setTimeout(() => setIsModalCopied(false), 1500);
+    }
+  };
+
+  const handleCopyField = async (text, fieldKey) => {
+    if (!text) return;
+    const ok = await copyToClipboard(String(text), {
+      showToast: true,
+      successMessage: t("global.copied") || "Đã sao chép",
+      duration: 1500,
+    });
+    if (ok) {
+      setCopiedField(fieldKey);
+      setTimeout(() => setCopiedField(null), 1500);
+    }
   };
 
   const handleResetFilters = () => {
@@ -453,24 +473,37 @@ const FullLogView = () => {
             )}
           </div>
 
-          {/* SEARCH INPUT WITH ICON */}
-          <div className="relative flex-1 max-w-md min-w-[240px]">
-            <input 
-              type="text" 
-              placeholder={t("log.filter.searchPlaceholder")}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-8 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:bg-white font-medium transition-all"
-            />
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            {searchTerm && (
-              <button 
-                onClick={() => setSearchTerm("")}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                <XCircle size={14} />
-              </button>
-            )}
+          {/* SEARCH INPUT WITH ICON & UPDATE/REFRESH BUTTON */}
+          <div className="flex items-center gap-2 flex-1 max-w-md min-w-[240px]">
+            <div className="relative flex-1">
+              <input 
+                type="text" 
+                placeholder={t("log.filter.searchPlaceholder")}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-8 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-indigo-500 focus:bg-white font-medium transition-all"
+              />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <XCircle size={14} />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                fetchLogs(false);
+                toast.success(t("global.refreshed") || "Dữ liệu đã được làm mới");
+              }}
+              disabled={loading}
+              className="p-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 hover:text-indigo-600 rounded-lg transition-colors cursor-pointer shadow-xxs disabled:opacity-50"
+              title="Làm mới (Update)"
+            >
+              <RefreshCw size={14} className={loading ? "animate-spin text-indigo-600" : ""} />
+            </button>
           </div>
 
         </div>
@@ -687,7 +720,19 @@ const FullLogView = () => {
                     </div>
 
                     <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("log.modal.origin")}</span>
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t("log.modal.origin")}</span>
+                        {selectedLog.origin && (
+                          <button
+                            type="button"
+                            onClick={() => handleCopyField(selectedLog.origin, "origin")}
+                            className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                            title="Copy"
+                          >
+                            {copiedField === "origin" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                          </button>
+                        )}
+                      </div>
                       <span className="font-mono font-bold text-slate-800 text-xs truncate" title={selectedLog.origin || "-"}>{selectedLog.origin || "-"}</span>
                     </div>
 
@@ -734,23 +779,59 @@ const FullLogView = () => {
 
                       <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                         <span className="text-slate-500 font-medium shrink-0">{t("log.modal.mtsId")}:</span>
-                        <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedLog.mtsId || "-"}>
-                          {selectedLog.mtsId || "-"}
-                        </span>
+                        <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right" title={selectedLog.mtsId || "-"}>
+                            {selectedLog.mtsId || "-"}
+                          </span>
+                          {selectedLog.mtsId && (
+                            <button
+                              type="button"
+                              onClick={() => handleCopyField(selectedLog.mtsId, "mtsId")}
+                              className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                              title="Copy"
+                            >
+                              {copiedField === "mtsId" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                         <span className="text-slate-500 font-medium shrink-0">{t("log.modal.ipmId")}:</span>
-                        <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedLog.ipmId || "-"}>
-                          {selectedLog.ipmId || "-"}
-                        </span>
+                        <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right" title={selectedLog.ipmId || "-"}>
+                            {selectedLog.ipmId || "-"}
+                          </span>
+                          {selectedLog.ipmId && (
+                            <button
+                              type="button"
+                              onClick={() => handleCopyField(selectedLog.ipmId, "ipmId")}
+                              className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                              title="Copy"
+                            >
+                              {copiedField === "ipmId" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                         <span className="text-slate-500 font-medium shrink-0">{t("log.modal.amqpMessageId")}:</span>
-                        <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedLog.amqpMessageId || selectedLog.messageId || "-"}>
-                          {selectedLog.amqpMessageId || selectedLog.messageId || "-"}
-                        </span>
+                        <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                          <span className="font-mono font-semibold text-slate-800 truncate text-right" title={selectedLog.amqpMessageId || selectedLog.messageId || "-"}>
+                            {selectedLog.amqpMessageId || selectedLog.messageId || "-"}
+                          </span>
+                          {(selectedLog.amqpMessageId || selectedLog.messageId) && (
+                            <button
+                              type="button"
+                              onClick={() => handleCopyField(selectedLog.amqpMessageId || selectedLog.messageId, "amqpMessageId")}
+                              className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                              title="Copy"
+                            >
+                              {copiedField === "amqpMessageId" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {selectedLog.ohi && (

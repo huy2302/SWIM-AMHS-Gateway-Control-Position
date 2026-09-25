@@ -4,6 +4,7 @@ import { useAuth } from "@/components/auth-context";
 import { authApi } from "@/api/authApi";
 import { useLanguageStore } from "@/store/languageStore";
 import { t } from "@/i18n/translator";
+import { translateApiMessage } from "@/i18n/errorTranslator";
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -59,10 +60,11 @@ export default function Settings() {
       setConfirmPassword("");
     } catch (err) {
       console.error("Change password error:", err);
-      const errMsg =
+      const rawErrMsg =
         err.response?.data?.error ||
         err.response?.data?.message ||
         "Failed to change password";
+      const errMsg = translateApiMessage(rawErrMsg);
       setError(errMsg);
       toast.error(errMsg);
     } finally {

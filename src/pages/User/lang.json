@@ -90,8 +90,12 @@
       "vi": "Quản trị viên (Admin)",
       "en": "Administrator"
     },
+    "operator": {
+      "vi": "Nhân viên vận hành (Operator)",
+      "en": "Operator"
+    },
     "viewer": {
-      "vi": "Người quan sát (Viewer)",
+      "vi": "Người dùng xem tin (Viewer)",
       "en": "Viewer"
     }
   },
@@ -127,6 +131,40 @@
     "save": {
       "vi": "Lưu thay đổi",
       "en": "Save Changes"
+    }
+  },
+  "validation": {
+    "fillRequired": {
+      "vi": "Vui lòng điền đầy đủ các thông tin bắt buộc!",
+      "en": "Please fill in all required fields!"
+    },
+    "usernameRequired": {
+      "vi": "Tên đăng nhập không được để trống",
+      "en": "Username is required"
+    },
+    "usernameMin": {
+      "vi": "Tên đăng nhập phải có ít nhất 3 ký tự",
+      "en": "Username must be at least 3 characters"
+    },
+    "fullNameRequired": {
+      "vi": "Họ và tên không được để trống",
+      "en": "Full name is required"
+    },
+    "emailRequired": {
+      "vi": "Email không được để trống",
+      "en": "Email is required"
+    },
+    "emailInvalid": {
+      "vi": "Địa chỉ Email không đúng định dạng",
+      "en": "Invalid email format"
+    },
+    "passwordRequired": {
+      "vi": "Mật khẩu không được để trống",
+      "en": "Password is required"
+    },
+    "passwordMin": {
+      "vi": "Mật khẩu phải có ít nhất 6 ký tự",
+      "en": "Password must be at least 6 characters"
     }
   }
 }

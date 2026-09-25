@@ -62,5 +62,61 @@
     "failed": {
         "vi": "Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản!",
         "en": "Login failed. Please check your credentials!"
+    },
+    "forgotTitle": {
+        "vi": "Khôi phục mật khẩu",
+        "en": "Password Recovery"
+    },
+    "forgotSubtitle": {
+        "vi": "Vui lòng nhập tên tài khoản và email đã đăng ký để đặt lại mật khẩu mới",
+        "en": "Enter your username and registered email to reset your password"
+    },
+    "email": {
+        "vi": "Địa chỉ Email",
+        "en": "Email Address"
+    },
+    "emailPlaceholder": {
+        "vi": "Nhập email đăng ký...",
+        "en": "Enter registered email..."
+    },
+    "newPassword": {
+        "vi": "Mật khẩu mới",
+        "en": "New Password"
+    },
+    "newPasswordPlaceholder": {
+        "vi": "Nhập mật khẩu mới...",
+        "en": "Enter new password..."
+    },
+    "confirmPassword": {
+        "vi": "Xác nhận mật khẩu mới",
+        "en": "Confirm New Password"
+    },
+    "confirmPasswordPlaceholder": {
+        "vi": "Nhập lại mật khẩu mới...",
+        "en": "Re-enter new password..."
+    },
+    "resetButton": {
+        "vi": "Đặt lại mật khẩu",
+        "en": "Reset Password"
+    },
+    "resetting": {
+        "vi": "Đang xử lý...",
+        "en": "Processing..."
+    },
+    "backToLogin": {
+        "vi": "Quay lại đăng nhập",
+        "en": "Back to Sign In"
+    },
+    "passwordMismatch": {
+        "vi": "Mật khẩu xác nhận không khớp!",
+        "en": "Passwords do not match!"
+    },
+    "resetSuccess": {
+        "vi": "Đặt lại mật khẩu thành công! Đang chuyển hướng về trang đăng nhập...",
+        "en": "Password reset successfully! Redirecting to login..."
+    },
+    "adminContactNote": {
+        "vi": "Nếu cần hỗ trợ khẩn cấp hoặc không nhớ thông tin tài khoản, vui lòng liên hệ Quản trị viên hệ thống (Admin) hoặc hotline Kỹ thuật ATTECH.",
+        "en": "If you need immediate assistance or forgot your credentials, please contact the System Administrator or ATTECH Support."
     }
 }

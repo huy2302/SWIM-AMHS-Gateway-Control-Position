@@ -28,14 +28,31 @@ export default function ConfigView() {
     fetchConfigs();
   }, []);
 
+  const isIntegerConfigKey = (key) => {
+    if (!key) return false;
+    const upper = key.toUpperCase();
+    return upper.includes("DAYS") || upper.includes("PORT") || upper.includes("TIMEOUT") || 
+           upper.includes("INTERVAL") || upper.includes("COUNT") || upper.includes("RETRIES") ||
+           upper.includes("SIZE") || upper.includes("MAX_") || upper.includes("PERIOD") ||
+           upper.includes("LIMIT");
+  };
+
   // Start editing a config key
   const startEditConfig = (cfg) => {
     setEditingConfigKey(cfg.configKey);
-    setEditingValue(cfg.configValue);
+    setEditingValue(cfg.configValue ?? "");
   };
 
   // Update a config key value
   const handleSaveConfig = async (key) => {
+    if (isIntegerConfigKey(key)) {
+      const val = (editingValue ?? "").trim();
+      if (val !== "" && !/^\d+$/.test(val)) {
+        toast.error("Giá trị phải là số nguyên");
+        return;
+      }
+    }
+
     try {
       setLoading(true);
       await gatewayApi.updateConfig(key, editingValue);
@@ -84,7 +101,11 @@ export default function ConfigView() {
                             onChange={(e) => setEditingValue(e.target.value)}
                           />
                         ) : (
-                          row.configValue || <span className="italic text-slate-400 font-medium">null</span>
+                          (row.configValue !== null && row.configValue !== undefined && row.configValue !== "") ? (
+                            row.configValue
+                          ) : (
+                            <span className="text-slate-400 font-normal">-</span>
+                          )
                         )}
                       </td>
                       <td className="p-3.5 text-right font-medium">

@@ -293,6 +293,32 @@
     "saving": {
       "vi": "Đang lưu...",
       "en": "Saving..."
+    },
+    "validation": {
+      "fillRequired": {
+        "vi": "Vui lòng nhập đầy đủ các trường bắt buộc",
+        "en": "Please fill in all required fields"
+      },
+      "accountNameRequired": {
+        "vi": "Tên tài khoản không được để trống",
+        "en": "Account name is required"
+      },
+      "hostRequired": {
+        "vi": "Địa chỉ máy chủ (Host) không được để trống",
+        "en": "Host is required"
+      },
+      "usernameRequired": {
+        "vi": "Tên đăng nhập không được để trống",
+        "en": "Username is required"
+      },
+      "passwordRequired": {
+        "vi": "Mật khẩu không được để trống",
+        "en": "Password is required"
+      },
+      "portRequired": {
+        "vi": "Cổng kết nối không hợp lệ",
+        "en": "Valid port number is required"
+      }
     }
   }
 }

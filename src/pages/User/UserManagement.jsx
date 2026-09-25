@@ -6,6 +6,7 @@ import ConfirmModal from "@/components/ConfirmModal";
 import toast from "react-hot-toast";
 import { useAuth } from "@/components/auth-context";
 import { t } from "@/i18n/translator";
+import { translateApiMessage } from "@/i18n/errorTranslator";
 import TablePagination from "@/components/TablePagination";
 
 export default function UserManagement() {
@@ -34,6 +35,7 @@ export default function UserManagement() {
     isActive: true,
   };
   const [formData, setFormData] = useState(defaultForm);
+  const [formErrors, setFormErrors] = useState({});
 
   // Confirm Modal State
   const [confirmModal, setConfirmModal] = useState({
@@ -112,6 +114,7 @@ export default function UserManagement() {
   const handleOpenAdd = () => {
     setEditingUser(null);
     setFormData(defaultForm);
+    setFormErrors({});
     setIsDialogOpen(true);
   };
 
@@ -125,6 +128,7 @@ export default function UserManagement() {
       role: user.role || "viewer",
       isActive: user.isActive !== false,
     });
+    setFormErrors({});
     setIsDialogOpen(true);
   };
 
@@ -134,16 +138,64 @@ export default function UserManagement() {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({ ...prev, [name]: null }));
+    }
   };
 
   // Submit Form (Create / Edit)
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const errors = {};
+    const cleanUsername = (formData.username || "").trim();
+    const cleanFullName = (formData.fullName || "").trim();
+    const cleanEmail = (formData.email || "").trim();
+    const cleanPassword = formData.password || "";
+
+    if (!cleanUsername) {
+      errors.username = t("users.validation.usernameRequired");
+    } else if (cleanUsername.length < 3) {
+      errors.username = t("users.validation.usernameMin");
+    }
+
+    if (!cleanFullName) {
+      errors.fullName = t("users.validation.fullNameRequired");
+    }
+
+    if (!cleanEmail) {
+      errors.email = t("users.validation.emailRequired");
+    } else if (!/^[A-Za-z0-9+_.-]+@(.+)$/.test(cleanEmail)) {
+      errors.email = t("users.validation.emailInvalid");
+    }
+
+    if (!editingUser) {
+      if (!cleanPassword) {
+        errors.password = t("users.validation.passwordRequired");
+      } else if (cleanPassword.length < 6) {
+        errors.password = t("users.validation.passwordMin");
+      }
+    } else {
+      if (cleanPassword && cleanPassword.length < 6) {
+        errors.password = t("users.validation.passwordMin");
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      toast.error(t("users.validation.fillRequired"));
+      return;
+    }
+
+    setFormErrors({});
     try {
       if (editingUser) {
         // Edit User
         const payload = {
           ...formData,
+          username: cleanUsername,
+          fullName: cleanFullName,
+          email: cleanEmail,
         };
         // Only include password if changed
         if (!formData.password) {
@@ -153,18 +205,19 @@ export default function UserManagement() {
         toast.success(t("users.messages.updateSuccess"));
       } else {
         // Create User
-        if (!formData.password) {
-          toast.error("Password is required for new users");
-          return;
-        }
-        await gatewayApi.createUser(formData);
+        await gatewayApi.createUser({
+          ...formData,
+          username: cleanUsername,
+          fullName: cleanFullName,
+          email: cleanEmail,
+        });
         toast.success(t("users.messages.createSuccess"));
       }
       setIsDialogOpen(false);
       fetchUsers();
     } catch (error) {
       console.error("Failed to save user:", error);
-      toast.error(error.response?.data?.message || "Failed to save user");
+      toast.error(translateApiMessage(error?.response?.data?.message || error?.message || "Failed to save user"));
     }
   };
 
@@ -180,7 +233,7 @@ export default function UserManagement() {
       fetchUsers();
     } catch (error) {
       console.error("Failed to toggle status:", error);
-      toast.error("Failed to update user status");
+      toast.error(translateApiMessage(error?.response?.data?.message || error?.message || "Failed to update user status"));
     }
   };
 
@@ -198,7 +251,7 @@ export default function UserManagement() {
           fetchUsers();
         } catch (error) {
           console.error("Failed to delete user:", error);
-          toast.error("Failed to delete user");
+          toast.error(translateApiMessage(error?.response?.data?.message || error?.message || "Failed to delete user"));
         }
       },
     });
@@ -290,9 +343,11 @@ export default function UserManagement() {
                         <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${
                           row.role?.toLowerCase() === "admin"
                             ? "bg-red-50 text-red-700 border-red-200/60"
+                            : row.role?.toLowerCase() === "operator"
+                            ? "bg-amber-50 text-amber-700 border-amber-200/60"
                             : "bg-blue-50 text-blue-700 border-blue-200/60"
                         }`}>
-                          {t(`users.roles.${row.role}`) || row.role}
+                          {t(`users.roles.${row.role?.toLowerCase()}`) || row.role}
                         </span>
                       </td>
                       <td className="p-4 text-center">
@@ -377,66 +432,92 @@ export default function UserManagement() {
               </div>
 
               {/* MODAL BODY */}
-              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+              <form onSubmit={handleSubmit} noValidate className="flex flex-col flex-1 overflow-hidden">
                 <div className="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4 text-xs">
                   {/* Username */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      {t("users.dialog.username")}
+                      {t("users.dialog.username")} <span className="text-red-500 font-bold">*</span>
                     </label>
                     <input
                       type="text"
                       name="username"
-                      required
                       disabled={Boolean(editingUser)}
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all disabled:opacity-50 disabled:bg-slate-100"
+                      className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all disabled:opacity-50 disabled:bg-slate-100 ${
+                        formErrors.username
+                          ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                          : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      }`}
                       value={formData.username}
                       onChange={handleFormChange}
                     />
+                    {formErrors.username && (
+                      <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.username}</p>
+                    )}
                   </div>
 
                   {/* Full Name */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      {t("users.dialog.fullName")}
+                      {t("users.dialog.fullName")} <span className="text-red-500 font-bold">*</span>
                     </label>
                     <input
                       type="text"
                       name="fullName"
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                        formErrors.fullName
+                          ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                          : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      }`}
                       value={formData.fullName}
                       onChange={handleFormChange}
                     />
+                    {formErrors.fullName && (
+                      <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.fullName}</p>
+                    )}
                   </div>
 
                   {/* Email */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      {t("users.dialog.email")}
+                      {t("users.dialog.email")} <span className="text-red-500 font-bold">*</span>
                     </label>
                     <input
                       type="email"
                       name="email"
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                        formErrors.email
+                          ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                          : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      }`}
                       value={formData.email}
                       onChange={handleFormChange}
                     />
+                    {formErrors.email && (
+                      <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.email}</p>
+                    )}
                   </div>
 
                   {/* Password */}
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                      {t("users.dialog.password")}
+                      {t("users.dialog.password")} {!editingUser && <span className="text-red-500 font-bold">*</span>}
                     </label>
                     <input
                       type="password"
                       name="password"
-                      required={!editingUser}
                       placeholder={editingUser ? t("users.dialog.passwordHelp") : ""}
-                      className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                      className={`w-full px-3.5 py-2 rounded-lg text-xs font-medium text-slate-800 focus:outline-none transition-all ${
+                        formErrors.password
+                          ? "bg-red-50/30 border border-red-500 ring-1 ring-red-500/30 focus:border-red-600"
+                          : "bg-slate-50 border border-slate-300 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                      }`}
                       value={formData.password}
                       onChange={handleFormChange}
                     />
+                    {formErrors.password && (
+                      <p className="text-[11px] text-red-600 font-medium mt-1">{formErrors.password}</p>
+                    )}
                   </div>
 
                   {/* Role */}
@@ -450,8 +531,9 @@ export default function UserManagement() {
                       value={formData.role}
                       onChange={handleFormChange}
                     >
-                      <option value="viewer">{t("users.roles.viewer")}</option>
                       <option value="admin">{t("users.roles.admin")}</option>
+                      <option value="operator">{t("users.roles.operator")}</option>
+                      <option value="viewer">{t("users.roles.viewer")}</option>
                     </select>
                   </div>
 

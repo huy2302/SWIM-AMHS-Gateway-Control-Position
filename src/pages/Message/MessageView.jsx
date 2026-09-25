@@ -24,6 +24,7 @@ import gatewayApi from "@/api/gatewayApi";
 import TablePagination from "@/components/TablePagination";
 import { t } from "@/i18n/translator";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { copyToClipboard } from "@/utils/clipboard";
 
 // ─── Status allowed-action helpers ────────────────────────────────────────────
 // SWIM→AMHS (inbound) status codes:
@@ -66,19 +67,32 @@ const MessageView = () => {
   const [amqpPropsMode, setAmqpPropsMode] = useState("table");
   const [isAmqpPropsCopied, setIsAmqpPropsCopied] = useState(false);
   const [copiedPropKey, setCopiedPropKey] = useState(null);
+  const [copiedField, setCopiedField] = useState(null);
 
-  const handleCopyAmqpProps = (propsText) => {
+  const handleCopyAmqpProps = async (propsText) => {
     if (!propsText) return;
-    navigator.clipboard.writeText(propsText);
-    setIsAmqpPropsCopied(true);
-    setTimeout(() => setIsAmqpPropsCopied(false), 2000);
+    const ok = await copyToClipboard(propsText, {
+      showToast: true,
+      successMessage: t("global.copied") || "Đã sao chép",
+      duration: 1500,
+    });
+    if (ok) {
+      setIsAmqpPropsCopied(true);
+      setTimeout(() => setIsAmqpPropsCopied(false), 1500);
+    }
   };
 
-  const handleCopySingleProp = (key, val) => {
+  const handleCopySingleProp = async (key, val) => {
     if (val === null || val === undefined) return;
-    navigator.clipboard.writeText(String(val));
-    setCopiedPropKey(key);
-    setTimeout(() => setCopiedPropKey(null), 1500);
+    const ok = await copyToClipboard(String(val), {
+      showToast: true,
+      successMessage: t("global.copied") || "Đã sao chép",
+      duration: 1500,
+    });
+    if (ok) {
+      setCopiedPropKey(key);
+      setTimeout(() => setCopiedPropKey(null), 1500);
+    }
   };
 
   const getAmqpPropertiesData = (item) => {
@@ -399,11 +413,21 @@ const MessageView = () => {
     }
   };
 
-  const handleCopy = (text) => {
-    if (text) {
-      navigator.clipboard.writeText(text);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+  const handleCopy = async (text, fieldKey) => {
+    if (!text) return;
+    const ok = await copyToClipboard(String(text), {
+      showToast: true,
+      successMessage: t("global.copied") || "Đã sao chép",
+      duration: 1500,
+    });
+    if (ok) {
+      if (fieldKey) {
+        setCopiedField(fieldKey);
+        setTimeout(() => setCopiedField(null), 1500);
+      } else {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 1500);
+      }
     }
   };
 
@@ -797,14 +821,38 @@ const MessageView = () => {
                 {/* 1. KEY METADATA SUMMARY BAR */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 bg-white p-3.5 rounded-xl border border-slate-200 shadow-2xs shrink-0">
                   <div className="flex flex-col min-w-0">
-                    <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.origin")}:</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.origin")}:</span>
+                      {selectedItem.origin && (
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(selectedItem.origin, "origin")}
+                          className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                          title="Copy"
+                        >
+                          {copiedField === "origin" ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+                        </button>
+                      )}
+                    </div>
                     <span className="font-mono font-bold text-slate-900 text-sm truncate" title={selectedItem.origin || "-"}>
                       {selectedItem.origin || "-"}
                     </span>
                   </div>
 
                   <div className="flex flex-col min-w-0">
-                    <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.address")}:</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-slate-500 font-medium">{t("messages.drawer.fields.address")}:</span>
+                      {(selectedItem.amhsRecipients || selectedItem.address) && (
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(selectedItem.amhsRecipients || selectedItem.address, "address")}
+                          className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                          title="Copy"
+                        >
+                          {copiedField === "address" ? <Check size={12} className="text-emerald-600" /> : <Copy size={12} />}
+                        </button>
+                      )}
+                    </div>
                     <span className="font-mono font-bold text-indigo-700 text-xs truncate" title={selectedItem.amhsRecipients || selectedItem.address || "-"}>
                       {selectedItem.amhsRecipients || selectedItem.address || "-"}
                     </span>
@@ -908,11 +956,35 @@ const MessageView = () => {
                       <>
                         <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.messageId")}:</span>
-                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.messageId || "-"}>{selectedItem.messageId || "-"}</span>
+                          <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                            <span className="font-mono font-semibold text-slate-800 truncate text-right" title={selectedItem.messageId || "-"}>{selectedItem.messageId || "-"}</span>
+                            {selectedItem.messageId && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(selectedItem.messageId, "messageId")}
+                                className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                                title="Copy"
+                              >
+                                {copiedField === "messageId" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ipmId")}:</span>
-                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}>{selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}</span>
+                          <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                            <span className="font-mono font-semibold text-slate-800 truncate text-right" title={selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}>{selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}</span>
+                            {(selectedItem.ipmId || selectedItem.amhs_ipm_id) && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(selectedItem.ipmId || selectedItem.amhs_ipm_id, "ipmId")}
+                                className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                                title="Copy"
+                              >
+                                {copiedField === "ipmId" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.filingTime")}:</span>
@@ -955,7 +1027,17 @@ const MessageView = () => {
                         {selectedItem.subject && (
                           <div className="md:col-span-2 flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                             <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.subject")}:</span>
-                            <span className="font-mono font-semibold text-slate-800 text-right truncate flex-1" title={selectedItem.subject}>{selectedItem.subject}</span>
+                            <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                              <span className="font-mono font-semibold text-slate-800 text-right truncate" title={selectedItem.subject}>{selectedItem.subject}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(selectedItem.subject, "subject")}
+                                className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                                title="Copy"
+                              >
+                                {copiedField === "subject" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                              </button>
+                            </div>
                           </div>
                         )}
                       </>
@@ -963,11 +1045,35 @@ const MessageView = () => {
                       <>
                         <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.amhsId")}:</span>
-                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.amhsid || "-"}>{selectedItem.amhsid || "-"}</span>
+                          <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                            <span className="font-mono font-semibold text-slate-800 truncate text-right" title={selectedItem.amhsid || "-"}>{selectedItem.amhsid || "-"}</span>
+                            {selectedItem.amhsid && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(selectedItem.amhsid, "amhsId")}
+                                className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                                title="Copy"
+                              >
+                                {copiedField === "amhsId" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.ipmId")}:</span>
-                          <span className="font-mono font-semibold text-slate-800 truncate text-right flex-1" title={selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}>{selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}</span>
+                          <div className="flex items-center gap-1.5 min-w-0 flex-1 justify-end">
+                            <span className="font-mono font-semibold text-slate-800 truncate text-right" title={selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}>{selectedItem.ipmId || selectedItem.amhs_ipm_id || "-"}</span>
+                            {(selectedItem.ipmId || selectedItem.amhs_ipm_id) && (
+                              <button
+                                type="button"
+                                onClick={() => handleCopy(selectedItem.ipmId || selectedItem.amhs_ipm_id, "ipmId_x400")}
+                                className="text-slate-400 hover:text-slate-700 p-0.5 rounded cursor-pointer transition-colors"
+                                title="Copy"
+                              >
+                                {copiedField === "ipmId_x400" ? <Check size={11} className="text-emerald-600" /> : <Copy size={11} />}
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <div className="flex justify-between items-center py-1 border-b border-slate-100 gap-2 min-w-0">
                           <span className="text-slate-500 font-medium shrink-0">{t("messages.drawer.fields.filingTime")}:</span>

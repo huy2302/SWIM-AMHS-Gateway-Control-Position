@@ -264,5 +264,31 @@
       "vi": "Không thể loại bỏ cấu hình định tuyến",
       "en": "Failed to remove routing rule"
     }
+  },
+  "validation": {
+    "fillRequired": {
+      "vi": "Vui lòng điền đầy đủ các thông tin bắt buộc!",
+      "en": "Please fill in all required fields!"
+    },
+    "recipientsRequired": {
+      "vi": "Địa chỉ nhận (Recipients) không được để trống",
+      "en": "Recipients are required"
+    },
+    "sendTopicRequired": {
+      "vi": "Topic phát không được để trống",
+      "en": "Send topic is required"
+    },
+    "receiveTopicRequired": {
+      "vi": "Topic nhận không được để trống",
+      "en": "Receive topic is required"
+    },
+    "priorityRange": {
+      "vi": "Mức ưu tiên phải nằm trong khoảng từ 0 đến 255",
+      "en": "Priority must be between 0 and 255"
+    },
+    "invalidAftn": {
+      "vi": "Địa chỉ AFTN không hợp lệ (yêu cầu 8 ký tự chữ cái, ví dụ: VVNBZTZX)",
+      "en": "Invalid AFTN address format (must be 8 alphabetic characters, e.g. VVNBZTZX)"
+    }
   }
 }

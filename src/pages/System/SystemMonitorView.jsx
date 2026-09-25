@@ -131,34 +131,51 @@ const SystemMonitorView = () => {
               {t("systemMonitor.disks.title")}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {GatewayProcess.disks.map((disk, idx) => (
-                <div key={idx} className="border border-slate-100 rounded-xl p-4 bg-slate-50/30">
-                  <div className="flex justify-between items-start mb-3 pb-2 border-b border-slate-100">
-                    <div>
-                      <p className="text-xs font-bold text-slate-700">{disk.model || disk.name}</p>
-                      <p className="text-[10px] text-slate-400 font-medium">Serial: {disk.serial || "N/A"} | Size: {(disk.sizeBytes / (1024 * 1024 * 1024)).toFixed(1)} GB</p>
+              {GatewayProcess.disks.map((disk, idx) => {
+                const diskName = (!disk.model || disk.model.toLowerCase() === "unknown")
+                  ? (disk.name && disk.name.toLowerCase() !== "unknown" ? disk.name : `Physical Drive ${idx + 1}`)
+                  : disk.model;
+                const diskSerial = (!disk.serial || disk.serial.toLowerCase() === "unknown") ? "N/A" : disk.serial;
+                const diskSizeGb = disk.sizeBytes ? (disk.sizeBytes / (1024 * 1024 * 1024)).toFixed(1) : "0.0";
+
+                return (
+                  <div key={idx} className="border border-slate-100 rounded-xl p-4 bg-slate-50/30">
+                    <div className="flex justify-between items-start mb-3 pb-2 border-b border-slate-100">
+                      <div>
+                        <p className="text-xs font-bold text-slate-700">{diskName}</p>
+                        <p className="text-[10px] text-slate-400 font-medium">Serial: {diskSerial} | Size: {diskSizeGb} GB</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {disk.partitions && disk.partitions.map((part, pIdx) => {
+                        const totalGb = part.totalBytes > 0 ? (part.totalBytes / (1024 * 1024 * 1024)) : 0;
+                        const usedBytes = Math.max(0, (part.totalBytes || 0) - (part.freeBytes || 0));
+                        const usedGb = usedBytes / (1024 * 1024 * 1024);
+                        const percent = part.totalBytes > 0 
+                          ? Math.min(100, Math.max(0, (usedBytes / part.totalBytes) * 100))
+                          : 0;
+
+                        return (
+                          <div key={pIdx}>
+                            <div className="flex justify-between text-[11px] font-semibold text-slate-600 mb-1">
+                              <span>{t("systemMonitor.disks.partition")}{part.mountPoint || `Part ${pIdx + 1}`}</span>
+                              <span>{percent.toFixed(1)}% ({usedGb.toFixed(1)} GB / {totalGb.toFixed(1)} GB)</span>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-2">
+                              <div 
+                                className={`h-2 rounded-full transition-all duration-300 ${
+                                  percent > 90 ? "bg-rose-500" : percent > 75 ? "bg-amber-500" : "bg-emerald-500"
+                                }`}
+                                style={{ width: `${percent}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    {disk.partitions && disk.partitions.map((part, pIdx) => (
-                      <div key={pIdx}>
-                        <div className="flex justify-between text-[11px] font-semibold text-slate-600 mb-1">
-                          <span>{t("systemMonitor.disks.partition")}{part.mountPoint}</span>
-                          <span>{part.usedPercent?.toFixed(1)}% ({((part.totalBytes - part.freeBytes) / (1024 * 1024 * 1024)).toFixed(1)} GB / {(part.totalBytes / (1024 * 1024 * 1024)).toFixed(1)} GB)</span>
-                        </div>
-                        <div className="w-full bg-slate-100 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full transition-all duration-300 ${
-                              part.usedPercent > 90 ? "bg-rose-500" : part.usedPercent > 75 ? "bg-amber-500" : "bg-emerald-500"
-                            }`}
-                            style={{ width: `${Math.min(part.usedPercent, 100)}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -238,7 +255,7 @@ const ChartCard = ({ title, children, color, type, card }) => {
           </div>
         </div>
       ) : type === "MySQL_CPU" ? (
-        <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-100">
+        <div className="grid grid-cols-3 gap-3 mt-4 pt-4 border-t border-slate-100">
           <div>
             <h4 className="text-[9px] font-bold tracking-wider text-slate-400">{t("systemMonitor.info.mysql.dbCpuLoad")}</h4>
             <p className="text-sm font-extrabold text-slate-800 mt-0.5">{card?.cpuPercent >= 0 ? `${card.cpuPercent.toFixed(2)}%` : "0.00%"}</p>
@@ -246,6 +263,10 @@ const ChartCard = ({ title, children, color, type, card }) => {
           <div>
             <h4 className="text-[9px] font-bold tracking-wider text-slate-400">{t("systemMonitor.info.mysql.dbRamUsage")}</h4>
             <p className="text-sm font-mono font-extrabold text-slate-800 mt-0.5">{card?.ramPercent >= 0 ? `${card.ramPercent.toFixed(2)}%` : "0.00%"}</p>
+          </div>
+          <div>
+            <h4 className="text-[9px] font-bold tracking-wider text-slate-400">PROCESS ID</h4>
+            <p className="text-sm font-mono font-extrabold text-slate-800 mt-0.5">{card?.pid || card?.processId || "N/A"}</p>
           </div>
         </div>
       ) : null}
